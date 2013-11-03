@@ -5,7 +5,7 @@ Module to manage employment contract into Dolibarr.
 This Module add a page into user's configuration to manage employment contract.
 
 Need to modify statut of the constant MAIN_FEATURES_LEVEL at 1 (Experimental mode)
-Need Dolibarr 3.4.x (Not tested into previous version - At you own risk)
+Need Dolibarr 3.4.x (Not tested into previous version - At your own risk)
 
 INSTALL
 -------
