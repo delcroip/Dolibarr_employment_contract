@@ -167,7 +167,8 @@ class modemcontract extends DolibarrModules
 		$r=0;
 
 		// Add here entries to declare new menus
-		$this->menu[$r]=array(	'fk_menu'=>0,			// Put 0 if this is a top menu
+		/*
+    $this->menu[$r]=array(	'fk_menu'=>0,			// Put 0 if this is a top menu
 								'type'=>'top',			// This is a Top menu entry
 								'titre'=>'GRH',
 								'mainmenu'=>'grh',
@@ -180,12 +181,13 @@ class modemcontract extends DolibarrModules
 								'target'=>'',
 								'user'=>2);				// 0=Menu for internal users, 1=external users, 2=both
 		$r++;
-		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=grh',			// Put 0 if this is a top menu
+    */
+		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=hrm',			// Put 0 if this is a top menu
 								'type'=>'left',			// This is a Top menu entry
 								'titre'=>'ContractTitle',
-								'mainmenu'=>'grh',
+								'mainmenu'=>'hrm',
 								'leftmenu'=>'emcontract',
-								'url'=>'/emcontract/index.php?mainmenu=grh&leftmenu=emcontract',
+								'url'=>'/emcontract/index.php?mainmenu=hrm&leftmenu=emcontract',
 								'langs'=>'emcontract@emcontract',	// Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 								'position'=>100,
 								'enabled'=>'1',			// Define condition to show or hide menu entry. Use '$conf->mymodule->enabled' if entry must be visible if module is enabled.
@@ -193,12 +195,12 @@ class modemcontract extends DolibarrModules
 								'target'=>'',
 								'user'=>2);				// 0=Menu for internal users, 1=external users, 2=both
 		$r++;
-		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=grh,fk_leftmenu=emcontract',		// Use r=value where r is index key used for the parent menu entry (higher parent must be a top menu entry)
+		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=hrm,fk_leftmenu=emcontract',		// Use r=value where r is index key used for the parent menu entry (higher parent must be a top menu entry)
 								'type'=>'left',			// This is a Left menu entry
 								'titre'=>'MenuListContract',
-								'mainmenu'=>'grh',
+								'mainmenu'=>'hrm',
 								'leftmenu'=>'emcontract_list',
-								'url'=>'/emcontract/index.php?mainmenu=grh&action=request',
+								'url'=>'/emcontract/index.php?mainmenu=hrm&action=request',
 								'langs'=>'emcontract@emcontract',	// Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 								'position'=>101,
 								'enabled'=>'$conf->emcontract->enabled',			// Define condition to show or hide menu entry. Use '$conf->mymodule->enabled' if entry must be visible if module is enabled.
@@ -206,12 +208,12 @@ class modemcontract extends DolibarrModules
 								'target'=>'',
 								'user'=>2);				// 0=Menu for internal users, 1=external users, 2=both
 		$r++;
-		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=grh,fk_leftmenu=emcontract',		// Use r=value where r is index key used for the parent menu entry (higher parent must be a top menu entry)
+		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=hrm,fk_leftmenu=emcontract',		// Use r=value where r is index key used for the parent menu entry (higher parent must be a top menu entry)
 								'type'=>'left',			// This is a Left menu entry
 								'titre'=>'MenuAddContract',
-								'mainmenu'=>'grh',
+								'mainmenu'=>'hrm',
 								'leftmenu'=>'emcontract_add',
-								'url'=>'/emcontract/fiche.php?mainmenu=grh&action=add',
+								'url'=>'/emcontract/fiche.php?mainmenu=hrm&action=add',
 								'langs'=>'emcontract@emcontract',	// Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 								'position'=>102,
 								'enabled'=>'$conf->emcontract->enabled',			// Define condition to show or hide menu entry. Use '$conf->mymodule->enabled' if entry must be visible if module is enabled.
