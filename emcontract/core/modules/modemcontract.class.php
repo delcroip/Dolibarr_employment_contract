@@ -37,6 +37,7 @@ class modemcontract extends DolibarrModules
 	 */
 	function __construct($db)
 	{
+            global $langs,$conf;
 		$this->db = $db;
 
 		// Id for module (must be unique).
@@ -53,8 +54,8 @@ class modemcontract extends DolibarrModules
 		// Module description, used if translation string 'ModuleXXXDesc' not found (where XXX is value of numeric property 'numero' of module)
 		$this->description = "Module to manage employment contract";
 		// Possible values for version are: 'development', 'experimental', 'dolibarr' or version
-		$this->version = 'experimental';
-    $this->revision = '0.1.0';
+		$this->version = '0.1.0';
+               // $this->revision = '0.1.0';
 		// Key used in llx_const table to save module status enabled/disabled (where MYMODULE is value of property name of module in uppercase)
 		$this->const_name = 'MAIN_MODULE_'.strtoupper($this->name);
 		// Where to store the module in setup page (0=common,1=interface,2=others,3=very specific)
@@ -65,8 +66,9 @@ class modemcontract extends DolibarrModules
 		$this->picto='list';
 
 		// Defined if the directory /mymodule/inc/triggers/ contains triggers or not
-		$this->triggers = 0;
-
+		//PDE not sure it's still needed as trigger should be set in module part
+                //$this->triggers = 0;
+                $this->module_parts = array();
 		// Data directories to create when module is enabled.
 		// Example: this->dirs = array("/mymodule/temp");
 		$this->dirs = array();
@@ -79,7 +81,8 @@ class modemcontract extends DolibarrModules
 		// $this->config_page_url = array("admin_contract.php?leftmenu=setup@emcontract");
 
 		// Dependencies
-		$this->depends = array("modSociete");		// List of modules id that must be enabled if this module is enabled
+                $this->hidden = false;
+		$this->depends = array(/*"modSociete"*/);		// List of modules id that must be enabled if this module is enabled
 		$this->requiredby = array();	// List of modules id to disable if this one is disabled
 		$this->phpmin = array(5,0);					// Minimum version of PHP required by module
 		$this->need_dolibarr_version = array(3,4);	// Minimum version of Dolibarr required by module
@@ -167,10 +170,10 @@ class modemcontract extends DolibarrModules
 		$r=0;
 
 		// Add here entries to declare new menus
-		$this->menu[$r]=array(	'fk_menu'=>0,			// Put 0 if this is a top menu
+		/*$this->menu[$r]=array(	'fk_menu'=>0,			// Put 0 if this is a top menu
 								'type'=>'top',			// This is a Top menu entry
 								'titre'=>'GRH',
-								'mainmenu'=>'grh',
+								'mainmenu'=>'hrm',
 								'leftmenu'=>'emcontract',
 								'url'=>'/emcontract/index.php',
 								'langs'=>'emcontract@emcontract',	// Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
@@ -179,13 +182,13 @@ class modemcontract extends DolibarrModules
 								'perms'=>'$user->rights->emcontract->view',			// Use 'perms'=>'$user->rights->mymodule->level1->level2' if you want your menu with a permission rules
 								'target'=>'',
 								'user'=>2);				// 0=Menu for internal users, 1=external users, 2=both
-		$r++;
-		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=grh',			// Put 0 if this is a top menu
+		$r++;*/
+		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=hrm',			// Put 0 if this is a top menu
 								'type'=>'left',			// This is a Top menu entry
 								'titre'=>'ContractTitle',
-								'mainmenu'=>'grh',
+								'mainmenu'=>'hrm',
 								'leftmenu'=>'emcontract',
-								'url'=>'/emcontract/index.php?mainmenu=grh&leftmenu=emcontract',
+								'url'=>'/emcontract/index.php?mainmenu=hrm&leftmenu=emcontract',
 								'langs'=>'emcontract@emcontract',	// Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 								'position'=>100,
 								'enabled'=>'1',			// Define condition to show or hide menu entry. Use '$conf->mymodule->enabled' if entry must be visible if module is enabled.
@@ -193,12 +196,12 @@ class modemcontract extends DolibarrModules
 								'target'=>'',
 								'user'=>2);				// 0=Menu for internal users, 1=external users, 2=both
 		$r++;
-		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=grh,fk_leftmenu=emcontract',		// Use r=value where r is index key used for the parent menu entry (higher parent must be a top menu entry)
+		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=hrm,fk_leftmenu=emcontract',		// Use r=value where r is index key used for the parent menu entry (higher parent must be a top menu entry)
 								'type'=>'left',			// This is a Left menu entry
 								'titre'=>'MenuListContract',
-								'mainmenu'=>'grh',
+								'mainmenu'=>'hrm',
 								'leftmenu'=>'emcontract_list',
-								'url'=>'/emcontract/index.php?mainmenu=grh&action=request',
+								'url'=>'/emcontract/index.php?mainmenu=hrm&action=request',
 								'langs'=>'emcontract@emcontract',	// Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 								'position'=>101,
 								'enabled'=>'$conf->emcontract->enabled',			// Define condition to show or hide menu entry. Use '$conf->mymodule->enabled' if entry must be visible if module is enabled.
@@ -206,12 +209,12 @@ class modemcontract extends DolibarrModules
 								'target'=>'',
 								'user'=>2);				// 0=Menu for internal users, 1=external users, 2=both
 		$r++;
-		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=grh,fk_leftmenu=emcontract',		// Use r=value where r is index key used for the parent menu entry (higher parent must be a top menu entry)
+		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=hrm,fk_leftmenu=emcontract',		// Use r=value where r is index key used for the parent menu entry (higher parent must be a top menu entry)
 								'type'=>'left',			// This is a Left menu entry
 								'titre'=>'MenuAddContract',
-								'mainmenu'=>'grh',
+								'mainmenu'=>'hrm',
 								'leftmenu'=>'emcontract_add',
-								'url'=>'/emcontract/fiche.php?mainmenu=grh&action=add',
+								'url'=>'/emcontract/fiche.php?mainmenu=hrm&action=add',
 								'langs'=>'emcontract@emcontract',	// Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 								'position'=>102,
 								'enabled'=>'$conf->emcontract->enabled',			// Define condition to show or hide menu entry. Use '$conf->mymodule->enabled' if entry must be visible if module is enabled.
@@ -248,7 +251,7 @@ class modemcontract extends DolibarrModules
 	{
 		$sql = array();
 
-		$result=$this->load_tables();
+		$result=$this->_load_tables('/emcontract/sql/');
 
 		return $this->_init($sql);
 	}
@@ -268,18 +271,7 @@ class modemcontract extends DolibarrModules
 	}
 
 
-	/**
-	 *	Create tables, keys and data required by module
-	 * 	Files llx_table1.sql, llx_table1.key.sql llx_data.sql with create table, create keys
-	 * 	and create data commands must be stored in directory /mymodule/sql/
-	 *	This function is called by this->init.
-	 *
-	 * 	@return		int		<=0 if KO, >0 if OK
-	 */
-	function load_tables()
-	{
-		return $this->_load_tables('/emcontract/sql/');
-	}
+
 }
 
 ?>
