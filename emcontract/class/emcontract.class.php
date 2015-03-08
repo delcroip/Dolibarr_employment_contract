@@ -382,17 +382,17 @@ class Emcontract extends CommonObject
                 $tab_result[$i]['fk_user'] = $obj->fk_user;
                 $tab_result[$i]['datec'] = $this->db->jdate($obj->datec);
                 $tab_result[$i]['type_contract'] = $obj->type_contract;
-                $tab_result[$i]['date_dpae'] = $this->db->jdate($obj->date_dpae);
-                $tab_result[$i]['date_medicalexam'] = $this->db->jdate($obj->date_medicalexam);
-                $tab_result[$i]['date_sign_employee'] = $this->db->jdate($obj->date_sign_employee);
-                $tab_result[$i]['date_sign_management'] = $this->db->jdate($obj->date_sign_management);
+                $tab_result[$i]['date_dpae'] = ($obj->date_dpae='0000-00-00')?NULL:$this->db->jdate($obj->date_dpae);
+                $tab_result[$i]['date_medicalexam'] = ($obj->date_medicalexam='0000-00-00')?NULL:$this->db->jdate($obj->date_medicalexam);
+                $tab_result[$i]['date_sign_employee'] = ($obj->date_sign_employee='0000-00-00')?NULL:$this->db->jdate($obj->date_sign_employee);
+                $tab_result[$i]['date_sign_management'] = ($obj->date_sign_management='0000-00-00')?NULL:$this->db->jdate($obj->date_sign_management);
                 $tab_result[$i]['description'] = $obj->description;
-                $tab_result[$i]['date_start_contract'] = $this->db->jdate($obj->date_start_contract);
-                $tab_result[$i]['date_end_contract'] = $this->db->jdate($obj->date_end_contract);
+                $tab_result[$i]['date_start_contract'] = ($obj->date_start_contract='0000-00-00')?NULL:$this->db->jdate($obj->date_start_contract);
+                $tab_result[$i]['date_end_contract'] = ($obj->date_end_contract='0000-00-00')?NULL:$this->db->jdate($obj->date_end_contract);
                 
                 $tab_result[$i]['user_firstname'] = $obj->user_firstname;
                 $tab_result[$i]['user_lastname'] = $obj->user_lastname;
-
+                //dol_syslog(get_class($this)."::fetchAll date_end_contract=".$obj->date_end_contract, LOG_DEBUG);
                 $i++;
             }
             // Retourne 1 et ajoute le tableau à la variable
