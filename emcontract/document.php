@@ -73,29 +73,7 @@ $modulepart='emcontract';
  * Actions
  */
 
-if (GETPOST('sendit','alpha') && ! empty($conf->global->MAIN_UPLOAD_DOC))
-{
-	require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-
-	dol_add_file_process($upload_dir,0,1,'userfile');
-}
-
-// Delete
-else if ($action == 'confirm_deletefile' && $confirm == 'yes')
-{
-	if ($object->id > 0)
-	{
-		$langs->load("other");
-		$object->fetch_thirdparty();
-
-		$file = $upload_dir . '/' . GETPOST('urlfile');	// Do not use urldecode here ($_GET and $_REQUEST are already decoded by PHP).
-		$ret=dol_delete_file($file,0,0,0,$object);
-		if ($ret) setEventMessage($langs->trans("FileWasRemoved", GETPOST('urlfile')));
-		else setEventMessage($langs->trans("ErrorFailToDeleteFile", GETPOST('urlfile')), 'errors');
-		header('Location: '.$_SERVER["PHP_SELF"].'?id='.$id);
-		exit;
-	}
-}
+include_once DOL_DOCUMENT_ROOT . '/core/tpl/document_actions_pre_headers.tpl.php';
 
 
 /*
@@ -105,6 +83,7 @@ else if ($action == 'confirm_deletefile' && $confirm == 'yes')
 $form = new Form($db);
 
 llxHeader(array(),$langs->trans('ContractTitle'));
+
 
 if ($object->id)
 {
@@ -142,23 +121,10 @@ if ($object->id)
 
     print '</div>';
 
-    /*
-     * Confirmation suppression fichier
-     */
-    if ($action == 'delete')
-    {
-    	$ret=$form->form_confirm($_SERVER["PHP_SELF"].'?id='.$object->id.'&urlfile='.urlencode($_GET["urlfile"]), $langs->trans('DeleteFile'), $langs->trans('ConfirmDeleteFile'), 'confirm_deletefile', '', 0, 1);
-    	if ($ret == 'html') print '<br>';
-    }
-
-    // Affiche formulaire upload
-   	$formfile=new FormFile($db);
-	  $formfile->form_attach_new_file(DOL_URL_ROOT.'/emcontract/document.php?id='.$object->id,'',0,0,$user->rights->emcontract->add,50,$object);
-
-
-	// List of document
-	$param='&id='.$object->id;
-	$formfile->list_of_documents($filearray,$object,'emcontract',$param);
+    $modulepart = 'emcontract';
+    $permission = $user->rights->emcontract->add;
+    $param = '&id=' . $object->id;
+    include_once DOL_DOCUMENT_ROOT . '/core/tpl/document_actions_post_headers.tpl.php';
 
 }
 else
