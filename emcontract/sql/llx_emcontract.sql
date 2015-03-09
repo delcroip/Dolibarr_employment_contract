@@ -57,6 +57,8 @@ night_hours_start   	TIME DEFAULT "21:00:00",-- operand 6 |
 night_rate	      	integer default 1.5,	-- operand 7 |
 night_hours_stop	TIME DEFAULT "06:00:00",-- operand 8 |
 holiday_weekly_generated DECIMAL(3,2) DEFAULT 0.5, -- operand 9 |
+overtime_rate     integer DEFAULT 1.25, -- operand 10 |
+overtime_recup_only   BOOLEAN DEFAULT true, --operand 11 |
 fk_salary_method	integer,
 PRIMARY KEY (rowid),
 FOREIGN KEY (fk_salary_method) REFERENCES llx_emcontract_salary_method(rowid),
