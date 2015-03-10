@@ -82,6 +82,7 @@ operand_1_type	        integer NOT NULL, -- 0- value from emcontract operand, 1-
 operand_1_value	        DECIMAL(16,4), -- depending of the type, could be the number of the emcontract operand or a step or a pure value
 operand_2_type	        integer NOT NULL, -- 0- value from emcontract operand, 1- output of another step, 2- value
 operand_2_value	        DECIMAL(16,4), -- depending of the type, could be the number of the emcontract operand or a step or a pure value
+operator                integer NOT NULL, -- 0 +, 1 -, 2 x, 3 /
 accounting_account      integer,
 toshow		        BOOLEAN NOT NULL,
 PRIMARY KEY (rowid),
@@ -90,6 +91,13 @@ FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
 FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
 ) 
 ENGINE=innodb;
+
+-- calculed operand
+-- 16, sum of overtime month
+-- 17, sum of holiday generated during the month
+-- 18, sum of hours during the month
+-- 19, theoretical monthly salary (4.33*weekly hours*hourlyrate)
+-- 20
 
 
 CREATE TABLE llx_emcontract 
