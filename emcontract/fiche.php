@@ -47,6 +47,9 @@ if ($user->societe_id > 0) accessforbidden();
 
 $user_id = $user->id;
 $now=dol_now();
+$new=true;
+$editable=true;
+$em = new Emcontract($db);
 
 
 /*******************************************************************
@@ -56,7 +59,7 @@ $now=dol_now();
 // Si création de la demande
 if ($action == 'create')
 {
-	  $em = new Emcontract($db);
+
 
     // Si pas le droit de créer un contrat
     if(!$user->rights->emcontract->add)
@@ -72,7 +75,7 @@ if ($action == 'create')
     $date_sign_employee = dol_mktime(0, 0, 0, GETPOST('date_sign_employee_month'), GETPOST('date_sign_employee_day'), GETPOST('date_sign_employee_year'));
     $date_sign_management = dol_mktime(0, 0, 0, GETPOST('date_sign_management_month'), GETPOST('date_sign_management_day'), GETPOST('date_sign_management_year'));
     
-    $type_contract=GETPOST('type_contract');
+    $fk_emcontract_type=GETPOST('fk_emcontract_type');
 
     $fk_user = GETPOST('fk_user');
     $description = trim(GETPOST('description'));
@@ -101,7 +104,7 @@ if ($action == 'create')
     $em->date_sign_employee = $date_sign_employee;
     $em->date_sign_management = $date_sign_management;
     $em->fk_user_author = $fk_user_author;
-	  $em->type_contract = $type_contract;
+	  $em->fk_emcontract_type = $fk_emcontract_type;
 
     $verif = $em->create($fk_user_author);
 
@@ -120,8 +123,32 @@ if ($action == 'create')
 
 }
 
+if ($action == 'view')
+{
+    $new=false;
+    $editable=False;
+	  // Si pas le droit de modifier un contrat
+    if(!$user->rights->emcontract->view)
+    {
+        header('Location: fiche.php?action=request&error=CantUpdate');
+        exit;
+    }
+
+ 
+    if(isset($_GET['id'])){
+        $em->fetch($_GET['id']);
+    }else if(isset($_POST['contract_id'])){
+        $em->fetch($_POST['contract_id']);
+    }else{
+        header('Location: fiche.php?action=request&error=CantUpdate');//FIXME --> Can't View not Can't update
+        exit;   
+    }   
+ }
+
 if ($action == 'update')
 {
+    $new=false;
+    $editable=true;
 	  // Si pas le droit de modifier un contrat
     if(!$user->rights->emcontract->add)
     {
@@ -129,8 +156,15 @@ if ($action == 'update')
         exit;
     }
 
-    $em = new Emcontract($db);
-    $em->fetch($_POST['contract_id']);
+
+        if(isset($_GET['id'])){
+        $em->fetch($_GET['id']);
+    }else if(isset($_POST['contract_id'])){
+        $em->fetch($_POST['contract_id']);
+    }else{
+        header('Location: fiche.php?action=request&error=CantUpdate');//FIXME --> Can't View not Can't update
+        exit;   
+    }  
 
     if ($user->rights->emcontract->add)
     {
@@ -140,7 +174,7 @@ if ($action == 'update')
         $date_medicalexam = dol_mktime(0, 0, 0, GETPOST('date_medicalexam_month'), GETPOST('date_medicalexam_day'), GETPOST('date_medicalexam_year'));
         $date_sign_employee = dol_mktime(0, 0, 0, GETPOST('date_sign_employee_month'), GETPOST('date_sign_employee_day'), GETPOST('date_sign_employee_year'));
         $date_sign_management = dol_mktime(0, 0, 0, GETPOST('date_sign_management_month'), GETPOST('date_sign_management_day'), GETPOST('date_sign_management_year'));
-        $type_contract = GETPOST('type_contract');
+        $fk_emcontract_type = GETPOST('fk_emcontract_type');
         $description = trim($_POST['description']);
         $fk_user_modif = $user->id;
 
@@ -156,7 +190,7 @@ if ($action == 'update')
         $em->date_medicalexam = $date_medicalexam;
         $em->date_sign_employee = $date_sign_employee;
         $em->date_sign_management = $date_sign_management;
-        $em->type_contract = $type_contract;
+        $em->fk_emcontract_type = $fk_emcontract_type;
         $em->description = $description;
         $em->fk_user_modif = $fk_user_modif;
 
@@ -182,7 +216,7 @@ if ($action == 'update')
 
 if ($action == 'confirm_delete' && $confirm == "yes" && $user->rights->emcontract->delete)
 {
-    $em = new Emcontract($db);
+    
 
     $result=$em->delete($id);
     if ($result >= 0)
@@ -201,7 +235,7 @@ if ($action == 'confirm_delete' && $confirm == "yes" && $user->rights->emcontrac
  */
 
 $form = new Form($db);
-$em = new Emcontract($db);
+
 
 llxHeader(array(),$langs->trans('ContractTitle'));
 
@@ -269,7 +303,7 @@ if (empty($id) || $action == 'add' || $action == 'request')
         print '<tr>';
         print '<td width="25%" class="fieldrequired">'.$langs->trans("Employee").'</td>';
         print '<td colspan="3">';
-        print $form->select_dolusers($user->fk_user, "fk_user", 1, "", 0 );	// By default, hierarchical parent
+        print $form->select_dolusers($em->fk_user, "fk_user", $new, "", !$editable );	// By default, hierarchical parent
         print '</td>';
         print '</tr>';
         
@@ -277,8 +311,8 @@ if (empty($id) || $action == 'add' || $action == 'request')
         print '<tr>';
         print '<td width="25%" class="fieldrequired">'.$langs->trans("Typecontract").'</td>';
         print '<td colspan="3">';
-        //print $form->selectarray('type_contract', $listtype, GETPOST('type_contract'));
-        print $em->select_typec(GETPOST('type_contract','int'),'type_contract',0); /*FIXME*/
+        //print $form->selectarray('fk_emcontract_type', $listtype, GETPOST('fk_emcontract_type'));
+        print $em->select_typec(GETPOST('fk_emcontract_type','int'),'fk_emcontract_type',0); /*FIXME*/
         print '</td>';
         print '</tr>';
         
@@ -436,12 +470,12 @@ else
                 } 
                 print '>'.$langs->trans("Typecontract").'</td>';
                 if(!$edit) {
-                    print '<td colspan="3">'.$em->LibTypeContract($em->type_contract);
-//                    print '<td colspan="3">'.$em->type_contract;
+                    print '<td colspan="3">'.$em->LibTypeContract($em->fk_emcontract_type);
+//                    print '<td colspan="3">'.$em->fk_emcontract_type;
 			              print '</td>';
                 } else {
                     print '<td colspan="3">';
-                    print $em->select_typec($em->type_contract,'type_contract',0); /*FIXME*/
+                    print $em->select_typec($em->fk_emcontract_type,'fk_emcontract_type',0); /*FIXME*/
                     print '</td>';
                 }
                 print '</tr>';

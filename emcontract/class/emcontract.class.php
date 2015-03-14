@@ -52,7 +52,7 @@ class Emcontract extends CommonObject
     var $date_medicalexam='';
     var $date_sign_employee='';
     var $date_sign_management='';
-    var $type_contract='';
+    var $fk_emcontract_type='';
     var $fk_user_author;
     var $datem='';
     var $fk_user_modif;
@@ -110,7 +110,7 @@ class Emcontract extends CommonObject
         // User
         $sql.= "'".$this->fk_user."',";
         $sql.= " '".$this->db->idate($now)."',";
-        $sql.= " ".$this->type_contract.",";
+        $sql.= " ".$this->fk_emcontract_type.",";
         $sql.= " '".$this->db->idate($this->date_dpae)."',";
         $sql.= " '".$this->db->idate($this->date_medicalexam)."',";
         $sql.= " '".$this->db->idate($this->date_sign_employee)."',";
@@ -170,8 +170,8 @@ class Emcontract extends CommonObject
         $sql.= " em.rowid,";
         $sql.= " em.fk_user,";
         $sql.= " em.datec,";
-//        $sql.= " emt.description as type_contract,";
-        $sql.= " em.fk_encontract_type as type_contract,";
+//        $sql.= " emt.description as fk_emcontract_type,";
+        $sql.= " em.fk_emcontract_type,";
         $sql.= " em.date_dpae,";
         $sql.= " em.date_medicalexam,";
         $sql.= " em.date_sign_employee,";
@@ -201,7 +201,7 @@ class Emcontract extends CommonObject
                 $this->ref    = $obj->rowid;
                 $this->fk_user = $obj->fk_user;
                 $this->datec = $this->db->jdate($obj->datec);
-                $this->type_contract = $obj->type_contract;
+                $this->fk_emcontract_type = $obj->fk_emcontract_type;
                 $this->date_dpae = $this->db->jdate($obj->date_dpae);
                 $this->date_medicalexam = $this->db->jdate($obj->date_medicalexam);
                 $this->date_sign_employee = $this->db->jdate($obj->date_sign_employee);
@@ -241,7 +241,7 @@ class Emcontract extends CommonObject
         $sql.= " em.rowid,";
         $sql.= " em.fk_user,";
         $sql.= " em.datec,";
-        $sql.= " em.fk_emcontract_type as type_contract,";
+        $sql.= " em.fk_emcontract_type as fk_emcontract_type,";
         $sql.= " em.date_dpae,";
         $sql.= " em.date_medicalexam,";
         $sql.= " em.date_sign_employee,";
@@ -249,8 +249,8 @@ class Emcontract extends CommonObject
         $sql.= " em.description,";
         $sql.= " em.date_start_contract,";
         $sql.= " em.date_end_contract,";
-        
-		    $sql.= " uu.lastname as user_lastname,";
+        $sql.= " em.base_rate,";
+        $sql.= " uu.lastname as user_lastname,";
         $sql.= " uu.firstname as user_firstname";
 
         $sql.= " FROM ".MAIN_DB_PREFIX."emcontract as em, ".MAIN_DB_PREFIX."user as uu";
@@ -291,7 +291,7 @@ class Emcontract extends CommonObject
                 $tab_result[$i]['ref'] = $obj->rowid;
                 $tab_result[$i]['fk_user'] = $obj->fk_user;
                 $tab_result[$i]['datec'] = $this->db->jdate($obj->datec);
-                $tab_result[$i]['type_contract'] = $obj->type_contract;
+                $tab_result[$i]['fk_emcontract_type'] = $obj->fk_emcontract_type;
                 $tab_result[$i]['date_dpae'] = $this->db->jdate($obj->date_dpae);
                 $tab_result[$i]['date_medicalexam'] = $this->db->jdate($obj->date_medicalexam);
                 $tab_result[$i]['date_sign_employee'] = $this->db->jdate($obj->date_sign_employee);
@@ -302,6 +302,7 @@ class Emcontract extends CommonObject
 
                 $tab_result[$i]['user_firstname'] = $obj->user_firstname;
                 $tab_result[$i]['user_lastname'] = $obj->user_lastname;
+                $tab_result[$i]['base_rate'] = $obj->base_rate;
 
                 $i++;
             }
@@ -335,7 +336,7 @@ class Emcontract extends CommonObject
 
         $sql.= " em.fk_user,";
         $sql.= " em.datec,";
-        $sql.= " em.fk_emcontract_type as type_contract,";
+        $sql.= " em.fk_emcontract_type,";
         $sql.= " em.date_dpae,";
         $sql.= " em.date_medicalexam,";
         $sql.= " em.date_sign_employee,";
@@ -343,7 +344,7 @@ class Emcontract extends CommonObject
         $sql.= " em.description,";
         $sql.= " em.date_start_contract,";
         $sql.= " em.date_end_contract,";
-
+        $sql.= " em.base_rate,";
         $sql.= " uu.lastname as user_lastname,";
         $sql.= " uu.firstname as user_firstname";
 
@@ -384,7 +385,7 @@ class Emcontract extends CommonObject
                 $tab_result[$i]['ref'] = $obj->rowid;
                 $tab_result[$i]['fk_user'] = $obj->fk_user;
                 $tab_result[$i]['datec'] = $this->db->jdate($obj->datec);
-                $tab_result[$i]['type_contract'] = $obj->type_contract;
+                $tab_result[$i]['fk_emcontract_type'] = $obj->fk_emcontract_type;
                 $tab_result[$i]['date_dpae'] = $this->db->jdate($obj->date_dpae);
                 $tab_result[$i]['date_medicalexam'] = $this->db->jdate($obj->date_medicalexam);
                 $tab_result[$i]['date_sign_employee'] = $this->db->jdate($obj->date_sign_employee);
@@ -395,7 +396,7 @@ class Emcontract extends CommonObject
                 
                 $tab_result[$i]['user_firstname'] = $obj->user_firstname;
                 $tab_result[$i]['user_lastname'] = $obj->user_lastname;
-
+                $tab_result[$i]['base_rate'] = $obj->base_rate;
                 $i++;
             }
             // Retourne 1 et ajoute le tableau à la variable
@@ -458,8 +459,8 @@ class Emcontract extends CommonObject
         } else {
             $error++;
         }
-        if(!empty($this->type_contract) && is_numeric($this->type_contract)) {
-            $sql.= " type_contract = '".$this->type_contract."',";
+        if(!empty($this->fk_emcontract_type) && is_numeric($this->fk_emcontract_type)) {
+            $sql.= " fk_emcontract_type = '".$this->fk_emcontract_type."',";
         } else {
             $error++;
         }
@@ -574,7 +575,7 @@ class Emcontract extends CommonObject
 
     	$result='';
 
-    	$lien = '<a href="'.DOL_URL_ROOT.'/emcontract/fiche.php?id='.$this->id.'">';
+    	$lien = '<a href="'.DOL_URL_ROOT.'/emcontract/fiche.php?id='.$this->id.'&action=view">';
     	$lienfin='</a>';
 
     	$picto='emcontract@emcontract';
@@ -595,7 +596,7 @@ class Emcontract extends CommonObject
   	*	@param	int		$empty			Add empty value in list
   	*	@return	void
   	*/
-  	function select_typec($selected='', $htmlname='type_contract', $empty=0)
+  	function select_typec($selected='', $htmlname='fk_emcontract_type', $empty=0)
   	{
     	global $langs;
             $sql = ' SELECT emt.rowid, emt.description';
