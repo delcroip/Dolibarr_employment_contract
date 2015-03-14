@@ -155,7 +155,7 @@ if(!empty($search_employee) && $search_employee != -1) {
 
 // Type contract
 if(!empty($search_type_contract) && $search_type_contract != -1) {
-    $filter.= " AND em.type_contract = '".$db->escape($search_type_contract)."'\n";
+    $filter.= " AND em.fk_emcontract_type = '".$db->escape($search_type_contract)."'\n";
 }
 
 /*************************************
@@ -241,7 +241,7 @@ print '<tr class="liste_titre">';
 print_liste_field_titre($langs->trans("Ref"),$_SERVER["PHP_SELF"],"em.rowid","",'','',$sortfield,$sortorder);
 //print_liste_field_titre($langs->trans("DateCreate"),$_SERVER["PHP_SELF"],"em.datec","",'','align="center"',$sortfield,$sortorder);
 print_liste_field_titre($langs->trans("Employee"),$_SERVER["PHP_SELF"],"em.fk_user","",'','',$sortfield,$sortorder);
-print_liste_field_titre($langs->trans("Typecontract"),$_SERVER["PHP_SELF"],"em.type_contract","",'','',$sortfield,$sortorder);
+print_liste_field_titre($langs->trans("Typecontract"),$_SERVER["PHP_SELF"],"em.fk_emcontract_type","",'','',$sortfield,$sortorder);
 print_liste_field_titre($langs->trans("DateStart"),$_SERVER["PHP_SELF"],"em.date_start_contract","",'','align="center"',$sortfield,$sortorder);
 print_liste_field_titre($langs->trans("DateEnd"),$_SERVER["PHP_SELF"],"em.date_end_contract","",'','align="center"',$sortfield,$sortorder);
 print_liste_field_titre("&nbsp;");
@@ -316,7 +316,7 @@ if (! empty($emcontract->emcontract))
 		//print '<td style="text-align: center;">'.dol_print_date($infos_em['datec'],'day').'</td>';
 		print '<td>'.$userstatic->getNomUrl('1').'</td>';
 		//print '<td>'.$emcontractstatic->getNomUrl('1').'</td>';
-    print '<td>'.$em->LibTypeContract($infos_em['type_contract']).'</td>';
+    print '<td>'.$emcontractstatic->LibTypeContract($infos_em['type_contract']).'</td>';
 		print '<td align="center">'.dol_print_date($infos_em['date_start_contract'],'day').'</td>';
 		print '<td align="center">'.dol_print_date($infos_em['date_end_contract'],'day').'</td>';
 		print '<td>&nbsp;</td>';

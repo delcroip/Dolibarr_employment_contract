@@ -96,7 +96,7 @@ class Emcontract extends CommonObject
         $sql = "INSERT INTO ".MAIN_DB_PREFIX."emcontract(";
         $sql.= "fk_user,";
         $sql.= "datec,";
-        $sql.= "type_contract,";
+        $sql.= "fk_emcontract_type,";
         $sql.= "date_dpae,";
         $sql.= "date_medicalexam,";
         $sql.= "date_sign_employee,";
@@ -170,7 +170,8 @@ class Emcontract extends CommonObject
         $sql.= " em.rowid,";
         $sql.= " em.fk_user,";
         $sql.= " em.datec,";
-        $sql.= " em.type_contract,";
+//        $sql.= " emt.description as type_contract,";
+        $sql.= " em.fk_encontract_type as type_contract,";
         $sql.= " em.date_dpae,";
         $sql.= " em.date_medicalexam,";
         $sql.= " em.date_sign_employee,";
@@ -183,6 +184,8 @@ class Emcontract extends CommonObject
         $sql.= " em.fk_user_modif,";
         $sql.= " em.datem";
         $sql.= " FROM ".MAIN_DB_PREFIX."emcontract as em";
+//       $sql.= " JOIN ".MAIN_DB_PREFIX."emcontract_type as emt";
+//        $sql.= " ON em.fk_emcontract_type = emt.rowid";
         $sql.= " WHERE em.rowid = ".$id;
 
         dol_syslog(get_class($this)."::fetch sql=".$sql, LOG_DEBUG);
@@ -238,7 +241,7 @@ class Emcontract extends CommonObject
         $sql.= " em.rowid,";
         $sql.= " em.fk_user,";
         $sql.= " em.datec,";
-        $sql.= " em.type_contract,";
+        $sql.= " em.fk_emcontract_type as type_contract,";
         $sql.= " em.date_dpae,";
         $sql.= " em.date_medicalexam,";
         $sql.= " em.date_sign_employee,";
@@ -332,7 +335,7 @@ class Emcontract extends CommonObject
 
         $sql.= " em.fk_user,";
         $sql.= " em.datec,";
-        $sql.= " em.type_contract,";
+        $sql.= " em.fk_emcontract_type as type_contract,";
         $sql.= " em.date_dpae,";
         $sql.= " em.date_medicalexam,";
         $sql.= " em.date_sign_employee,";
@@ -595,34 +598,40 @@ class Emcontract extends CommonObject
   	function select_typec($selected='', $htmlname='type_contract', $empty=0)
   	{
     	global $langs;
-  
-  		print '<select class="flat" name="'.$htmlname.'">';
-      print '<option value="">&nbsp;</option>';
-      print '<option ';
-      if ($selected == 1) 
-      { 
-        print 'selected="selected"';
-      }
-      print ' value="1">'.$langs->trans("CDI").'</option>';
-      print '<option ';
-      if ($selected == 2) 
-      { 
-        print 'selected="selected"';
-      }
-      print ' value="2">'.$langs->trans("CDD").'</option>';
-      print '<option ';
-      if ($selected == 3) 
-      { 
-        print 'selected="selected"';
-      }
-      print ' value="3">'.$langs->trans("CA").'</option>';
-      print '<option ';
-      if ($selected == 4) 
-      { 
-        print 'selected="selected"';
-      }
-      print ' value="4">'.$langs->trans("CP").'</option>';
-  		print '</select>';
+            $sql = ' SELECT emt.rowid, emt.description';
+            $sql.= ' FROM '.MAIN_DB_PREFIX.'emcontract_type as emt';
+            if($conf->entity)
+                $sql.= ' WHERE emt.entity = '.$conf->entity;
+
+            dol_syslog(get_class($this).'::SelectType sql='.$sql);
+            $tabType=array();
+            $result = $this->db->query($sql);
+            
+            if ($result)
+            {
+                $numRows=$this->db->num_rows($result);
+                for($i=0;$i<$numRows;$i++)
+                {
+                         $obj = $this->db->fetch_object($result);
+                         $tabType[$obj->rowid]= $obj->description;
+                }
+                    
+            }else
+            {
+                    dol_print_error($this->db);
+            }
+            print '<select class="flat" name="'.$htmlname.'">';
+            print '<option value="">&nbsp;</option>';
+            foreach($tabType as $key => $value)
+            {
+                print '<option ';
+                if ($selected == $key) 
+                { 
+                  print 'selected="selected"';
+                }
+                print ' value="'.$key.'">'.$value.'</option>';               
+            }
+            print '</select>';
   	}
   
     /**
@@ -637,11 +646,29 @@ class Emcontract extends CommonObject
   	{
     	global $langs;
       
-      if ($libtc == 1) return $langs->trans('CDI');
-      if ($libtc == 2) return $langs->trans('CDD');
-      if ($libtc == 3) return $langs->trans('CA');
-      if ($libtc == 4) return $langs->trans('CP');
-    		
+            $sql = ' SELECT emt.description';
+            $sql.= ' FROM '.MAIN_DB_PREFIX.'emcontract_type as emt';
+            $sql.= ' WHERE emt.rowid= '.$libtc;
+            if($conf->entity)
+                $sql.= ' AND emt.entity = '.$conf->entity;
+
+            dol_syslog(get_class($this).'::TypeContract sql='.$sql);
+            $result = $this->db->query($sql);
+
+            if ($result)
+            {
+                    if ($this->db->num_rows($result))
+                    {
+                            $obj = $this->db->fetch_object($result);
+                            return $obj->description;
+                    }
+            }else
+            {
+                    dol_print_error($this->db);
+            }
+        
+
+        	
     	return $libtc;
     }
     

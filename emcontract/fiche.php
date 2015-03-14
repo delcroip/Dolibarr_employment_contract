@@ -30,7 +30,6 @@ if (! $res && file_exists("../main.inc.php")) $res=@include("../main.inc.php");
 if (! $res && file_exists("../../main.inc.php")) $res=@include("../../main.inc.php");
 if (! $res && file_exists("../../../main.inc.php")) $res=@include("../../../main.inc.php");
 if (! $res && file_exists("/var/www/dolibarr/htdocs/main.inc.php")) $res=@include "/var/www/dolibarr/htdocs/main.inc.php";     // Used on dev env only
-
 if (! $res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT.'/emcontract/class/emcontract.class.php';
@@ -279,7 +278,7 @@ if (empty($id) || $action == 'add' || $action == 'request')
         print '<td width="25%" class="fieldrequired">'.$langs->trans("Typecontract").'</td>';
         print '<td colspan="3">';
         //print $form->selectarray('type_contract', $listtype, GETPOST('type_contract'));
-        print $em->select_typec(GETPOST('type_contract','int'),'type_contract',0);
+        print $em->select_typec(GETPOST('type_contract','int'),'type_contract',0); /*FIXME*/
         print '</td>';
         print '</tr>';
         
@@ -438,10 +437,11 @@ else
                 print '>'.$langs->trans("Typecontract").'</td>';
                 if(!$edit) {
                     print '<td colspan="3">'.$em->LibTypeContract($em->type_contract);
+//                    print '<td colspan="3">'.$em->type_contract;
 			              print '</td>';
                 } else {
                     print '<td colspan="3">';
-                    print $em->select_typec($em->type_contract,'type_contract',0);
+                    print $em->select_typec($em->type_contract,'type_contract',0); /*FIXME*/
                     print '</td>';
                 }
                 print '</tr>';
