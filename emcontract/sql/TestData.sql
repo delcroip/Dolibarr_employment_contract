@@ -10,3 +10,9 @@ VALUE (NOW(), "Salaire brut","4","1","0","18","0","0","2","1","1")
 -- contract type
 INSERT INTO llx_emcontract_type (datec,type_contract,description,weekly_hours,fk_salary_method,fk_user_author)
 VALUE (NOW(),"1","CDI simple","35","4","1");
+
+INSERT INTO llx_emcontract_type (datec,type_contract,description,weekly_hours,fk_salary_method,fk_user_author)
+VALUE (NOW(),"2","CDD simple","35","4","1");
+
+INSERT INTO llx_emcontract_type (datec,type_contract,description,weekly_hours,fk_salary_method,fk_user_author)
+VALUE (NOW(),"1","Adminstateur Entreprise","35","4","1");
