@@ -56,7 +56,7 @@ class Emcontract extends CommonObject
     var $fk_user_author;
     var $datem='';
     var $fk_user_modif;
-
+    var $hourly_rate;
     var $emcontract = array();
     var $events = array();
     var $logs = array();
@@ -182,6 +182,7 @@ class Emcontract extends CommonObject
 
         $sql.= " em.fk_user_author,";
         $sql.= " em.fk_user_modif,";
+        $sql.= " em.base_rate,";
         $sql.= " em.datem";
         $sql.= " FROM ".MAIN_DB_PREFIX."emcontract as em";
 //       $sql.= " JOIN ".MAIN_DB_PREFIX."emcontract_type as emt";
@@ -212,6 +213,7 @@ class Emcontract extends CommonObject
                 $this->fk_user_author = $obj->fk_user_author;
                 $this->fk_user_modif = $obj->fk_user_modif;
                 $this->datem = $this->db->jdate($obj->datem);
+                $this->hourly_rate= $obj->base_rate;
             }
             $this->db->free($resql);
 
@@ -437,30 +439,45 @@ class Emcontract extends CommonObject
         if(!empty($this->date_end_contract)) {
             $sql.= " date_end_contract = '".$this->db->idate($this->date_end_contract)."',";
         } else {
-            $error++;
+            $sql.= " date_end_contract = NULL,";
+            //not mandatory
+            //$error++;
         }
         if(!empty($this->date_dpae)) {
             $sql.= " date_dpae = '".$this->db->idate($this->date_dpae)."',";
         } else {
-            $error++;
+             $sql.= " date_dpae = NULL,";
+            //not mandatory
+            //$error++;
         }
         if(!empty($this->date_medicalexam)) {
             $sql.= " date_medicalexam = '".$this->db->idate($this->date_medicalexam)."',";
         } else {
-            $error++;
+            $sql.= " date_medicalexam = NULL,";
+            //not mandatory
+            //$error++;
         }
         if(!empty($this->date_sign_employee)) {
             $sql.= " date_sign_employee = '".$this->db->idate($this->date_sign_employee)."',";
         } else {
-            $error++;
+            //not Mandaory
+            //$error++;
+            $sql.= " date_sign_employee = NULL,";
         }
         if(!empty($this->date_sign_management)) {
             $sql.= " date_sign_management = '".$this->db->idate($this->date_sign_management)."',";
         } else {
-            $error++;
+            //not mandatory
+            //$error++;
+            $sql.= " date_sign_management = NULL,";
         }
         if(!empty($this->fk_emcontract_type) && is_numeric($this->fk_emcontract_type)) {
             $sql.= " fk_emcontract_type = '".$this->fk_emcontract_type."',";
+        } else {
+            $error++;
+        }
+        if(!empty($this->hourly_rate) && is_numeric($this->fk_emcontract_type)) {
+            $sql.= " base_rate = '".$this->hourly_rate."',";
         } else {
             $error++;
         }
@@ -477,8 +494,8 @@ class Emcontract extends CommonObject
         
         $sql.= " datem= '".$this->db->idate($now)."',";
         
-        if(!empty($this->fk_user_modif)) {
-            $sql.= " fk_user_modif = '".$this->fk_user_modif."'";
+        if($user!=0){
+            $sql.= " fk_user_modif = '".$user."'";
         } else {
             $sql.= " fk_user_modif = NULL";
         }
@@ -489,15 +506,13 @@ class Emcontract extends CommonObject
 
         dol_syslog(get_class($this)."::update sql=".$sql, LOG_DEBUG);
         $resql = $this->db->query($sql);
-        if (! $resql) {
+        //check if the querry passed
+        //if ($this->db->lastqueryerror()==$this->db->lastquery()){
+        if(!$resql){
             $error++; $this->errors[]="Error ".$this->db->lasterror();
         }
 
-        if (! $error)
-        {
-
-        }
-
+   
         // Commit or rollback
         if ($error)
         {

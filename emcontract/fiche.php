@@ -78,7 +78,7 @@ if ($action == 'create')
     $date_medicalexam = dol_mktime(0, 0, 0, GETPOST('date_medicalexam_month'), GETPOST('date_medicalexam_day'), GETPOST('date_medicalexam_year'));
     $date_sign_employee = dol_mktime(0, 0, 0, GETPOST('date_sign_employee_month'), GETPOST('date_sign_employee_day'), GETPOST('date_sign_employee_year'));
     $date_sign_management = dol_mktime(0, 0, 0, GETPOST('date_sign_management_month'), GETPOST('date_sign_management_day'), GETPOST('date_sign_management_year'));
-    
+    $hourly_rate=GETPOST('hourlyrate');
     $fk_emcontract_type=GETPOST('fk_emcontract_type');
 
     $fk_user = GETPOST('fk_user');
@@ -109,7 +109,7 @@ if ($action == 'create')
     $em->date_sign_management = $date_sign_management;
     $em->fk_user_author = $fk_user_author;
 	  $em->fk_emcontract_type = $fk_emcontract_type;
-
+    $em->hourly_rate=$hourly_rate;
     $verif = $em->create($fk_user_author);
 
     // Si pas d'erreur SQL on redirige vers la fiche du contrat de travail
@@ -175,7 +175,8 @@ if ($action == 'update')
         $date_sign_employee = dol_mktime(0, 0, 0, GETPOST('date_sign_employee_month'), GETPOST('date_sign_employee_day'), GETPOST('date_sign_employee_year'));
         $date_sign_management = dol_mktime(0, 0, 0, GETPOST('date_sign_management_month'), GETPOST('date_sign_management_day'), GETPOST('date_sign_management_year'));
         $fk_emcontract_type = GETPOST('fk_emcontract_type');
-        $description = trim($_POST['description']);
+        $hourly_rate=GETPOST('hourly_rate');
+         $description = trim($_POST['description']);
         $fk_user_modif = $user->id;
 
         // Si pas de date de début
@@ -193,6 +194,7 @@ if ($action == 'update')
         $em->fk_emcontract_type = $fk_emcontract_type;
         $em->description = $description;
         $em->fk_user_modif = $fk_user_modif;
+        $em->hourly_rate=$hourly_rate;
 
       	// Update
       	$verif = $em->update($user->id);
@@ -233,7 +235,7 @@ if ($action == 'confirm_delete' && $confirm == "yes" && $user->rights->emcontrac
 /*
  * View
  */
-
+print '<script type="text/javascript" src="emcontract.js"></script>';
 $form = new Form($db);
 
 
@@ -248,6 +250,7 @@ if (empty($id) || $action == 'add' || $action == 'request')
     }
     else
     {
+        
         // Formulaire de demande de congés payés
         print_fiche_titre($langs->trans('MenuAddContract'));
 
@@ -269,26 +272,6 @@ if (empty($id) || $action == 'add' || $action == 'request')
             dol_htmloutput_mesg('',$errors,'error');
         }
 
-		  print '<script type="text/javascript">
-	    function valider()
-	    {
-    	    if(document.addcontract.date_start_contract_.value != "")
-    	    {
-	           	if(document.addcontract.usercontract.value != "-1") {
-	            return true;
-	            }
-	            else {
-	               alert("'.dol_escape_js($langs->transnoentities('InvalidUserContract')).'");
-	               return false;
-	            }
-	        }
-	        else
-	        {
-	           alert("'.dol_escape_js($langs->transnoentities('NoDateStart')).'");
-	           return false;
-	        }
-       	}
-       </script>'."\n";
 
         // Formulaire d'ajout de contrat
         print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'" onsubmit="return valider()" name="addcontract">'."\n";
@@ -310,10 +293,18 @@ if (empty($id) || $action == 'add' || $action == 'request')
         // Type of contract
         print '<tr>';
         print '<td width="25%" class="fieldrequired">'.$langs->trans("Typecontract").'</td>';
-        print '<td colspan="3">';
+        print '<td>';
         //print $form->selectarray('fk_emcontract_type', $listtype, GETPOST('fk_emcontract_type'));
         print $em->select_typec(GETPOST('fk_emcontract_type','int'),'fk_emcontract_type',0); /*FIXME*/
         print '</td>';
+        // hourly rate 
+        print '<td width="25%" class="fieldrequired">'.$langs->trans("Hourlyrate").'</td>';
+        print '<td >';
+        //print $form->selectarray('fk_emcontract_type', $listtype, GETPOST('fk_emcontract_type'));
+        print '<input name="hourly_rate" type="text" value="10" size="9"';
+        print ' onkeypress="return regexEvent(this,event)" />'; /*FIXME*/
+        print '</td>';      
+        
         print '</tr>';
         
         // Date Start
@@ -372,13 +363,13 @@ if (empty($id) || $action == 'add' || $action == 'request')
         print '</div>';
         
 
-        print '<center>';
+        print '<div align="center">';
          print '<input type="submit" value="'.$langs->trans("SendContract").'" name="bouton" class="button">';
         print '&nbsp; &nbsp; ';
         print '<input type="button" value="'.$langs->trans("Cancel").'" class="button" onclick="history.go(-1)">';
         
-        print '</center>';
-    print '</from>';
+        print '</div>';
+    print '</form>';
     }
 
 }
@@ -419,6 +410,26 @@ else
 
                 dol_htmloutput_mesg('',$errors,'error');
             }
+		  print '<script type="text/javascript">
+	    function valider()
+	    {
+    	    if(document.addcontract.date_start_contract_.value != "")
+    	    {
+	           	if(document.addcontract.usercontract.value != "-1") {
+	            return true;
+	            }
+	            else {
+	               alert("'.dol_escape_js($langs->transnoentities('InvalidUserContract')).'");
+	               return false;
+	            }
+	        }
+	        else
+	        {
+	           alert("'.dol_escape_js($langs->transnoentities('NoDateStart')).'");
+	           return false;
+	        }
+       	}
+       </script>'."\n";
 
             // On vérifie si l'utilisateur à le droit de lire cette demande
             if($user->id == $em->fk_user || $user->rights->emcontract->view->all)
@@ -472,14 +483,29 @@ else
                 } 
                 print '>'.$langs->trans("Typecontract").'</td>';
                 if(!$edit) {
-                    print '<td colspan="3">'.$em->LibTypeContract($em->fk_emcontract_type);
+                    print '<td >'.$em->LibTypeContract($em->fk_emcontract_type);
 //                    print '<td colspan="3">'.$em->fk_emcontract_type;
 			              print '</td>';
                 } else {
-                    print '<td colspan="3">';
+                    print '<td>';
                     print $em->select_typec($em->fk_emcontract_type,'fk_emcontract_type',0); /*FIXME*/
                     print '</td>';
                 }
+                
+                //Rate 
+                if(!$edit) {
+                    print '<td class="fieldrequired">'.$langs->trans("Hourlyrate").'</td>';
+                    print '<td>'.$em->hourly_rate;
+                    print '</td>';
+                } else {
+                    print '<td>'.$langs->trans("Hourlyrate").'</td>';
+                    print '<td>';
+                    print '<input name="hourly_rate" type="text" size="9"';
+                    print ' onkeypress="return regexEvent(this,event)"';
+                    print ' value='.$em->hourly_rate.' />'; /*FIXME*/
+                    print '</td>';
+                }
+                
                 print '</tr>';
                 
                 // Date Start Contract
