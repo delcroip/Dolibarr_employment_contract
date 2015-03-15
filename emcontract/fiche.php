@@ -48,9 +48,13 @@ if ($user->societe_id > 0) accessforbidden();
 $user_id = $user->id;
 $now=dol_now();
 $new=true;
-$editable=true;
+$edit=false;
 $em = new Emcontract($db);
-
+    if(isset($_POST['contract_id'])){
+        $id=$_POST['contract_id'];
+    }else if(isset($_GET['id'])){
+        $id=$_GET['id'];
+    }
 
 /*******************************************************************
  * Actions
@@ -126,7 +130,7 @@ if ($action == 'create')
 if ($action == 'view')
 {
     $new=false;
-    $editable=False;
+    $edit=False;
 	  // Si pas le droit de modifier un contrat
     if(!$user->rights->emcontract->view)
     {
@@ -135,10 +139,8 @@ if ($action == 'view')
     }
 
  
-    if(isset($_GET['id'])){
-        $em->fetch($_GET['id']);
-    }else if(isset($_POST['contract_id'])){
-        $em->fetch($_POST['contract_id']);
+if(isset($id)){
+        $em->fetch($id);
     }else{
         header('Location: fiche.php?action=request&error=CantUpdate');//FIXME --> Can't View not Can't update
         exit;   
@@ -147,8 +149,8 @@ if ($action == 'view')
 
 if ($action == 'update')
 {
-    $new=false;
-    $editable=true;
+//    $new=false;
+//    $editable=true;
 	  // Si pas le droit de modifier un contrat
     if(!$user->rights->emcontract->add)
     {
@@ -157,10 +159,8 @@ if ($action == 'update')
     }
 
 
-        if(isset($_GET['id'])){
-        $em->fetch($_GET['id']);
-    }else if(isset($_POST['contract_id'])){
-        $em->fetch($_POST['contract_id']);
+    if(isset($id)){
+        $em->fetch($id);
     }else{
         header('Location: fiche.php?action=request&error=CantUpdate');//FIXME --> Can't View not Can't update
         exit;   
@@ -180,7 +180,7 @@ if ($action == 'update')
 
         // Si pas de date de début
         if (empty($_POST['date_start_contract_'])) {
-          header('Location: fiche.php?id='.$_POST['contract_id'].'&action=edit&error=nostartdate');
+          header('Location: fiche.php?id='.$id.'&action=edit&error=nostartdate');
           exit;
         }
         
@@ -198,18 +198,18 @@ if ($action == 'update')
       	$verif = $em->update($user->id);
         if ($verif > 0)
         {
-          header('Location: fiche.php?id='.$_POST['contract_id']);
+          header('Location: fiche.php?id='.$id);
           exit;
         }
         else
         {
           // Sinon on affiche le formulaire de demande avec le message d'erreur SQL
-          header('Location: fiche.php?id='.$_POST['contract_id'].'&action=edit&error=SQL_Create&msg='.$em->error);
+          header('Location: fiche.php?id='.$id.'&action=edit&error=SQL_Create&msg='.$em->error);
           exit;
         }
     }
     else {
-        header('Location: fiche.php?id='.$_POST['contract_id']);
+        header('Location: fiche.php?id='.$id);
         exit;
     }
 }
@@ -303,7 +303,7 @@ if (empty($id) || $action == 'add' || $action == 'request')
         print '<tr>';
         print '<td width="25%" class="fieldrequired">'.$langs->trans("Employee").'</td>';
         print '<td colspan="3">';
-        print $form->select_dolusers($em->fk_user, "fk_user", $new, "", !$editable );	// By default, hierarchical parent
+        print $form->select_dolusers($em->fk_user, "fk_user", 1, "", 0 );	// By default, hierarchical parent
         print '</td>';
         print '</tr>';
         
@@ -370,13 +370,15 @@ if (empty($id) || $action == 'add' || $action == 'request')
         print '</table>';
         print '<div style="clear: both;"></div>';
         print '</div>';
-        print '</from>';
+        
 
         print '<center>';
-        print '<input type="submit" value="'.$langs->trans("SendContract").'" name="bouton" class="button">';
+         print '<input type="submit" value="'.$langs->trans("SendContract").'" name="bouton" class="button">';
         print '&nbsp; &nbsp; ';
         print '<input type="button" value="'.$langs->trans("Cancel").'" class="button" onclick="history.go(-1)">';
+        
         print '</center>';
+    print '</from>';
     }
 
 }
