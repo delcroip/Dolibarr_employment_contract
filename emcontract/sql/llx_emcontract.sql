@@ -20,7 +20,7 @@
 
 
 
-CREATE TABLE llx_ghr_salary_method
+CREATE TABLE llx_hr_salary_method
 (
 rowid                 	integer NOT NULL AUTO_INCREMENT,
 entity	              	integer DEFAULT 1 NOT NULL,		-- multi company id
