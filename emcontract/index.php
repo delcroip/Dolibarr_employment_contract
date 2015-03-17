@@ -68,7 +68,7 @@ $year_start           = GETPOST('year_start');
 $month_end            = GETPOST('month_end');
 $year_end             = GETPOST('year_end');
 $search_employee      = GETPOST('search_employee');
-$search_fk_emcontract_type = GETPOST('search_fk_emcontract_type');
+$search_fk_contract_type = GETPOST('search_fk_contract_type');
 
 /*
  * Actions
@@ -154,8 +154,8 @@ if(!empty($search_employee) && $search_employee != -1) {
 }
 
 // Type contract
-if(!empty($search_fk_emcontract_type) && $search_fk_emcontract_type != -1) {
-    $filter.= " AND em.fk_emcontract_type = '".$db->escape($search_fk_emcontract_type)."'\n";
+if(!empty($search_fk_contract_type) && $search_fk_contract_type != -1) {
+    $filter.= " AND em.fk_contract_type = '".$db->escape($search_fk_contract_type)."'\n";
 }
 
 /*************************************
@@ -241,7 +241,7 @@ print '<tr class="liste_titre">';
 print_liste_field_titre($langs->trans("Ref"),$_SERVER["PHP_SELF"],"em.rowid","",'','',$sortfield,$sortorder);
 //print_liste_field_titre($langs->trans("DateCreate"),$_SERVER["PHP_SELF"],"em.datec","",'','align="center"',$sortfield,$sortorder);
 print_liste_field_titre($langs->trans("Employee"),$_SERVER["PHP_SELF"],"em.fk_user","",'','',$sortfield,$sortorder);
-print_liste_field_titre($langs->trans("Typecontract"),$_SERVER["PHP_SELF"],"em.fk_emcontract_type","",'','',$sortfield,$sortorder);
+print_liste_field_titre($langs->trans("Typecontract"),$_SERVER["PHP_SELF"],"em.fk_contract_type","",'','',$sortfield,$sortorder);
 print_liste_field_titre($langs->trans("DateStart"),$_SERVER["PHP_SELF"],"em.date_start_contract","",'','align="center"',$sortfield,$sortorder);
 print_liste_field_titre($langs->trans("DateEnd"),$_SERVER["PHP_SELF"],"em.date_end_contract","",'','align="center"',$sortfield,$sortorder);
 print_liste_field_titre($langs->trans("Rate"),$_SERVER["PHP_SELF"],"em.base_rate","",'','align="center"',$sortfield,$sortorder);
@@ -273,7 +273,7 @@ else {
 
 // Type of contract
 print '<td class="liste_titre" colspan="1" align="left">';
-print $em->select_typec($search_fk_emcontract_type,'search_fk_emcontract_type',0);
+print $em->select_typec($search_fk_contract_type,'search_fk_contract_type',0);
 print '</td>';
         
 // Date Start
@@ -319,7 +319,7 @@ if (! empty($emcontract->emcontract))
 		//print '<td style="text-align: center;">'.dol_print_date($infos_em['datec'],'day').'</td>';
 		print '<td>'.$userstatic->getNomUrl('1').'</td>';
 		//print '<td>'.$emcontractstatic->getNomUrl('1').'</td>';
-    print '<td>'.$emcontractstatic->LibTypeContract($infos_em['fk_emcontract_type']).'</td>';
+    print '<td>'.$emcontractstatic->LibTypeContract($infos_em['fk_contract_type']).'</td>';
 		print '<td align="center">'.dol_print_date($infos_em['date_start_contract'],'day').'</td>';
 		print '<td align="center">'.dol_print_date($infos_em['date_end_contract'],'day').'</td>';
 		print '<td align="center">'.$infos_em['base_rate'].'</td>';

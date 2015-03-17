@@ -52,7 +52,7 @@ class Emcontract extends CommonObject
     var $date_medicalexam='';
     var $date_sign_employee='';
     var $date_sign_management='';
-    var $fk_emcontract_type='';
+    var $fk_contract_type='';
     var $fk_user_author;
     var $datem='';
     var $fk_user_modif;
@@ -93,10 +93,10 @@ class Emcontract extends CommonObject
         if (empty($this->fk_user) || ! is_numeric($this->fk_user) || $this->fk_user < 0) { $this->error="ErrorBadParameter"; return -1; }
         
         // Insert request
-        $sql = "INSERT INTO ".MAIN_DB_PREFIX."emcontract(";
+        $sql = "INSERT INTO ".MAIN_DB_PREFIX."hr_contract(";
         $sql.= "fk_user,";
         $sql.= "datec,";
-        $sql.= "fk_emcontract_type,";
+        $sql.= "fk_contract_type,";
         $sql.= "date_dpae,";
         $sql.= "date_medicalexam,";
         $sql.= "date_sign_employee,";
@@ -110,7 +110,7 @@ class Emcontract extends CommonObject
         // User
         $sql.= "'".$this->fk_user."',";
         $sql.= " '".$this->db->idate($now)."',";
-        $sql.= " ".$this->fk_emcontract_type.",";
+        $sql.= " ".$this->fk_contract_type.",";
         $sql.= " '".$this->db->idate($this->date_dpae)."',";
         $sql.= " '".$this->db->idate($this->date_medicalexam)."',";
         $sql.= " '".$this->db->idate($this->date_sign_employee)."',";
@@ -133,7 +133,7 @@ class Emcontract extends CommonObject
 
         if (! $error)
         {
-            $this->rowid = $this->db->last_insert_id(MAIN_DB_PREFIX."emcontract");
+            $this->rowid = $this->db->last_insert_id(MAIN_DB_PREFIX."hr_contract");
 
         }
 
@@ -170,8 +170,8 @@ class Emcontract extends CommonObject
         $sql.= " em.rowid,";
         $sql.= " em.fk_user,";
         $sql.= " em.datec,";
-//        $sql.= " emt.description as fk_emcontract_type,";
-        $sql.= " em.fk_emcontract_type,";
+//        $sql.= " emt.description as fk_contract_type,";
+        $sql.= " em.fk_contract_type,";
         $sql.= " em.date_dpae,";
         $sql.= " em.date_medicalexam,";
         $sql.= " em.date_sign_employee,";
@@ -184,9 +184,9 @@ class Emcontract extends CommonObject
         $sql.= " em.fk_user_modif,";
         $sql.= " em.base_rate,";
         $sql.= " em.datem";
-        $sql.= " FROM ".MAIN_DB_PREFIX."emcontract as em";
-//       $sql.= " JOIN ".MAIN_DB_PREFIX."emcontract_type as emt";
-//        $sql.= " ON em.fk_emcontract_type = emt.rowid";
+        $sql.= " FROM ".MAIN_DB_PREFIX."hr_contract as em";
+//       $sql.= " JOIN ".MAIN_DB_PREFIX."hr_contract_type as emt";
+//        $sql.= " ON em.fk_contract_type = emt.rowid";
         $sql.= " WHERE em.rowid = ".$id;
 
         dol_syslog(get_class($this)."::fetch sql=".$sql, LOG_DEBUG);
@@ -202,7 +202,7 @@ class Emcontract extends CommonObject
                 $this->ref    = $obj->rowid;
                 $this->fk_user = $obj->fk_user;
                 $this->datec = $this->db->jdate($obj->datec);
-                $this->fk_emcontract_type = $obj->fk_emcontract_type;
+                $this->fk_contract_type = $obj->fk_contract_type;
                 $this->date_dpae = $this->db->jdate($obj->date_dpae);
                 $this->date_medicalexam = $this->db->jdate($obj->date_medicalexam);
                 $this->date_sign_employee = $this->db->jdate($obj->date_sign_employee);
@@ -243,7 +243,7 @@ class Emcontract extends CommonObject
         $sql.= " em.rowid,";
         $sql.= " em.fk_user,";
         $sql.= " em.datec,";
-        $sql.= " em.fk_emcontract_type as fk_emcontract_type,";
+        $sql.= " em.fk_contract_type as fk_contract_type,";
         $sql.= " em.date_dpae,";
         $sql.= " em.date_medicalexam,";
         $sql.= " em.date_sign_employee,";
@@ -255,7 +255,7 @@ class Emcontract extends CommonObject
         $sql.= " uu.lastname as user_lastname,";
         $sql.= " uu.firstname as user_firstname";
 
-        $sql.= " FROM ".MAIN_DB_PREFIX."emcontract as em, ".MAIN_DB_PREFIX."user as uu";
+        $sql.= " FROM ".MAIN_DB_PREFIX."hr_contract as em, ".MAIN_DB_PREFIX."user as uu";
     		$sql.= " WHERE em.fk_user = uu.rowid"; // Hack pour la recherche sur le tableau
         $sql.= " AND em.fk_user = '".$user_id."'";
 
@@ -293,7 +293,7 @@ class Emcontract extends CommonObject
                 $tab_result[$i]['ref'] = $obj->rowid;
                 $tab_result[$i]['fk_user'] = $obj->fk_user;
                 $tab_result[$i]['datec'] = $this->db->jdate($obj->datec);
-                $tab_result[$i]['fk_emcontract_type'] = $obj->fk_emcontract_type;
+                $tab_result[$i]['fk_contract_type'] = $obj->fk_contract_type;
                 $tab_result[$i]['date_dpae'] = $this->db->jdate($obj->date_dpae);
                 $tab_result[$i]['date_medicalexam'] = $this->db->jdate($obj->date_medicalexam);
                 $tab_result[$i]['date_sign_employee'] = $this->db->jdate($obj->date_sign_employee);
@@ -338,7 +338,7 @@ class Emcontract extends CommonObject
 
         $sql.= " em.fk_user,";
         $sql.= " em.datec,";
-        $sql.= " em.fk_emcontract_type,";
+        $sql.= " em.fk_contract_type,";
         $sql.= " em.date_dpae,";
         $sql.= " em.date_medicalexam,";
         $sql.= " em.date_sign_employee,";
@@ -350,7 +350,7 @@ class Emcontract extends CommonObject
         $sql.= " uu.lastname as user_lastname,";
         $sql.= " uu.firstname as user_firstname";
 
-        $sql.= " FROM ".MAIN_DB_PREFIX."emcontract as em, ".MAIN_DB_PREFIX."user as uu";
+        $sql.= " FROM ".MAIN_DB_PREFIX."hr_contract as em, ".MAIN_DB_PREFIX."user as uu";
         $sql.= " WHERE em.fk_user = uu.rowid";
 
         // Filtrage de séléction
@@ -387,7 +387,7 @@ class Emcontract extends CommonObject
                 $tab_result[$i]['ref'] = $obj->rowid;
                 $tab_result[$i]['fk_user'] = $obj->fk_user;
                 $tab_result[$i]['datec'] = $this->db->jdate($obj->datec);
-                $tab_result[$i]['fk_emcontract_type'] = $obj->fk_emcontract_type;
+                $tab_result[$i]['fk_contract_type'] = $obj->fk_contract_type;
                 $tab_result[$i]['date_dpae'] = $this->db->jdate($obj->date_dpae);
                 $tab_result[$i]['date_medicalexam'] = $this->db->jdate($obj->date_medicalexam);
                 $tab_result[$i]['date_sign_employee'] = $this->db->jdate($obj->date_sign_employee);
@@ -429,7 +429,7 @@ class Emcontract extends CommonObject
         $now=dol_now();
 
         // Update request
-        $sql = "UPDATE ".MAIN_DB_PREFIX."emcontract SET";
+        $sql = "UPDATE ".MAIN_DB_PREFIX."hr_contract SET";
 
         if(!empty($this->date_start_contract)) {
             $sql.= " date_start_contract = '".$this->db->idate($this->date_start_contract)."',";
@@ -471,12 +471,12 @@ class Emcontract extends CommonObject
             //$error++;
             $sql.= " date_sign_management = NULL,";
         }
-        if(!empty($this->fk_emcontract_type) && is_numeric($this->fk_emcontract_type)) {
-            $sql.= " fk_emcontract_type = '".$this->fk_emcontract_type."',";
+        if(!empty($this->fk_contract_type) && is_numeric($this->fk_contract_type)) {
+            $sql.= " fk_contract_type = '".$this->fk_contract_type."',";
         } else {
             $error++;
         }
-        if(!empty($this->hourly_rate) && is_numeric($this->fk_emcontract_type)) {
+        if(!empty($this->hourly_rate) && is_numeric($this->fk_contract_type)) {
             $sql.= " base_rate = '".$this->hourly_rate."',";
         } else {
             $error++;
@@ -544,7 +544,7 @@ class Emcontract extends CommonObject
         global $conf, $langs;
         $error=0;
 
-        $sql = "DELETE FROM ".MAIN_DB_PREFIX."emcontract";
+        $sql = "DELETE FROM ".MAIN_DB_PREFIX."hr_contract";
         $sql.= " WHERE rowid=".$id;
 
         $this->db->begin();
@@ -611,11 +611,11 @@ class Emcontract extends CommonObject
   	*	@param	int		$empty			Add empty value in list
   	*	@return	void
   	*/
-  	function select_typec($selected='', $htmlname='fk_emcontract_type', $empty=0)
+  	function select_typec($selected='', $htmlname='fk_contract_type', $empty=0)
   	{
     	global $langs;
             $sql = ' SELECT emt.rowid, emt.description';
-            $sql.= ' FROM '.MAIN_DB_PREFIX.'emcontract_type as emt';
+            $sql.= ' FROM '.MAIN_DB_PREFIX.'hr_contract_type as emt';
             if($conf->entity)
                 $sql.= ' WHERE emt.entity = '.$conf->entity;
 
@@ -663,7 +663,7 @@ class Emcontract extends CommonObject
     	global $langs;
       
             $sql = ' SELECT emt.description';
-            $sql.= ' FROM '.MAIN_DB_PREFIX.'emcontract_type as emt';
+            $sql.= ' FROM '.MAIN_DB_PREFIX.'hr_contract_type as emt';
             $sql.= ' WHERE emt.rowid= '.$libtc;
             if($conf->entity)
                 $sql.= ' AND emt.entity = '.$conf->entity;
@@ -698,7 +698,7 @@ class Emcontract extends CommonObject
   	{
   		$sql = 'SELECT em.rowid, em.datec, em.fk_user_author, em.fk_user_modif,';
   		$sql.= ' em.datem';
-  		$sql.= ' FROM '.MAIN_DB_PREFIX.'emcontract as em';
+  		$sql.= ' FROM '.MAIN_DB_PREFIX.'hr_contract as em';
   		$sql.= ' WHERE em.rowid = '.$id;
   
   		dol_syslog(get_class($this).'::info sql='.$sql);

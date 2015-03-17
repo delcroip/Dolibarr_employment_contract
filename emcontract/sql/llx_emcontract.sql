@@ -20,7 +20,7 @@
 
 
 
-CREATE TABLE llx_emcontract_salary_method
+CREATE TABLE llx_ghr_salary_method
 (
 rowid                 	integer NOT NULL AUTO_INCREMENT,
 entity	              	integer DEFAULT 1 NOT NULL,		-- multi company id
@@ -37,7 +37,7 @@ ENGINE=innodb;
 
 
 
-CREATE TABLE llx_emcontract_type 
+CREATE TABLE llx_hr_contract_type 
 (
 rowid                 	integer NOT NULL AUTO_INCREMENT,
 entity	              	integer DEFAULT 1 NOT NULL,		-- multi company id
@@ -45,28 +45,32 @@ datec                 	DATETIME NOT NULL,
 datem		      	TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 type_contract         	integer NOT NULL,      -- 0- admin, 1- CDI, 2- CDD, 3- apprentissage , 4- stage ,,          
 description           	VARCHAR( 255 ) NOT NULL,
+employee_status         integer, -- cadre, assimilé cadre, non cadre, cadre dirigeant
 fk_user_author        	integer ,
 fk_user_modif         	integer ,
-weekly_hours	      	integer NOT NULL, -- operand 1 |
+weekly_hours	      	DECIMAL(5,3) NOT NULL, -- operand 1 |
 modulation_period      	integer DEFAULT 0, -- operand 2 | 0 - one week, 1- one month, 2- two month ...
 working_days           	integer DEFAULT 31, -- operand 3 | (2^0)=1- monday, (2^1)=2- tuesday, (2^2)=4- Wednesday ... ex M+T+W+T+F=1+2+4+8+16=31, 
 normal_rate_days     	integer DEFAULT 31, -- operand 4 |  all other worink day are regarded as days with an overrate
-daily_hours	      	integer Default 8, -- operand 5 | informative, could be used for the timesheet
+daily_hours	      	DECIMAL(5,3) DEFAULT 8, -- operand 5 | informative, could be used for the timesheet
 night_hours_start   	TIME DEFAULT "21:00:00",-- operand 6 |
-night_rate	      	integer default 1.5,	-- operand 7 |
+night_rate	      	DECIMAL(4,3) default 1.5,	-- operand 7 |
 night_hours_stop	TIME DEFAULT "06:00:00",-- operand 8 |
-holiday_weekly_generated DECIMAL(3,2) DEFAULT 0.5, -- operand 9 |
-overtime_rate     integer DEFAULT 1.25, -- operand 10 |
-overtime_recup_only   BOOLEAN DEFAULT true, --operand 11 |
+holiday_weekly_generated DECIMAL(4,3) DEFAULT 0.5, -- operand 9 |
+overtime_rate           DECIMAL((4,3) DEFAULT 1.25, -- operand 10 |
+overtime_recup_only     BOOLEAN DEFAULT true, --operand 11 |
+weekly_max_hours        DECIMAL(5,3) DEFAULT 48, -- operand 12 | for modulation calculation
+weekly_min_hours        DECIMAL(5,3) DEFAULT 16, -- operand 13 | for modulation calculation
+daily_max_hours         DECIMAL(5,3) Default 12, -- operand 14 | for timesheet 
 fk_salary_method	integer,
 PRIMARY KEY (rowid),
-FOREIGN KEY (fk_salary_method) REFERENCES llx_emcontract_salary_method(rowid),
+FOREIGN KEY (fk_salary_method) REFERENCES llx_hr_salary_method(rowid),
 FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
 FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
 ) 
 ENGINE=innodb;
 
-CREATE TABLE llx_emcontract_salary_steps
+CREATE TABLE llx_hr_salary_steps
 (
 rowid                   integer NOT NULL AUTO_INCREMENT,
 entity	                integer DEFAULT 1 NOT NULL,		-- multi company id
@@ -81,11 +85,11 @@ operand_1_type	        integer NOT NULL, -- 0- value from emcontract operand, 1-
 operand_1_value	        DECIMAL(16,4), -- depending of the type, could be the number of the emcontract operand or a step or a pure value
 operand_2_type	        integer NOT NULL, -- 0- value from emcontract operand, 1- output of another step, 2- value
 operand_2_value	        DECIMAL(16,4), -- depending of the type, could be the number of the emcontract operand or a step or a pure value
-operator                integer NOT NULL, -- 0 +, 1 -, 2 x, 3 /
+operator                integer NOT NULL, -- 0 +, 1 -, 2 x, 3 /, 4 %(modulo: rest de division)
 accounting_account      integer,
 toshow		        BOOLEAN NOT NULL,
 PRIMARY KEY (rowid),
-FOREIGN KEY (fk_salary_method) REFERENCES llx_emcontract_salary_method(rowid),
+FOREIGN KEY (fk_salary_method) REFERENCES llx_hr_salary_method(rowid),
 FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
 FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
 ) 
@@ -98,15 +102,67 @@ ENGINE=innodb;
 -- 19, theoretical monthly salary (4.33*weekly hours*hourlyrate)
 -- 20
 
+CREATE TABLE llx_hr_job_type 
+(
+rowid                 integer NOT NULL AUTO_INCREMENT,
+entity                integer DEFAULT 1 NOT NULL,		-- multi company id
+datec                 DATETIME NOT NULL,
+datem		      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,                
+description           VARCHAR( 255 ),
+fk_user_author        integer,
+fk_user_modif         integer, 
+base_rate             DECIMAL(8,4) NOT NULL, -- operand 0 |
+PRIMARY KEY (rowid),
+FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
+FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
+) 
+ENGINE=innodb;
 
-CREATE TABLE llx_emcontract 
+CREATE TABLE llx_hr_user_skills
+(
+rowid                 integer NOT NULL AUTO_INCREMENT,
+entity                integer DEFAULT 1 NOT NULL,		-- multi company id
+datec                 DATETIME NOT NULL,
+datem		      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,                
+description           VARCHAR( 255 ),
+fk_user_author        integer,
+fk_user_modif         integer, 
+fk_user               integer,
+PRIMARY KEY (rowid),
+FOREIGN KEY (fk_user) REFERENCES llx_user(rowid),
+FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
+FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
+) 
+ENGINE=innodb;
+
+CREATE TABLE llx_hr_job_skills
+(
+rowid                 integer NOT NULL AUTO_INCREMENT,
+entity                integer DEFAULT 1 NOT NULL,		-- multi company id
+datec                 DATETIME NOT NULL,
+datem		      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,                
+description           VARCHAR( 255 ),
+fk_user_author        integer,
+fk_user_modif         integer, 
+fk_job_type               integer,
+PRIMARY KEY (rowid),
+FOREIGN KEY (fk_user) REFERENCES llx_hr_job_type(rowid),
+FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
+FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
+) 
+ENGINE=innodb;
+
+
+CREATE TABLE llx_hr_contract 
 (
 rowid                 integer NOT NULL AUTO_INCREMENT,
 fk_user               integer NOT NULL,
 entity                integer DEFAULT 1 NOT NULL,		-- multi company id
 datec                 DATETIME NOT NULL,
 datem		      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,   
-fk_emcontract_type    integer,                 
+fk_contract_type    integer,   
+fk_job_type           integer, 
+fk_job_Location       integer,             
 date_dpae             date NULL,
 date_medicalexam      date NULL,
 date_sign_employee    date NULL,
@@ -117,10 +173,30 @@ date_end_contract     date NULL,
 fk_user_author        integer,
 fk_user_modif         integer, 
 base_rate             DECIMAL(8,4) NOT NULL, -- operand 0 |
+-- Health_insurance_number         VARCHAR(64), -- Should it be in llx_user or in llx_emcontract ?
 PRIMARY KEY (rowid),
-FOREIGN KEY (fk_emcontract_type ) REFERENCES llx_emcontract_type(rowid),
+FOREIGN KEY (fk_user) REFERENCES llx_user(rowid),
+FOREIGN KEY (fk_contract_type ) REFERENCES llx_hr_contract_type(rowid),
+FOREIGN KEY (fk_job_location ) REFERENCES llx_societe_address(rowid),
 FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
 FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
 ) 
 ENGINE=innodb;
 
+CREATE TABLE llx_hr_open_days
+{
+rowid                 integer NOT NULL AUTO_INCREMENT,
+entity                integer DEFAULT 1 NOT NULL,		-- multi company id
+datec                 DATETIME NOT NULL,
+datem		      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,                
+description           VARCHAR( 255 ),
+fk_user_author        integer,
+fk_user_modif         integer, 
+day_status            integer NOT NULL,  -- 0 open, 1 weekend, 2 national holiday, 3 other
+day_date              DATE not NULL,
+PRIMARY KEY (rowid),
+FOREIGN KEY (fk_user) REFERENCES llx_hr_job_type(rowid),
+FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
+FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
+) 
+ENGINE=innodb;

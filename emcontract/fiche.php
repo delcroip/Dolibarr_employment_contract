@@ -295,7 +295,7 @@ if (empty($id) || $action == 'add' || $action == 'request')
         print '<td width="25%" class="fieldrequired">'.$langs->trans("Typecontract").'</td>';
         print '<td>';
         //print $form->selectarray('fk_emcontract_type', $listtype, GETPOST('fk_emcontract_type'));
-        print $em->select_typec(GETPOST('fk_emcontract_type','int'),'fk_emcontract_type',0); /*FIXME*/
+        print $em->select_typec(GETPOST('fk_contract_type','int'),'fk_contract_type',0); /*FIXME*/
         print '</td>';
         // hourly rate 
         print '<td width="25%" class="fieldrequired">'.$langs->trans("Hourlyrate").'</td>';
