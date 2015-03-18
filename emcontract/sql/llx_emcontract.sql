@@ -57,7 +57,7 @@ night_hours_start   	TIME DEFAULT "21:00:00",-- operand 6 |
 night_rate	      	DECIMAL(4,3) default 1.5,	-- operand 7 |
 night_hours_stop	TIME DEFAULT "06:00:00",-- operand 8 |
 holiday_weekly_generated DECIMAL(4,3) DEFAULT 0.5, -- operand 9 |
-overtime_rate           DECIMAL((4,3) DEFAULT 1.25, -- operand 10 |
+overtime_rate           DECIMAL(4,3) DEFAULT 1.25, -- operand 10 |
 overtime_recup_only     BOOLEAN DEFAULT true, --operand 11 |
 weekly_max_hours        DECIMAL(5,3) DEFAULT 48, -- operand 12 | for modulation calculation
 weekly_min_hours        DECIMAL(5,3) DEFAULT 16, -- operand 13 | for modulation calculation
@@ -146,7 +146,7 @@ fk_user_author        integer,
 fk_user_modif         integer, 
 fk_job_type               integer,
 PRIMARY KEY (rowid),
-FOREIGN KEY (fk_user) REFERENCES llx_hr_job_type(rowid),
+FOREIGN KEY (fk_job_type) REFERENCES llx_hr_job_type(rowid),
 FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
 FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
 ) 
@@ -184,9 +184,9 @@ FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
 ENGINE=innodb;
 
 CREATE TABLE llx_hr_open_days
-{
+(
 rowid                 integer NOT NULL AUTO_INCREMENT,
-entity                integer DEFAULT 1 NOT NULL,		-- multi company id
+entity                integer DEFAULT 1 ,		-- multi company id
 datec                 DATETIME NOT NULL,
 datem		      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,                
 description           VARCHAR( 255 ),
@@ -194,9 +194,10 @@ fk_user_author        integer,
 fk_user_modif         integer, 
 day_status            integer NOT NULL,  -- 0 open, 1 weekend, 2 national holiday, 3 other
 day_date              DATE not NULL,
+fk_country            integer DEFAULT NULL, -- null if the country doesn't matter
 PRIMARY KEY (rowid),
-FOREIGN KEY (fk_user) REFERENCES llx_hr_job_type(rowid),
+FOREIGN KEY (fk_country) REFERENCES llx_c_pays(rowid),
 FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
 FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
-) 
+)
 ENGINE=innodb;
