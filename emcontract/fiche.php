@@ -78,8 +78,8 @@ if ($action == 'create')
     $date_medicalexam = dol_mktime(0, 0, 0, GETPOST('date_medicalexam_month'), GETPOST('date_medicalexam_day'), GETPOST('date_medicalexam_year'));
     $date_sign_employee = dol_mktime(0, 0, 0, GETPOST('date_sign_employee_month'), GETPOST('date_sign_employee_day'), GETPOST('date_sign_employee_year'));
     $date_sign_management = dol_mktime(0, 0, 0, GETPOST('date_sign_management_month'), GETPOST('date_sign_management_day'), GETPOST('date_sign_management_year'));
-    $hourly_rate=GETPOST('hourlyrate');
-    $fk_emcontract_type=GETPOST('fk_emcontract_type');
+    $hourly_rate=GETPOST('hourly_rate');
+    $fk_contract_type=GETPOST('fk_contract_type');
 
     $fk_user = GETPOST('fk_user');
     $description = trim(GETPOST('description'));
@@ -108,7 +108,7 @@ if ($action == 'create')
     $em->date_sign_employee = $date_sign_employee;
     $em->date_sign_management = $date_sign_management;
     $em->fk_user_author = $fk_user_author;
-	  $em->fk_emcontract_type = $fk_emcontract_type;
+	  $em->fk_contract_type = $fk_contract_type;
     $em->hourly_rate=$hourly_rate;
     $verif = $em->create($fk_user_author);
 
@@ -174,7 +174,7 @@ if ($action == 'update')
         $date_medicalexam = dol_mktime(0, 0, 0, GETPOST('date_medicalexam_month'), GETPOST('date_medicalexam_day'), GETPOST('date_medicalexam_year'));
         $date_sign_employee = dol_mktime(0, 0, 0, GETPOST('date_sign_employee_month'), GETPOST('date_sign_employee_day'), GETPOST('date_sign_employee_year'));
         $date_sign_management = dol_mktime(0, 0, 0, GETPOST('date_sign_management_month'), GETPOST('date_sign_management_day'), GETPOST('date_sign_management_year'));
-        $fk_emcontract_type = GETPOST('fk_emcontract_type');
+        $fk_contract_type = GETPOST('fk_contract_type');
         $hourly_rate=GETPOST('hourly_rate');
          $description = trim($_POST['description']);
         $fk_user_modif = $user->id;
@@ -191,7 +191,7 @@ if ($action == 'update')
         $em->date_medicalexam = $date_medicalexam;
         $em->date_sign_employee = $date_sign_employee;
         $em->date_sign_management = $date_sign_management;
-        $em->fk_emcontract_type = $fk_emcontract_type;
+        $em->fk_contract_type = $fk_contract_type;
         $em->description = $description;
         $em->fk_user_modif = $fk_user_modif;
         $em->hourly_rate=$hourly_rate;
@@ -216,19 +216,20 @@ if ($action == 'update')
     }
 }
 
-if ($action == 'confirm_delete' && $confirm == "yes" && $user->rights->emcontract->delete)
+if ($action == 'confirm_delete' && $user->rights->emcontract->delete)
 {
-    
-
-    $result=$em->delete($id);
-    if ($result >= 0)
-    {
-        header("Location: index.php");
-        exit;
-    }
-    else
-    {
-        $mesg=$em->error;
+    $confirm =GETPOST("confirm");
+    if($confirm =="yes"){
+        $result=$em->delete($id);
+        if ($result >= 0)
+        {
+            header("Location: index.php");
+            exit;
+        }
+        else
+        {
+            $mesg=$em->error;
+        }
     }
 }
 
@@ -294,13 +295,13 @@ if (empty($id) || $action == 'add' || $action == 'request')
         print '<tr>';
         print '<td width="25%" class="fieldrequired">'.$langs->trans("Typecontract").'</td>';
         print '<td>';
-        //print $form->selectarray('fk_emcontract_type', $listtype, GETPOST('fk_emcontract_type'));
+        //print $form->selectarray('fk_contract_type', $listtype, GETPOST('fk_contract_type'));
         print $em->select_typec(GETPOST('fk_contract_type','int'),'fk_contract_type',0); /*FIXME*/
         print '</td>';
         // hourly rate 
         print '<td width="25%" class="fieldrequired">'.$langs->trans("Hourlyrate").'</td>';
         print '<td >';
-        //print $form->selectarray('fk_emcontract_type', $listtype, GETPOST('fk_emcontract_type'));
+        //print $form->selectarray('fk_contract_type', $listtype, GETPOST('fk_contract_type'));
         print '<input name="hourly_rate" type="text" value="10" size="9"';
         print ' onkeypress="return regexEvent(this,event)" />'; /*FIXME*/
         print '</td>';      
@@ -483,12 +484,12 @@ else
                 } 
                 print '>'.$langs->trans("Typecontract").'</td>';
                 if(!$edit) {
-                    print '<td >'.$em->LibTypeContract($em->fk_emcontract_type);
-//                    print '<td colspan="3">'.$em->fk_emcontract_type;
+                    print '<td >'.$em->LibTypeContract($em->fk_contract_type);
+//                    print '<td colspan="3">'.$em->fk_contract_type;
 			              print '</td>';
                 } else {
                     print '<td>';
-                    print $em->select_typec($em->fk_emcontract_type,'fk_emcontract_type',0); /*FIXME*/
+                    print $em->select_typec($em->fk_contract_type,'fk_contract_type',0); /*FIXME*/
                     print '</td>';
                 }
                 

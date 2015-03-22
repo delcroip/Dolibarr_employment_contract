@@ -96,28 +96,48 @@ class Emcontract extends CommonObject
         $sql = "INSERT INTO ".MAIN_DB_PREFIX."hr_contract(";
         $sql.= "fk_user,";
         $sql.= "datec,";
+        if($this->fk_contract_type)
         $sql.= "fk_contract_type,";
-        $sql.= "date_dpae,";
-        $sql.= "date_medicalexam,";
-        $sql.= "date_sign_employee,";
-        $sql.= "date_sign_management,";
-        $sql.= "description,";
-        $sql.= "date_start_contract,";
-        $sql.= "date_end_contract,";
+        if($this->date_dpae)
+            $sql.= "date_dpae,";
+        if($this->date_medicalexam)
+            $sql.= "date_medicalexam,";
+        if($this->date_sign_employee)
+            $sql.= "date_sign_employee,";
+        if($this->date_sign_management)
+            $sql.= "date_sign_management,";
+        if($this->description)
+            $sql.= "description,";
+        if($this->date_start_contract)
+            $sql.= "date_start_contract,";
+        if($this->date_end_contract)
+            $sql.= "date_end_contract,";        
+        if($this->hourly_rate)
+            $sql.= "base_rate,";
         $sql.= "fk_user_author";
         $sql.= ") VALUES (";
 
         // User
         $sql.= "'".$this->fk_user."',";
         $sql.= " '".$this->db->idate($now)."',";
-        $sql.= " ".$this->fk_contract_type.",";
-        $sql.= " '".$this->db->idate($this->date_dpae)."',";
-        $sql.= " '".$this->db->idate($this->date_medicalexam)."',";
-        $sql.= " '".$this->db->idate($this->date_sign_employee)."',";
-        $sql.= " '".$this->db->idate($this->date_sign_management)."',";
-        $sql.= " '".$this->db->escape($this->description)."',";
-        $sql.= " '".$this->db->idate($this->date_start_contract)."',";
-        $sql.= " '".$this->db->idate($this->date_end_contract)."',";
+        if($this->fk_contract_type)
+            $sql.= " '".$this->fk_contract_type."',";
+        if($this->date_dpae)
+            $sql.= " '".$this->db->idate($this->date_dpae)."',";
+        if($this->date_medicalexam)
+            $sql.= " '".$this->db->idate($this->date_medicalexam)."',";
+        if($this->date_sign_employee)
+            $sql.= " '".$this->db->idate($this->date_sign_employee)."',";
+        if($this->date_sign_management)
+            $sql.= " '".$this->db->idate($this->date_sign_management)."',";
+        if($this->description)
+            $sql.= " '".$this->db->escape($this->description)."',";
+        if($this->date_start_contract)
+            $sql.= " '".$this->db->idate($this->date_start_contract)."',";
+        if($this->date_end_contract)
+            $sql.= " '".$this->db->idate($this->date_end_contract)."',";
+        if($this->hourly_rate)
+            $sql.= " '".$this->hourly_rate."',";
         
         $sql.= " '".$this->fk_user_author."'";
 
@@ -661,7 +681,7 @@ class Emcontract extends CommonObject
     function LibTypeContract($libtc)
   	{
     	global $langs;
-      
+        if($libtc){
             $sql = ' SELECT emt.description';
             $sql.= ' FROM '.MAIN_DB_PREFIX.'hr_contract_type as emt';
             $sql.= ' WHERE emt.rowid= '.$libtc;
@@ -682,7 +702,7 @@ class Emcontract extends CommonObject
             {
                     dol_print_error($this->db);
             }
-        
+        }
 
         	
     	return $libtc;
