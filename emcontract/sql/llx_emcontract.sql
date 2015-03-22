@@ -96,11 +96,14 @@ FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
 ENGINE=innodb;
 
 -- calculed operand
--- 16, sum of overtime month
+-- 16, number of weeks of the month
+
+
+-- 16, raw number of hours
 -- 17, sum of holiday generated during the month
 -- 18, sum of hours during the month
 -- 19, theoretical monthly salary (4.33*weekly hours*hourlyrate)
--- 20
+-- 20, theoretical monthly salary based on the real month weeks(NbWeeks*weekly hours*hourlyrate)
 
 CREATE TABLE llx_hr_job_type 
 (

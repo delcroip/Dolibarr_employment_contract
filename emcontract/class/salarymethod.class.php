@@ -133,22 +133,180 @@ class salarymethod {
      */
    function calculateOperands($user,$month,$year)
    {
-       if(!$month || !$year)
-           return -1;
-       //FIXME, JOIN needed with opendays
-        $sql='SELECT ptt.rowid, SUM(ptt.task_duration), WEEK(ptt.task_date)';
-        $sql.=' FROM llx_projet_task_time AS ptt';
-        $sql.=' WHERE ptt.fk_user="2"';
-        $sql.=' AND MONTH(ptt.task_date)="2"';
-        $sql.=' AND YEAR(ptt.task_date)="2015"';
-        $sql.=' GROUP BY WEEK(ptt.task_date)';
-        $sql.=' ORDER BY WEEK(ptt.task_date)'; 
+        if(!$user || !$month || !$year)
+            return -1;
+        $error=0;
+        
+        $error+=calculateNbWeeks($user,$month,$year);
+        if(error<0)
+            return $error;
+        $error+=calculateOvertime($user,$month,$year);
+        if(error<0)
+            return $error;
+        
+        
+
        
        
-       return $error;
+       return 1;
    }
+     /**
+     *	retrieve the first working day for the user, could be in the month before
+     *
+     *	@param		int			$user                   User row id
+     *	@param		int			$month                  month to calculate
+     *	@param		int			$year                   year to calculate
+     *  @param		string			$mode                   mode: theoric,raw, exact
+     *	@return		date						first wokring day
+     */
+ function getLastWorkingDay($user,$month,$year,$mode){
+       $lastDay=strtotime("last day of ".$month."/".$year);
+       if($mode=="exact"){
+            $lastDayWkNb=date('N',$lastDay)-1;
+            // test if the week of the last day should be handled
 
+            if($this->operands[3]-2^($lastDayWkNb)<0){ 
+                // week closed, should be handled        
+            }else{// week between two month, should be calculated during this month
+                $lastDay=strtotime("last sunday of ".$month."/".$year);
+            } 
+       }
+       return $lastDay;
+ }
+     /**
+     *	retrieve the last working day for the user
+     *
+     *	@param		int			$user                   User row id
+     *	@param		int			$month                  month to calculate
+     *	@param		int			$year                   year to calculate
+     *  @param		string			$mode                   mode: theoric,raw, exact
+     *	@return		date						last wokring day
+     */
+ function getFirstWorkingDay($user,$month,$year,$mode){
+       $firstDay=strtotime("first day of ".$month."/".$year);
+       if($mode=="exact"){
+            $firstDayWkNb=date('N',$firstDay)-1;
+            $nbWeeks=0;
+            //test if week of the first day should be handled
+            if($this->operands[3]%2^($firstDayWkNb)==0){//could be use as the first day of the week
 
+            }else if($this->operands[3]-2^($firstDayWkNb)<0){ 
+                 // week closed, should be handled by the previous nomth
+                $firstDay=strtotime("first monday of ".$month."/".$year);
+            }else{// week between two month, should be calculated during this month
+                $firstDay=strtotime("first monday of this week ",$firstDay);
+            } 
+       }
+       return $firstDay;
+ }
+      /**
+     *	retrieve the the number of weeks for an user between tzo date
+     *
+     *	@param		int			$user                   User row id
+     *	@param		date			$first day              month to calculate
+     *	@param		date			$last day               year to calculate
+     *  @param		string			$mode                   mode
+     *	@return		int						number of weeks
+     */
+ function getNbWeeks($user,$firstDay,$LastDay,$mode){
+         $nbWeeks=52/12;
+        if($mode=="exact"){
+            //using the day number to avid issue if the last day is before thursday in december
+            $nbWeeks=ciel((date('z',$lastDay)-date('z',$firstDay))/7);
+        }else if($mode=="raw"){
+           $nbWeeks=date('j',$lastDay)/7;
+        }
+       return $nbWeeks;
+ }
+      /**
+     *	Calculate the number of weeks in the month
+     *
+     *	@param		int			$user                   User row id
+     *	@param		int			$month                  month to calculate
+     *	@param		int			$year                   year to calculate
+     *	@return		int						1= sucess, -1 =failure
+     */
+ function calculateNbWeeks($user,$month,$year){
+        $firstDay=getFirstWorkingDay($user,$month,$year,HR_WEEKCALC);
+        $lastDay=getLastWorkingDay($user,$month,$year,HR_WEEKCALC);
+        $this->operands[16]=getNbWeeks($user,$firstDay,$LastDay,HR_WEEKCALC);
+ }
+ 
+ 
+      /**
+     *	Calculate the number of weeks in the month
+     *
+     *	@param		int			$user                   User row id
+     *	@param		int			$month                  month to calculate
+     *	@param		int			$year                   year to calculate
+     *	@return		int						1= sucess, -1 =failure
+     */ 
+ function calculateOvertime($user,$month,$year){
+        $firstDay=getFirstWorkingDay($user,$month,$year,"exact");
+        $lastDay=getLastWorkingDay($user,$month,$year,"exact");
+        $nbWeeks =getNbWeeks($user,$firstDay,$LastDay,"exact");
+        
+
+        
+ }
+ function fetchweeklyActuals($user,$yearWeek){
+        $weeklyActuals=0;
+        $sql = "SELECT SUM(ptt.task_duration)";	
+        $sql .= " FROM ".MAIN_DB_PREFIX."projet_task_time AS ptt";
+        $sql .= " WHERE ptt.fk_user='".$user."'";
+        $sql .= " AND (ptt.task_date>=FROM_UNIXTIME('".strtotime($yearWeek)."')) ";
+        $sql .= " AND (ptt.task_date<FROM_UNIXTIME('".strtotime($yearWeek.' + 7 days')."'));";
+        dol_syslog(get_class($this)."::fetchweeklyActuals sql=".$sql, LOG_DEBUG);
+        $resql=$this->db->query($sql);
+        if ($resql)
+        {
+                $num = $this->db->num_rows($resql);
+                if($num)
+                {
+                        $error=0;
+                        $weeklyActuals= $obj->task_duration/360000;
+                }
+                $this->db->free($resql);
+                return $weeklyActuals;
+         }
+        else
+        {
+                $this->error="Error ".$this->db->lasterror();
+                dol_syslog(get_class($this)."::fetchweeklyActuals".$this->error, LOG_ERR);
+                return -1;
+        }
+  
+        
+ }
+  function fetchweeklyHolidays($user,$yearWeek){
+      //
+        $sql = "SELECT hd.date_debut,hd.date_fin,hd.halfday";	
+        $sql .= " FROM ".MAIN_DB_PREFIX."holiday AS hd";
+        $sql .= " WHERE (hd.fk_user='".$user."'OR  hd.fk_user='0')"; //FIXME public holiday on admin
+        $sql .= " AND (hd.statut='3') ";
+        $sql .= " AND ((hd.date_fin>=FROM_UNIXTIME('".strtotime($yearWeek)."')) ";
+        $sql .= " OR (hd.date_debut<FROM_UNIXTIME('".strtotime($yearWeek.' + 7 days')."')));";
+        dol_syslog(get_class($this)."::fetchweeklyHolidays sql=".$sql, LOG_DEBUG);
+        $resql=$this->db->query($sql);
+        if ($resql) // FIXME
+        {
+                $num = $this->db->num_rows($resql);
+                for($i=0;$i<$num;$i++)
+                {
+                        $error=0;
+                        //FIXME find how many day of but don't count the public holiday as day off
+                        //$weeklyActuals= $obj->task_duration/360000;
+                }
+                $this->db->free($resql);
+                return $weeklyActuals;
+         }
+        else
+        {
+                $this->error="Error ".$this->db->lasterror();
+                dol_syslog(get_class($this)."::fetchweeklyHolidays".$this->error, LOG_ERR);
+                return -1;
+        }       
+ }
 }//end class
 
 
