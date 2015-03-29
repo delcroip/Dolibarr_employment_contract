@@ -233,30 +233,105 @@ class salarymethod {
  }
  
  
-      /**
-     *	Calculate the number of weeks in the month
-     *
-     *	@param		int			$user                   User row id
-     *	@param		int			$month                  month to calculate
-     *	@param		int			$year                   year to calculate
-     *	@return		int						1= sucess, -1 =failure
-     */ 
+
  function calculateOvertime($user,$month,$year){
-        $firstDay=getFirstWorkingDay($user,$month,$year,"exact");
-        $lastDay=getLastWorkingDay($user,$month,$year,"exact");
-        $nbWeeks =getNbWeeks($user,$firstDay,$LastDay,"exact");
-        
+  
+        $weeklyHours=$this->operands[1];
+        $dailyHours=$this->operands[5];
+        if(($weeklyHours<=0) || ($dailyHours<=0)) // if not set calculation not possible
+            return -1;
+        $actuals=0;
+        $holiday=0;
+        $overtime=0;
+        $workingDays=$this->operands[3];
+        $nbWkDays=0;
+        // calculate the number of possible working days
+         $MTWTFSS=sprintf( "%07d", decbin($openDays));
+        for($i=0;$i<7;$i++){
+            if($MTWTFSS[$i]==1)
+                $nbWkDays++;
+        }    
+        switch ($this->operands[2])
+        {
+            case 1:// if the modulation period is the month
+
+                    
+                //FIXME
+                break;
+            case 3:// if the modulation period is the quarter              
+                if($month%3==0){ // calculate only after the end of the quarter
+                    //FIXME
+                }
+                break;
+            case 6:// if the modulation period is the semester
+                if($month==6 ||$month==12){ // calculate only after the end of the semester
+                    //FIXME
+                }
+                break;
+            case 12:// if the modulation period is the year
+                if($month==12){ // calculate only after the end of the year
+                    //FIXME
+                }
+                break;
+
+            case 0:// if the modulation period is the week
+                $firstDay=getFirstWorkingDay($user,$month,$year,"exact");
+                $lastDay=getLastWorkingDay($user,$month,$year,"exact");
+                $nbWeeks =getNbWeeks($user,$firstDay,$LastDay,"exact");
+                for($i=0;$i<$nbWeeks;$i++)
+                {
+                    $lastDay=strtotime('next sunday',$firstDay);
+                    $actuals=fetchActuals($user,$firstDay,$lastDay);
+                    $holiday=fetchHoliday($user,$firstDay,$lastDay,$workingDays,1);
+                    if($actuals>=0 && $holiday>=0){
+                        //get the number of day that he should work
+                        //$nbWkDays=round($weeklyHours/$dailyHours);
+                        $expectedHours=($nbWkDays-$holiday)/$nbWkDays*$weeklyHours;
+                        //$expectedHours=$weeklyHours-$holiday*$dailyHours;
+                        //$expectedHours=($nbWkDays-$holiday)*$dailyHours;
+                        if($expectedHours<0){
+                            $expectedHours=0;
+                        }elseif ($expectedHours>$weeklyHours) {
+                            $expectedHours=$weeklyHours;
+                        }
+                       $overtime+=$actuals-($expectedHours);
+                    }else{
+                       $overtime=-1;
+                       break;
+                    }
+                    $firstDay=  strtotime('next monday',$firstDay);
+                    
+                }
+                break;
+  
+
+            default:
+                
+                break;
+        }
+        //FIXME
 
         
  }
- function fetchweeklyActuals($user,$yearWeek){
-        $weeklyActuals=0;
+ 
+       /**
+     *	fetch Actuals
+     *
+     *	@param		int			$user                   User row id
+     *	@param		date			$firstDay               first day of the assesement period
+     *	@param		date			$lastDay                first day of the assesement period
+     *	@return		int						number of hours worked this week
+     */ 
+ function fetchActuals($user,$firstDay,$lastDay){
+        if(empty($firstDay)||empty($user)||empty($lastDay))
+            return -1;
+        $actuals=0;
         $sql = "SELECT SUM(ptt.task_duration)";	
         $sql .= " FROM ".MAIN_DB_PREFIX."projet_task_time AS ptt";
         $sql .= " WHERE ptt.fk_user='".$user."'";
-        $sql .= " AND (ptt.task_date>=FROM_UNIXTIME('".strtotime($yearWeek)."')) ";
-        $sql .= " AND (ptt.task_date<FROM_UNIXTIME('".strtotime($yearWeek.' + 7 days')."'));";
-        dol_syslog(get_class($this)."::fetchweeklyActuals sql=".$sql, LOG_DEBUG);
+        $sql .= " AND (ptt.task_date>=FROM_UNIXTIME('".$firstDay."')) ";
+        $sql .= " AND (ptt.task_date<FROM_UNIXTIME('".strtotime($firstDay.' + 1 days')."'));";
+        dol_syslog(get_class($this)."::fetchActuals sql=".$sql, LOG_DEBUG);
         $resql=$this->db->query($sql);
         if ($resql)
         {
@@ -264,48 +339,109 @@ class salarymethod {
                 if($num)
                 {
                         $error=0;
-                        $weeklyActuals= $obj->task_duration/360000;
+                        $obj = $this->db->fetch_object($resql);
+                        $actuals= $obj->task_duration/360000;
                 }
                 $this->db->free($resql);
-                return $weeklyActuals;
+                return $actuals;
          }
         else
         {
                 $this->error="Error ".$this->db->lasterror();
-                dol_syslog(get_class($this)."::fetchweeklyActuals".$this->error, LOG_ERR);
+                dol_syslog(get_class($this)."::fetchActuals".$this->error, LOG_ERR);
                 return -1;
         }
   
         
  }
-  function fetchweeklyHolidays($user,$yearWeek){
+
+        /**
+     *	fetch holiday 
+     *
+     *	@param		int			$user                   User row id
+     *	@param		date			$firstDay               first day of the assesement period
+     *	@param		date			$lastDay                first day of the assesement period
+     *	@param		int			$openDays               Monday 2^0, Tuesday 2^1,   
+     *	@param		int			$publicHoliday          0 - don't fetch public holiday, 1- fetch it  
+     *	@return		int						number of hours worked this week
+     */ 
+ function fetchHolidays($user,$firstDay,$lastDay,$openDays,$publicHoliday=0){
       //
+        if(empty($yearWeek)||empty($user))
+            return -1;
+        //$firstDay=strtotime("monday of this week ",$yearWeek);
+        //$lastDay=strtotime("monday of next week ",$yearWeek);
+        $nbPHD=($publicHoliday)?fetchPublicHoliday($firstDay,$lastDay,$openDays):0;
         $sql = "SELECT hd.date_debut,hd.date_fin,hd.halfday";	
         $sql .= " FROM ".MAIN_DB_PREFIX."holiday AS hd";
-        $sql .= " WHERE (hd.fk_user='".$user."'OR  hd.fk_user='0')"; //FIXME public holiday on admin
+        $sql .= " WHERE hd.fk_user='".$user."'";
         $sql .= " AND (hd.statut='3') ";
         $sql .= " AND ((hd.date_fin>=FROM_UNIXTIME('".strtotime($yearWeek)."')) ";
         $sql .= " OR (hd.date_debut<FROM_UNIXTIME('".strtotime($yearWeek.' + 7 days')."')));";
-        dol_syslog(get_class($this)."::fetchweeklyHolidays sql=".$sql, LOG_DEBUG);
+        dol_syslog(get_class($this)."::fetchHolidays sql=".$sql, LOG_DEBUG);
         $resql=$this->db->query($sql);
-        if ($resql) // FIXME
+        $nbHD=0;
+        if ($resql)// FIXME remove not workingday
         {
+                $halfday=0;
                 $num = $this->db->num_rows($resql);
                 for($i=0;$i<$num;$i++)
                 {
                         $error=0;
-                        //FIXME find how many day of but don't count the public holiday as day off
-                        //$weeklyActuals= $obj->task_duration/360000;
+                        $obj = $this->db->fetch_object($resql);
+                        // define the limites of the holiday within the week
+                        if($obj->date_debut < $firstDay ){ //fixme need time not date
+                            $firstHoliday=$firstDay;
+                        }else{
+                            $firstHoliday=$obj->date_debut;
+                            if($obj->halfday==-1 ||$obj->halfday==2)
+                                $halfday++;
+                        }
+                        if($obj->date_fin > $lastDay ){ //fixme need time not date
+                            $lastHoliday=$lastDay;
+                        }else{
+                            $lastHoliday=$obj->date_debut;
+                            if($obj->halfday==1||$obj->halfday==2)
+                                $halfday++;
+                        }
+                        // count the days 
+                        $nbHDRaw=$firstHoliday->diff($lastHoliday)->format("%a");
+                        //remove the non woking days
+                        ////get the day (monday, tues ...) of hte first day
+                        $fday=$firstHoliday->format("%N");
+                        //transforn OpenDays to a string of bit first for monday ....
+                        $MTWTFSS=sprintf( "%07d", decbin($openDays));
+                        // remove the non open day from the vacation count
+                        for($i=$fday-1;$i<$nbHDRaw+$fday;$i++){
+                            if($MTWTFSS[$i%7]==0)
+                                $nbHDRaw--;
+                        }                      
+                        $nbHD+=$nbHDRaw;
+                        
+                        // remove the public holiday part of the holiday
+                        if($nbPHD)
+                           $nbPHD-=fetchPublicHoliday($firstHoliday,$lastHoliday,$openDays); 
                 }
                 $this->db->free($resql);
-                return $weeklyActuals;
+                return $nbHD+$nbPHD;
          }
         else
         {
                 $this->error="Error ".$this->db->lasterror();
-                dol_syslog(get_class($this)."::fetchweeklyHolidays".$this->error, LOG_ERR);
+                dol_syslog(get_class($this)."::fetchHolidays".$this->error, LOG_ERR);
                 return -1;
         }       
+ }
+     /**
+     *	fetch public holiday 
+     *
+     *	@param		date			$firstDay               first day of the assesement period
+     *	@param		date			$lastDay                first day of the assesement period
+     *	@return		int						number of public holiday
+     */ 
+ function fetchPublicHoliday($firstDay,$lastDay, $openDays){
+     $publicUser=0; // fixme
+     return fetchHolidays($publicUser,$firstDay,$lastDay,$openDays,0);
  }
 }//end class
 
