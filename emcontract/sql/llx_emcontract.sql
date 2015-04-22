@@ -22,7 +22,7 @@
 
 CREATE TABLE llx_hr_salary_method
 (
-rowid                 	integer NOT NULL AUTO_INCREMENT,
+rowid                 	integer NOT NULL DEFAULT AUTO_INCREMENT,
 entity	              	integer DEFAULT 1 NOT NULL,		-- multi company id
 datec                 	DATETIME NOT NULL,
 datem		      	TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,              
@@ -63,12 +63,15 @@ weekly_max_hours        DECIMAL(5,3) DEFAULT 48, -- operand 12 | for modulation 
 weekly_min_hours        DECIMAL(5,3) DEFAULT 16, -- operand 13 | for modulation calculation
 daily_max_hours         DECIMAL(5,3) Default 12, -- operand 14 | for timesheet 
 fk_salary_method	integer,
+sm_custom_field_1_value DECIMAL(16,4),
+sm_custom_field_2_value DECIMAL(16,4),
 PRIMARY KEY (rowid),
 FOREIGN KEY (fk_salary_method) REFERENCES llx_hr_salary_method(rowid),
 FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
 FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
 ) 
 ENGINE=innodb;
+
 
 CREATE TABLE llx_hr_salary_steps
 (
@@ -81,12 +84,18 @@ fk_user_modif           integer ,
 description             VARCHAR( 255 ) NOT NULL,
 fk_salary_method        integer NOT NULL,
 step		        integer NOT NULL,
-operand_1_type	        integer NOT NULL, -- 0- value from emcontract operand, 1- output of another step, 2- value
+operand_1_type	        ENUM ('value','step','operand','salary_method') default 'value' NOT NULL, -- 0- value from emcontract operand, 1- output of another step, 2- value
 operand_1_value	        DECIMAL(16,4), -- depending of the type, could be the number of the emcontract operand or a step or a pure value
-operand_2_type	        integer NOT NULL, -- 0- value from emcontract operand, 1- output of another step, 2- value
+operand_2_type	        ENUM ('value','step','operand','salary_method') default 'value' NOT NULL, -- 0- value from emcontract operand, 1- output of another step, 2- value
 operand_2_value	        DECIMAL(16,4), -- depending of the type, could be the number of the emcontract operand or a step or a pure value
-operator                integer NOT NULL, -- 0 +, 1 -, 2 x, 3 /, 4 %(modulo: rest de division)
+operator                ENUM ('plus','minus','mult','div','mod','slice','if','sup','inf','not','or','and','xor') NOT NULL, -- 0- value from emcontract operand, 1- output of another step, 2- value
+operand_3_type	        ENUM ('value','step','operand','salary_method') default 'value' NOT NULL, -- 0- value from emcontract operand, 1- output of another step, 2- value
+operand_3_value	        DECIMAL(16,4), -- depending of the type, could be the number of the emcontract operand or a step or a pure value
 accounting_account      integer,
+ct_custom_fields_1_desc varchar(255), -- contract type custom field  1 desc
+ct_custom_fields_2_desc varchar(255),-- contract type custom field  2 desc
+c_custom_fields_1_desc  varchar(255),-- contract custom field  1 desc
+c_custom_fields_2_desc  varchar(255),-- contract custom field  2 desc
 toshow		        BOOLEAN NOT NULL,
 PRIMARY KEY (rowid),
 FOREIGN KEY (fk_salary_method) REFERENCES llx_hr_salary_method(rowid),
@@ -120,6 +129,8 @@ FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
 FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
 ) 
 ENGINE=innodb;
+
+--contract event --> should document the trying periods, the period of 'non concurences'
 
 CREATE TABLE llx_hr_user_skills
 (
@@ -176,6 +187,9 @@ date_end_contract     date NULL,
 fk_user_author        integer,
 fk_user_modif         integer, 
 base_rate             DECIMAL(8,4) NOT NULL, -- operand 0 |
+motif                 varchar(), -- coulb be used for cdd
+custom_field_1_value DECIMAL(16,4),
+custom_field_2_value DECIMAL(16,4),
 -- Health_insurance_number         VARCHAR(64), -- Should it be in llx_user or in llx_emcontract ?
 PRIMARY KEY (rowid),
 FOREIGN KEY (fk_user) REFERENCES llx_user(rowid),
@@ -185,6 +199,22 @@ FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
 FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
 ) 
 ENGINE=innodb;
+
+CREATE TABLE llx_hr_contract_event -- use for try period, year vacancy, to document a contract update ...
+(
+rowid                 	integer NOT NULL AUTO_INCREMENT,
+entity	              	integer DEFAULT 1 NOT NULL,		-- multi company id
+datec                 	DATETIME NOT NULL,
+datem		      	TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+date_start              DATETIME NOT NULL,
+date_stop               DATETIME NOT NULL,
+title                   varchar(255) NOT NULL,
+description             varchar(2048),
+PRIMARY KEY (rowid),
+FOREIGN KEY (fk_contract) REFERENCES llx_hr_contract(rowid)
+) 
+ENGINE=innodb;
+
 
 CREATE TABLE llx_hr_open_days
 (
@@ -198,6 +228,24 @@ fk_user_modif         integer,
 day_status            integer NOT NULL,  -- 0 open, 1 weekend, 2 national holiday, 3 other
 day_date              DATE not NULL,
 fk_country            integer DEFAULT NULL, -- null if the country doesn't matter
+PRIMARY KEY (rowid),
+FOREIGN KEY (fk_country) REFERENCES llx_c_pays(rowid),
+FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
+FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
+)
+ENGINE=innodb;
+
+CREATE TABLE llx_hr_contract_event
+(
+rowid                 integer NOT NULL AUTO_INCREMENT,
+entity                integer DEFAULT 1 ,		-- multi company id
+datec                 DATETIME NOT NULL,
+datem		      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,                
+description           VARCHAR( 255 ),
+fk_user_author        integer,
+fk_user_modif         integer, 
+day_date              DATE not NULL,
+-- FIXME
 PRIMARY KEY (rowid),
 FOREIGN KEY (fk_country) REFERENCES llx_c_pays(rowid),
 FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
