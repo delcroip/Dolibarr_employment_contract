@@ -22,7 +22,7 @@
 
 CREATE TABLE llx_hr_salary_method
 (
-rowid                 	integer NOT NULL DEFAULT AUTO_INCREMENT,
+rowid                 	integer AUTO_INCREMENT,
 entity	              	integer DEFAULT 1 NOT NULL,		-- multi company id
 datec                 	DATETIME NOT NULL,
 datem		      	TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,              
@@ -187,7 +187,7 @@ date_end_contract     date NULL,
 fk_user_author        integer,
 fk_user_modif         integer, 
 base_rate             DECIMAL(8,4) NOT NULL, -- operand 0 |
-motif                 varchar(), -- coulb be used for cdd
+motif                 varchar(2048), -- coulb be used for cdd
 custom_field_1_value DECIMAL(16,4),
 custom_field_2_value DECIMAL(16,4),
 -- Health_insurance_number         VARCHAR(64), -- Should it be in llx_user or in llx_emcontract ?
@@ -206,12 +206,17 @@ rowid                 	integer NOT NULL AUTO_INCREMENT,
 entity	              	integer DEFAULT 1 NOT NULL,		-- multi company id
 datec                 	DATETIME NOT NULL,
 datem		      	TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+fk_user_author          integer,
+fk_user_modif           integer,  
+fk_contract             integer,
 date_start              DATETIME NOT NULL,
 date_stop               DATETIME NOT NULL,
 title                   varchar(255) NOT NULL,
 description             varchar(2048),
 PRIMARY KEY (rowid),
-FOREIGN KEY (fk_contract) REFERENCES llx_hr_contract(rowid)
+FOREIGN KEY (fk_contract) REFERENCES llx_hr_contract(rowid),
+FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
+FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
 ) 
 ENGINE=innodb;
 
@@ -235,20 +240,3 @@ FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
 )
 ENGINE=innodb;
 
-CREATE TABLE llx_hr_contract_event
-(
-rowid                 integer NOT NULL AUTO_INCREMENT,
-entity                integer DEFAULT 1 ,		-- multi company id
-datec                 DATETIME NOT NULL,
-datem		      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,                
-description           VARCHAR( 255 ),
-fk_user_author        integer,
-fk_user_modif         integer, 
-day_date              DATE not NULL,
--- FIXME
-PRIMARY KEY (rowid),
-FOREIGN KEY (fk_country) REFERENCES llx_c_pays(rowid),
-FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
-FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
-)
-ENGINE=innodb;
