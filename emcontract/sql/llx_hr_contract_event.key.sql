@@ -20,7 +20,7 @@
 
 
 
-ALTER TABLE llx_hr_contract_event  ADD 
-FOREIGN KEY (fk_contract) REFERENCES llx_hr_contract(rowid)
-FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
-FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
+ALTER TABLE llx_hr_contract_event 
+ADD FOREIGN KEY (fk_contract) REFERENCES llx_hr_contract(rowid)
+ADD FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
+ADD FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)

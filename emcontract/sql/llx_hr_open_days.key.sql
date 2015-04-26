@@ -18,7 +18,7 @@
 -- HR Revision 0.1.0
 
 
-ALTER TABLE llx_hr_open_days ADD
-FOREIGN KEY (fk_country) REFERENCES llx_c_pays(rowid),
-FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
-FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
+ALTER TABLE llx_hr_open_days
+ADD FOREIGN KEY (fk_country) REFERENCES llx_c_pays(rowid),
+ADD FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
+ADD FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)

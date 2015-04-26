@@ -18,6 +18,6 @@
 -- HR Revision 0.1.0
 
 
-ALTER TABLE llx_hr_job_type  ADD
-FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
-FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
+ALTER TABLE llx_hr_job_type 
+ADD FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
+ADD FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)

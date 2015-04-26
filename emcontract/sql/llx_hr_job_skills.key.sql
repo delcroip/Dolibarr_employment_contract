@@ -19,7 +19,7 @@
 
 
 
-ALTER TABLE llx_hr_job_skills ADD
-FOREIGN KEY (fk_job_type) REFERENCES llx_hr_job_type(rowid),
-FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
-FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
+ALTER TABLE llx_hr_job_skills
+ADD FOREIGN KEY (fk_job_type) REFERENCES llx_hr_job_type(rowid),
+ADD FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
+ADD FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)

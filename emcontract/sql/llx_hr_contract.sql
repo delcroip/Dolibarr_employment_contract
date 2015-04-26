@@ -18,10 +18,6 @@
 -- ===================================================================
 -- HR Revision 0.1.0
 
-
-
-
-
 CREATE TABLE llx_hr_contract 
 (
 rowid                 integer NOT NULL AUTO_INCREMENT,
@@ -42,10 +38,9 @@ date_end_contract     date NULL,
 fk_user_author        integer,
 fk_user_modif         integer, 
 base_rate             DECIMAL(8,4) NOT NULL, -- operand 0 |
-motif                 varchar(), -- coulb be used for cdd
+motif                 varchar(2048), -- coulb be used for cdd
 custom_field_1_value DECIMAL(16,4),
 custom_field_2_value DECIMAL(16,4),
--- Health_insurance_number         VARCHAR(64), -- Should it be in llx_user or in llx_emcontract ?
 PRIMARY KEY (rowid)
 ) 
 ENGINE=innodb;
