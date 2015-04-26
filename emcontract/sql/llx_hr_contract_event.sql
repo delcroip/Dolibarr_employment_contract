@@ -31,11 +31,6 @@ date_start              DATETIME NOT NULL,
 date_stop               DATETIME NOT NULL,
 title                   varchar(255) NOT NULL,
 description             varchar(2048),
-PRIMARY KEY (rowid),
-FOREIGN KEY (fk_contract) REFERENCES llx_hr_contract(rowid)
-FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
-FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
+PRIMARY KEY (rowid)
 ) 
 ENGINE=innodb;
-
-

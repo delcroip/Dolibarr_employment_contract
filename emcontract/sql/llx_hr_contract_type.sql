@@ -48,13 +48,10 @@ overtime_recup_only     BOOLEAN DEFAULT true, --operand 11 |
 weekly_max_hours        DECIMAL(5,3) DEFAULT 48, -- operand 12 | for modulation calculation
 weekly_min_hours        DECIMAL(5,3) DEFAULT 16, -- operand 13 | for modulation calculation
 daily_max_hours         DECIMAL(5,3) Default 12, -- operand 14 | for timesheet 
-fk_salary_method	integer,
-sm_custom_field_1_value DECIMAL(16,4),
-sm_custom_field_2_value DECIMAL(16,4),
-PRIMARY KEY (rowid),
-FOREIGN KEY (fk_salary_method) REFERENCES llx_hr_salary_method(rowid),
-FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
-FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
+fk_salary_method	integer, -- foreigner key to document which salary mehode should be used
+sm_custom_field_1_value DECIMAL(16,4), -- value a a custom fields 1, the description depends on the salary methods
+sm_custom_field_2_value DECIMAL(16,4), -- value a a custom fields 1, the description depends on the salary methods
+PRIMARY KEY (rowid)
 ) 
 ENGINE=innodb;
 

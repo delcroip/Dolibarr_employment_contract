@@ -18,20 +18,15 @@
 -- HR Revision 0.1.0
 
 
-
-CREATE TABLE llx_hr_open_days
+CREATE TABLE llx_hr_salary_method
 (
-rowid                 integer NOT NULL AUTO_INCREMENT,
-entity                integer DEFAULT 1 ,		-- multi company id
-datec                 DATETIME NOT NULL,
-datem		      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,                
-description           VARCHAR( 255 ),
-fk_user_author        integer,
-fk_user_modif         integer, 
-day_status            integer NOT NULL,  -- 0 open, 1 weekend, 2 national holiday, 3 other
-day_date              DATE not NULL,
-fk_country            integer DEFAULT NULL, -- null if the country doesn't matter
+rowid                 	integer NOT NULL DEFAULT AUTO_INCREMENT,
+entity	              	integer DEFAULT 1 NOT NULL,		-- multi company id
+datec                 	DATETIME NOT NULL,
+datem		      	TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,              
+description           	VARCHAR( 255 ) NOT NULL,
+fk_user_author        	integer NOT NULL,
+fk_user_modif         	integer,
 PRIMARY KEY (rowid)
-)
+) 
 ENGINE=innodb;
-

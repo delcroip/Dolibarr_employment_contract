@@ -18,17 +18,19 @@
 -- HR Revision 0.1.0
 
 
-CREATE TABLE llx_hr_salary_method
+
+
+
+CREATE TABLE llx_hr_job_type 
 (
-rowid                 	integer NOT NULL DEFAULT AUTO_INCREMENT,
-entity	              	integer DEFAULT 1 NOT NULL,		-- multi company id
-datec                 	DATETIME NOT NULL,
-datem		      	TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,              
-description           	VARCHAR( 255 ) NOT NULL,
-fk_user_author        	integer NOT NULL,
-fk_user_modif         	integer,
-PRIMARY KEY (rowid),
-FOREIGN KEY(fk_user_author)  REFERENCES llx_user(rowid),
-FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
+rowid                 integer NOT NULL AUTO_INCREMENT,
+entity                integer DEFAULT 1 NOT NULL,		-- multi company id
+datec                 DATETIME NOT NULL,
+datem		      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,                
+title                       VARCHAR( 255 ),
+description           VARCHAR( 2048 ),
+fk_user_author        integer,
+fk_user_modif         integer, 
+PRIMARY KEY (rowid)
 ) 
 ENGINE=innodb;

@@ -46,11 +46,7 @@ motif                 varchar(), -- coulb be used for cdd
 custom_field_1_value DECIMAL(16,4),
 custom_field_2_value DECIMAL(16,4),
 -- Health_insurance_number         VARCHAR(64), -- Should it be in llx_user or in llx_emcontract ?
-PRIMARY KEY (rowid),
-FOREIGN KEY (fk_user) REFERENCES llx_user(rowid),
-FOREIGN KEY (fk_contract_type ) REFERENCES llx_hr_contract_type(rowid),
-FOREIGN KEY (fk_job_location ) REFERENCES llx_societe_address(rowid),
-FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
-FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
+PRIMARY KEY (rowid)
 ) 
 ENGINE=innodb;
+

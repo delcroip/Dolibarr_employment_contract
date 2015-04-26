@@ -42,9 +42,7 @@ ct_custom_fields_2_desc varchar(255),-- contract type custom field  2 desc
 c_custom_fields_1_desc  varchar(255),-- contract custom field  1 desc
 c_custom_fields_2_desc  varchar(255),-- contract custom field  2 desc
 toshow		        BOOLEAN NOT NULL,
-PRIMARY KEY (rowid),
-FOREIGN KEY (fk_salary_method) REFERENCES llx_hr_salary_method(rowid),
-FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
-FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
+PRIMARY KEY (rowid)
 ) 
 ENGINE=innodb;
+

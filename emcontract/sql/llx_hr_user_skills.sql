@@ -17,8 +17,7 @@
 -- ===================================================================
 -- HR Revision 0.1.0
 
-
-CREATE TABLE llx_hr_job_skills
+CREATE TABLE llx_hr_user_skills
 (
 rowid                 integer NOT NULL AUTO_INCREMENT,
 entity                integer DEFAULT 1 NOT NULL,		-- multi company id
@@ -27,10 +26,7 @@ datem		      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 description           VARCHAR( 255 ),
 fk_user_author        integer,
 fk_user_modif         integer, 
-fk_job_type               integer,
-PRIMARY KEY (rowid),
-FOREIGN KEY (fk_job_type) REFERENCES llx_hr_job_type(rowid),
-FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
-FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
+fk_user               integer,
+PRIMARY KEY (rowid)
 ) 
 ENGINE=innodb;

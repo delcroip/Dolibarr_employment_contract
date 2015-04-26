@@ -19,19 +19,7 @@
 
 
 
-CREATE TABLE llx_hr_open_days
-(
-rowid                 integer NOT NULL AUTO_INCREMENT,
-entity                integer DEFAULT 1 ,		-- multi company id
-datec                 DATETIME NOT NULL,
-datem		      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,                
-description           VARCHAR( 255 ),
-fk_user_author        integer,
-fk_user_modif         integer, 
-day_status            integer NOT NULL,  -- 0 open, 1 weekend, 2 national holiday, 3 other
-day_date              DATE not NULL,
-fk_country            integer DEFAULT NULL, -- null if the country doesn't matter
-PRIMARY KEY (rowid)
-)
-ENGINE=innodb;
-
+ALTER TABLE llx_hr_job_skills ADD
+FOREIGN KEY (fk_job_type) REFERENCES llx_hr_job_type(rowid),
+FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
+FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
