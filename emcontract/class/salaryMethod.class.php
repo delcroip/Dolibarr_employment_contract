@@ -1,9 +1,20 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/* 
+ * Copyright (C) 2015 delcroip <pmpdelcroix@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
@@ -11,8 +22,9 @@
  *
  * @author patrick
  */
-class salarymethod {
+class salaryMethod {
     //put your code here
+   var $db;
    var $id;
    var $entity;
    var $datec;
@@ -23,7 +35,11 @@ class salarymethod {
    var $operands;
    
    
-   
+   public function __construct($db,$id='0') 
+	{
+		$this->db=$db;
+		$this->id=$id;
+	}
      /**
      *	fetch 
      *
@@ -442,6 +458,51 @@ class salarymethod {
  function fetchPublicHoliday($firstDay,$lastDay, $openDays){
      $publicUser=0; // fixme
      return fetchHolidays($publicUser,$firstDay,$lastDay,$openDays,0);
+ }
+      /**
+     *	fetch data from the POST tab
+     *
+     *	@param		array			$matrix                    array containing all the Salary Method info
+    *	@return		int						   0 - sucess | -1 failure
+     */ 
+ 
+ function fetchFromTab($matrix){
+    $ret=0;
+        //FIXME
+    return $ret;
+ }
+       /**
+     *	create a new Salary methode in the db
+     *
+    *	@return		int						   0 - sucess | -1 failure
+     */ 
+ 
+ function create(){
+    $ret=0;
+        //FIXME
+     return $ret;
+ }
+       /**
+     *	delete a new Salary methode in the db
+     *
+    *	@return		int						   0 - sucess | -1 failure
+     */ 
+ 
+ function delete(){
+    $ret=0;
+        //FIXME
+     return $ret;
+ } 
+    /**
+    *	create a new Salary methode in the db
+    *
+    *	@return		int						   0 - sucess | -1 failure
+     */ 
+ 
+ function update(){
+    $ret=0;
+        //FIXME
+     return $ret;
  }
 }//end class
 
