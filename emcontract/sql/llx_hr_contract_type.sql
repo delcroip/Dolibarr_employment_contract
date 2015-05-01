@@ -19,10 +19,6 @@
 
 
 
-
-
-
-
 CREATE TABLE llx_hr_contract_type 
 (
 rowid                 	integer NOT NULL AUTO_INCREMENT,

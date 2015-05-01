@@ -1,3 +1,4 @@
+
 -- ===================================================================
 -- Copyright (C) 2015  Patrick Delcroix <pmpdelcroix@gmail.com>
 --
@@ -17,16 +18,17 @@
 -- ===================================================================
 -- HR Revision 0.1.0
 
-
-CREATE TABLE llx_hr_salary_method
-(
-rowid                 	integer NOT NULL DEFAULT AUTO_INCREMENT,
-entity	              	integer DEFAULT 1 NOT NULL,		-- multi company id
-datec                 	DATETIME NOT NULL,
-datem		      	TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,              
-description           	VARCHAR( 255 ) NOT NULL,
-fk_user_author        	integer NOT NULL,
-fk_user_modif         	integer,
-PRIMARY KEY (rowid)
-) 
-ENGINE=innodb;
+CREATE TABLE `llx_hr_salary_method` (
+  `rowid` int(11) NOT NULL AUTO_INCREMENT,
+  `entity` int(11) NOT NULL DEFAULT '1',
+  `datec` datetime NOT NULL,
+  `datem` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `description` varchar(255) NOT NULL,
+  `fk_user_author` int(11) NOT NULL,
+  `fk_user_modif` int(11) DEFAULT NULL,
+  ct_custom_fields_1_desc varchar(255), -- contract type custom field  1 desc
+  ct_custom_fields_2_desc varchar(255),-- contract type custom field  2 desc
+  c_custom_fields_1_desc  varchar(255),-- contract custom field  1 desc
+  c_custom_fields_2_desc  varchar(255),-- contract custom field  2 desc
+  PRIMARY KEY (`rowid`)
+) ENGINE=InnoDB 

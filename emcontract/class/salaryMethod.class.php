@@ -1,9 +1,20 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/* 
+ * Copyright (C) 2015 delcroip <pmpdelcroix@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
@@ -11,8 +22,14 @@
  *
  * @author patrick
  */
-class salarymethod {
+class salaryMethod extends CommonObject {
     //put your code here
+   var $db;
+    var $error;							//!< To return error code (or message)
+    var $errors=array();				//!< To return several error codes (or messages)
+    var $element='salary_method';			//!< Id that identify managed objects
+    var $table_element='hr_salary_method';
+   
    var $id;
    var $entity;
    var $datec;
@@ -20,10 +37,21 @@ class salarymethod {
    var $description;
    var $fk_user_author;
    var $fk_user_modif;
-   var $operands;
+  var $ct_custom_fields_1_desc ;
+  var $ct_custom_fields_2_desc ;
+  var $c_custom_fields_1_desc ;
+  var $c_custom_fields_2_desc ;
    
-   
-   
+       /**
+     *  Constructor
+     *
+     *  @param	DoliDb		$db      Database handler
+     */
+   public function __construct($db,$id='0') 
+	{
+		$this->db=$db;
+		$this->id=$id;
+	}
      /**
      *	fetch 
      *
@@ -33,9 +61,8 @@ class salarymethod {
    
    function fetch($rowid)
    {
-        $sql="SELECT emsm.rowid, emsm.entity, emsm.datec, emsm.datem, emsm.description";
-        $sql.=" emsm.fk_user_author,emsm.fk_user_modif";   
-        $sql.=" FROM ".MAIN_DB_PREFIX."_emcontract_salary_method as emsm";
+        $sql="SELECT *"; //FIXME
+        $sql.=" FROM ".MAIN_DB_PREFIX.$this->table_element." as emsm";
         $sql.=' WHERE emsm.rowid="'.$rowid.'"';
         
         dol_syslog(get_class($this)."::fetch sql=".$sql, LOG_DEBUG);
@@ -53,6 +80,10 @@ class salarymethod {
                 $this->description	= $obj->description;
                 $this->fk_user_author   = $obj->fk_user_author;
                 $this->fk_user_modif    = $obj->fk_user_modif;
+                $this->ct_custom_fields_1_desc = $obj->ct_custom_fields_1_desc;
+               $this->ct_custom_fields_2_desc= $obj->ct_custom_fields_2_desc ;
+               $this->c_custom_fields_1_desc = $obj->c_custom_fields_1_desc;
+               $this->c_custom_fields_2_desc = $obj->c_custom_fields_2_desc ;
 
             }
             $this->db->free($resql);
@@ -81,8 +112,14 @@ class salarymethod {
         $sql.=" emt.night_hours_start, emt.night_rate, emt.night_hours_stop,";   
         $sql.=" emt.holiday_weekly_generated, emt.overtime_rate, emt.overtime_recup_only,";
         $sql.=" emt.weekly_max_hours, emt.weekly_min_hours, emt.daily_max_hours,";
-        $sql.=" FROM ".MAIN_DB_PREFIX."_grh_contract as em";
-        $sql.=" JOIN ".MAIN_DB_PREFIX."_grh_contract_type as emt";
+        $sql.=" emt.sm_custom_field_1_value as ct_custom_field_1_value ,";
+        $sql.=" emt.sm_custom_field_2_value as ct_custom_field_2_value ,";
+        $sql.=" em.sm_custom_field_1_value as c_custom_field_1_value ,";
+        $sql.=" em.sm_custom_field_2_value as c_custom_field_2_value ,";
+                                
+
+        $sql.=" FROM ".MAIN_DB_PREFIX."hr_contract as em";
+        $sql.=" JOIN ".MAIN_DB_PREFIX."hr_contract_type as emt";
         $sql.=" ON emt.rowid=em.fk_contract_type";
         $sql.=' WHERE em.rowid="'.$user.'"';
         
@@ -109,6 +146,12 @@ class salarymethod {
                 $this->operands[12]           = $obj->weekly_max_hours;
                 $this->operands[13]           = $obj->weekly_min_hours;
                 $this->operands[14]           = $obj->daily_max_hours;
+                
+                $this->operands[28]           = $obj->ct_custom_field_1_value;
+                $this->operands[29]           = $obj->ct_custom_field_2_value;
+                $this->operands[30]           = $obj->c_custom_field_1_value;
+                $this->operands[31]           = $obj->c_custom_field_2_value;
+                //FIXME Custome fields
                 if($month && $year){
                     $error=calculateOperands($user,$month,$year);
                 }
@@ -443,6 +486,267 @@ class salarymethod {
      $publicUser=0; // fixme
      return fetchHolidays($publicUser,$firstDay,$lastDay,$openDays,0);
  }
+      /**
+     *	fetch data from the POST tab
+     *
+     *	@param		array			$matrix                    array containing all the Salary Method info
+    *	@return		int						   0 - sucess | -1 failure
+     */ 
+ 
+ function fetchFromTab($matrix){
+    $ret=0;
+        //FIXME
+    return $ret;
+ }
+    /**
+     *  Create object into database
+     *
+     *  @param	User	$user        User that creates
+     *  @param  int		$notrigger   0=launch triggers after, 1=disable triggers
+     *  @return int      		   	 <0 if KO, Id of created object if OK
+     */
+    function create($user, $notrigger=0)
+    {
+            global $conf, $langs;
+            $error=0;
+
+            // Clean parameters
+
+            if (isset($this->entity)) $this->entity=trim($this->entity);
+//FIXME
+            if (isset($this->weeklyhours)) $this->weeklyhours=trim($this->weeklyhours);
+
+
+
+            // Check parameters
+            // Put here code to add control on parameters values
+    // Insert request
+            $sql = "INSERT INTO ".MAIN_DB_PREFIX.$this->table_element."(";
+
+            $sql.= "entity,";//FIXME
+               $sql.= "datec,";
+               $sql.= "datem,";
+               $sql.= "description,";
+               $sql.= "fk_user_author,";
+               $sql.= "fk_user_modif,";
+               $sql.= "ct_custom_fields_1_desc ,";
+               $sql.= "ct_custom_fields_2_desc,";
+               $sql.= "c_custom_fields_1_desc ,";
+               $sql.= "c_custom_fields_2_desc ";
+
+		
+            $sql.= ") VALUES (";
+        
+            $sql.= " ".(! isset($this->entity)?'NULL':"'".$this->entity."'").",";//FIXME
+           $sql.= " ".(! isset($this->datec)?'NULL':"'".$this->entity."'").",";
+           $sql.= " ".(! isset($this->datem)?'NULL':"'".$this->entity."'").",";
+           $sql.= " ".(! isset($this->description)?'NULL':"'".$this->entity."'").",";
+           $sql.= " ".(! isset($this->fk_user_author)?'NULL':"'".$this->entity."'").",";
+           $sql.= " ".(! isset($this->fk_user_modif)?'NULL':"'".$this->entity."'").",";
+           $sql.= " ".(! isset($this->ct_custom_fields_1_desc )?'NULL':"'".$this->entity."'").",";
+           $sql.= " ".(! isset($this->ct_custom_fields_2_desc )?'NULL':"'".$this->entity."'")."";
+          $sql.= " ".(! isset($this->c_custom_fields_1_desc )?'NULL':"'".$this->entity."'").",";
+           $sql.= " ".(! isset($this->c_custom_fields_2_desc )?'NULL':"'".$this->entity."'")."";
+            $sql.= ")";
+
+            $this->db->begin();
+
+            dol_syslog(__METHOD__, LOG_DEBUG);
+            $resql=$this->db->query($sql);
+            if (! $resql) { $error++; $this->errors[]="Error ".$this->db->lasterror(); }
+            if (! $error)
+            {
+                $this->id = $this->db->last_insert_id(MAIN_DB_PREFIX.$this->table_element);
+                if (! $notrigger)
+                {
+                // Uncomment this and change MYOBJECT to your own tag if you
+                // want this action calls a trigger.
+
+                //// Call triggers
+                //$result=$this->call_trigger('MYOBJECT_CREATE',$user);
+                //if ($result < 0) { $error++; //Do also what you must do to rollback action if trigger fail}
+                //// End call triggers
+                }
+            }
+
+        // Commit or rollback
+            if ($error)
+            {
+                            foreach($this->errors as $errmsg)
+                            {
+                        dol_syslog(__METHOD__." ".$errmsg, LOG_ERR);
+                        $this->error.=($this->error?', '.$errmsg:$errmsg);
+                            }
+                            $this->db->rollback();
+                            return -1*$error;
+                    }
+                    else
+                    {
+                            $this->db->commit();
+                return $this->id;
+           }
+    }
+       /**
+     *	delete a new Salary methode in the db
+     *
+    *	@return		int						   0 - sucess | -1 failure
+     */ 
+ 
+ function delete(){
+    $ret=0;
+        //FIXME
+     return $ret;
+ } 
+
+    /**
+     *  Update object into database
+     *
+     *  @param	User	$user        User that modifies
+     *  @param  int		$notrigger	 0=launch triggers after, 1=disable triggers
+     *  @return int     		   	 <0 if KO, >0 if OK
+     */
+ function update($user, $notrigger=0){
+            global $conf, $langs;
+            $error=0;
+
+            // Clean parameters
+
+            if (isset($this->entity)) $this->entity=trim($this->entity);
+            if (isset($this->datec)) $this->entity=trim($this->datec);
+            if (isset($this->datem)) $this->entity=trim($this->datem);
+            if (isset($this->description)) $this->entity=trim($this->description);
+            if (isset($this->fk_user_author)) $this->entity=trim($this->fk_user_author);
+            if (isset($this->fk_user_modif)) $this->entity=trim($this->fk_user_modif);
+            if (isset($this->ct_custom_fields_1_desc)) $this->entity=trim($this->ct_custom_fields_1_desc);
+            if (isset($this->ct_custom_fields_2_desc)) $this->entity=trim($this->ct_custom_fields_2_desc);
+            if (isset($this->c_custom_fields_1_desc)) $this->entity=trim($this->c_custom_fields_1_desc);
+            if (isset($this->c_custom_fields_2_desc)) $this->entity=trim($this->c_custom_fields_2_desc); 
+
+                    
+                    
+//FIXME
+            if (isset($this->weeklyhours)) $this->weeklyhours=trim($this->weeklyhours);
+
+            // Check parameters
+            // Put here code to add control on parameters values
+    // Insert request
+            $sql = "UPDATE INTO ".MAIN_DB_PREFIX.$this->table_element."(";
+            $sql.= "entity";//FIXME
+            $sql.= "=".(! isset($this->entity)?'NULL':"'".$this->db->escape($this->entity)."'").",";
+            $sql.= "datec";
+            $sql.= "=".(! isset($this->datec)?'NULL':"'".$this->db->escape($this->datec)."'").",";
+            $sql.= "datem";
+            $sql.= "=".(! isset($this->datem)?'NULL':"'".$this->db->escape($this->datem)."'").",";
+            $sql.= "description";
+            $sql.= "=".(! isset($this->description)?'NULL':"'".$this->db->escape($this->description)."'").",";
+            $sql.= "fk_user_author";
+            $sql.= "=".(! isset($this->fk_user_author)?'NULL':"'".$this->db->escape($this->fk_user_author)."'").",";
+            $sql.= "fk_user_modif";
+            $sql.= "=".(! isset($this->fk_user_modif)?'NULL':"'".$this->db->escape($this->fk_user_modif)."'").",";
+            $sql.= "ct_custom_fields_1_desc ";
+            $sql.= "=".(! isset($this->ct_custom_fields_1_desc )?'NULL':"'".$this->db->escape($this->ct_custom_fields_1_desc )."'").",";
+            $sql.= "ct_custom_fields_2_desc ";
+            $sql.= "=".(! isset($this->ct_custom_fields_2_desc )?'NULL':"'".$this->db->escape($this->ct_custom_fields_2_desc )."'")."";
+            $sql.= "c_custom_fields_1_desc ";
+            $sql.= "=".(! isset($this->c_custom_fields_1_desc )?'NULL':"'".$this->db->escape($this->c_custom_fields_1_desc )."'").",";
+            $sql.= "c_custom_fields_2_desc ";
+            $sql.= "=".(! isset($this->c_custom_fields_2_desc )?'NULL':"'".$this->db->escape($this->c_custom_fields_2_desc )."'")."";
+            $sql.= ")";
+
+            $this->db->begin();
+
+            dol_syslog(__METHOD__, LOG_DEBUG);
+            $resql=$this->db->query($sql);
+            if (! $resql) { $error++; $this->errors[]="Error ".$this->db->lasterror(); }
+            if (! $error)
+            {
+                $this->id = $this->db->last_insert_id(MAIN_DB_PREFIX.$this->table_element);
+                if (! $notrigger)
+                {
+                // Uncomment this and change MYOBJECT to your own tag if you
+                // want this action calls a trigger.
+
+                //// Call triggers
+                //$result=$this->call_trigger('MYOBJECT_CREATE',$user);
+                //if ($result < 0) { $error++; //Do also what you must do to rollback action if trigger fail}
+                //// End call triggers
+                }
+            }
+
+        // Commit or rollback
+            if ($error)
+            {
+                foreach($this->errors as $errmsg)
+                {
+                    dol_syslog(__METHOD__." ".$errmsg, LOG_ERR);
+                    $this->error.=($this->error?', '.$errmsg:$errmsg);
+                }
+                $this->db->rollback();
+                return -1*$error;
+            }
+            else
+            {
+                $this->db->commit();
+                return $this->id;
+            }
+ }
+ 
+  	/**
+	 *  Delete object in database
+	 *
+     *	@param  User	$user        User that deletes
+     *  @param  int		$notrigger	 0=launch triggers after, 1=disable triggers
+	 *  @return	int					 <0 if KO, >0 if OK
+	 */
+    function delete($user, $notrigger=0)
+    {
+            global $conf, $langs;
+            $error=0;
+
+            $this->db->begin();
+
+            if (! $error)
+            {
+                    if (! $notrigger)
+                    {
+                            // Uncomment this and change MYOBJECT to your own tag if you
+                    // want this action calls a trigger.
+
+                //// Call triggers
+                //$result=$this->call_trigger('MYOBJECT_DELETE',$user);
+                //if ($result < 0) { $error++; //Do also what you must do to rollback action if trigger fail}
+                //// End call triggers
+                    }
+            }
+
+            if (! $error)
+            {
+                $sql = "DELETE FROM ".MAIN_DB_PREFIX.$this->table_element;
+                $sql.= " WHERE rowid=".$this->id;
+
+                dol_syslog(__METHOD__);
+                $resql = $this->db->query($sql);
+                if (! $resql) { $error++; $this->errors[]="Error ".$this->db->lasterror(); }
+            }
+
+    // Commit or rollback
+            if ($error)
+            {
+                    foreach($this->errors as $errmsg)
+                    {
+                        dol_syslog(__METHOD__." ".$errmsg, LOG_ERR);
+                        $this->error.=($this->error?', '.$errmsg:$errmsg);
+                    }
+                    $this->db->rollback();
+                    return -1*$error;
+            }
+            else
+            {
+                    $this->db->commit();
+                    return 1;
+            }
+    }
+ 
 }//end class
 
 

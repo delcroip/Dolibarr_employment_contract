@@ -39,8 +39,8 @@ fk_user_author        integer,
 fk_user_modif         integer, 
 base_rate             DECIMAL(8,4) NOT NULL, -- operand 0 |
 motif                 varchar(2048), -- coulb be used for cdd
-custom_field_1_value DECIMAL(16,4),
-custom_field_2_value DECIMAL(16,4),
+sm_custom_field_1_value DECIMAL(16,4),
+sm_custom_field_2_value DECIMAL(16,4),
 PRIMARY KEY (rowid)
 ) 
 ENGINE=innodb;

@@ -37,10 +37,6 @@ operator                ENUM ('plus','minus','mult','div','mod','slice','if','su
 operand_3_type	        ENUM ('value','step','operand','salary_method') default 'value' NOT NULL, -- 0- value from emcontract operand, 1- output of another step, 2- value
 operand_3_value	        DECIMAL(16,4), -- depending of the type, could be the number of the emcontract operand or a step or a pure value
 accounting_account      integer,
-ct_custom_fields_1_desc varchar(255), -- contract type custom field  1 desc
-ct_custom_fields_2_desc varchar(255),-- contract type custom field  2 desc
-c_custom_fields_1_desc  varchar(255),-- contract custom field  1 desc
-c_custom_fields_2_desc  varchar(255),-- contract custom field  2 desc
 toshow		        BOOLEAN NOT NULL,
 PRIMARY KEY (rowid)
 ) 
