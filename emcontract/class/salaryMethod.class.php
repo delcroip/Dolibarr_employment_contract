@@ -115,7 +115,7 @@ class salaryMethod extends CommonObject {
         $sql.=" emt.sm_custom_field_1_value as ct_custom_field_1_value ,";
         $sql.=" emt.sm_custom_field_2_value as ct_custom_field_2_value ,";
         $sql.=" em.sm_custom_field_1_value as c_custom_field_1_value ,";
-        $sql.=" em.sm_custom_field_2_value as c_custom_field_2_value ,";
+        $sql.=" em.sm_custom_field_2_value as c_custom_field_2_value ";
                                 
 
         $sql.=" FROM ".MAIN_DB_PREFIX."hr_contract as em";
@@ -513,19 +513,24 @@ class salaryMethod extends CommonObject {
             // Clean parameters
 
             if (isset($this->entity)) $this->entity=trim($this->entity);
-//FIXME
-            if (isset($this->weeklyhours)) $this->weeklyhours=trim($this->weeklyhours);
-
-
+            if (isset($this->datec)) $this->datec=trim($this->datec);
+           // if (isset($this->datem)) $this->datem=trim($this->datem);
+            if (isset($this->description)) $this->description=trim($this->description);
+           //if (isset($this->fk_user_author)) $this->fk_user_author=trim($this->fk_user_author);
+          //  if (isset($this->fk_user_modif)) $this->fk_user_modif=trim($this->fk_user_modif);
+            if (isset($this->ct_custom_fields_1_desc)) $this->ct_custom_fields_1_desc=trim($this->ct_custom_fields_1_desc);
+            if (isset($this->ct_custom_fields_2_desc)) $this->ct_custom_fields_2_desc=trim($this->ct_custom_fields_2_desc);
+            if (isset($this->c_custom_fields_1_desc)) $this->c_custom_fields_1_desc=trim($this->c_custom_fields_1_desc);
+            if (isset($this->c_custom_fields_2_desc)) $this->c_custom_fields_2_desc=trim($this->c_custom_fields_2_desc);
 
             // Check parameters
             // Put here code to add control on parameters values
     // Insert request
             $sql = "INSERT INTO ".MAIN_DB_PREFIX.$this->table_element."(";
 
-            $sql.= "entity,";//FIXME
+            $sql.= "entity,";
                $sql.= "datec,";
-               $sql.= "datem,";
+              // $sql.= "datem,";
                $sql.= "description,";
                $sql.= "fk_user_author,";
                $sql.= "fk_user_modif,";
@@ -538,11 +543,13 @@ class salaryMethod extends CommonObject {
             $sql.= ") VALUES (";
         
             $sql.= " ".(! isset($this->entity)?'NULL':"'".$this->entity."'").",";//FIXME
-           $sql.= " ".(! isset($this->datec)?'NULL':"'".$this->entity."'").",";
-           $sql.= " ".(! isset($this->datem)?'NULL':"'".$this->entity."'").",";
+           $sql.= " NOW(), ";
+           //$sql.= " ".(! isset($this->datec)?'NULL':"'".$this->entity."'").",";
+           //$sql.= " ".(! isset($this->datem)?'NULL':"'".$this->entity."'").",";
            $sql.= " ".(! isset($this->description)?'NULL':"'".$this->entity."'").",";
-           $sql.= " ".(! isset($this->fk_user_author)?'NULL':"'".$this->entity."'").",";
-           $sql.= " ".(! isset($this->fk_user_modif)?'NULL':"'".$this->entity."'").",";
+           $sql.= " ".$user->id.',';
+           //$sql.= " ".(! isset($this->fk_user_author)?'NULL':"'".$this->entity."'").",";
+           //$sql.= " ".(! isset($this->fk_user_modif)?'NULL':"'".$this->entity."'").",";
            $sql.= " ".(! isset($this->ct_custom_fields_1_desc )?'NULL':"'".$this->entity."'").",";
            $sql.= " ".(! isset($this->ct_custom_fields_2_desc )?'NULL':"'".$this->entity."'")."";
           $sql.= " ".(! isset($this->c_custom_fields_1_desc )?'NULL':"'".$this->entity."'").",";
@@ -612,20 +619,15 @@ class salaryMethod extends CommonObject {
             // Clean parameters
 
             if (isset($this->entity)) $this->entity=trim($this->entity);
-            if (isset($this->datec)) $this->entity=trim($this->datec);
-            if (isset($this->datem)) $this->entity=trim($this->datem);
-            if (isset($this->description)) $this->entity=trim($this->description);
-            if (isset($this->fk_user_author)) $this->entity=trim($this->fk_user_author);
-            if (isset($this->fk_user_modif)) $this->entity=trim($this->fk_user_modif);
-            if (isset($this->ct_custom_fields_1_desc)) $this->entity=trim($this->ct_custom_fields_1_desc);
-            if (isset($this->ct_custom_fields_2_desc)) $this->entity=trim($this->ct_custom_fields_2_desc);
-            if (isset($this->c_custom_fields_1_desc)) $this->entity=trim($this->c_custom_fields_1_desc);
-            if (isset($this->c_custom_fields_2_desc)) $this->entity=trim($this->c_custom_fields_2_desc); 
-
-                    
-                    
-//FIXME
-            if (isset($this->weeklyhours)) $this->weeklyhours=trim($this->weeklyhours);
+            //if (isset($this->datec)) $this->datec=trim($this->datec);
+            //if (isset($this->datem)) $this->datem=trim($this->datem);
+            if (isset($this->description)) $this->description=trim($this->description);
+            //if (isset($this->fk_user_author)) $this->fk_user_author=trim($this->fk_user_author);
+            //if (isset($this->fk_user_modif)) $this->fk_user_modif=trim($this->fk_user_modif);
+            if (isset($this->ct_custom_fields_1_desc)) $this->ct_custom_fields_1_desc=trim($this->ct_custom_fields_1_desc);
+            if (isset($this->ct_custom_fields_2_desc)) $this->ct_custom_fields_2_desc=trim($this->ct_custom_fields_2_desc);
+            if (isset($this->c_custom_fields_1_desc)) $this->c_custom_fields_1_desc=trim($this->c_custom_fields_1_desc);
+            if (isset($this->c_custom_fields_2_desc)) $this->c_custom_fields_2_desc=trim($this->c_custom_fields_2_desc);
 
             // Check parameters
             // Put here code to add control on parameters values
@@ -633,16 +635,17 @@ class salaryMethod extends CommonObject {
             $sql = "UPDATE INTO ".MAIN_DB_PREFIX.$this->table_element."(";
             $sql.= "entity";//FIXME
             $sql.= "=".(! isset($this->entity)?'NULL':"'".$this->db->escape($this->entity)."'").",";
-            $sql.= "datec";
-            $sql.= "=".(! isset($this->datec)?'NULL':"'".$this->db->escape($this->datec)."'").",";
-            $sql.= "datem";
-            $sql.= "=".(! isset($this->datem)?'NULL':"'".$this->db->escape($this->datem)."'").",";
+            //$sql.= "datec";
+            //$sql.= "=".(! isset($this->datec)?'NULL':"'".$this->db->escape($this->datec)."'").",";
+            $sql.= "datem = NOW(),";
+            //$sql.= "=".(! isset($this->datem)?'NULL':"'".$this->db->escape($this->datem)."'").",";
             $sql.= "description";
             $sql.= "=".(! isset($this->description)?'NULL':"'".$this->db->escape($this->description)."'").",";
-            $sql.= "fk_user_author";
-            $sql.= "=".(! isset($this->fk_user_author)?'NULL':"'".$this->db->escape($this->fk_user_author)."'").",";
+            //$sql.= "fk_user_author";
+            //$sql.= "=".(! isset($this->fk_user_author)?'NULL':"'".$this->db->escape($this->fk_user_author)."'").",";
             $sql.= "fk_user_modif";
-            $sql.= "=".(! isset($this->fk_user_modif)?'NULL':"'".$this->db->escape($this->fk_user_modif)."'").",";
+            $sql.= " ".$user->id.',';
+            //$sql.= "=".(! isset($this->fk_user_modif)?'NULL':"'".$this->db->escape($this->fk_user_modif)."'").",";
             $sql.= "ct_custom_fields_1_desc ";
             $sql.= "=".(! isset($this->ct_custom_fields_1_desc )?'NULL':"'".$this->db->escape($this->ct_custom_fields_1_desc )."'").",";
             $sql.= "ct_custom_fields_2_desc ";
