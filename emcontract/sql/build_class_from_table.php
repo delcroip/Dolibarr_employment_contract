@@ -1,6 +1,7 @@
 #!/usr/bin/php
 <?php
-/* Copyright (C) 2008-2014 Laurent Destailleur  <eldy@users.sourceforge.net>
+/* Copyright (C) 2015 delcroip <pmpdelcroix@gmail.com>
+ * Copyright (C) 2008-2014 Laurent Destailleur  <eldy@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +34,7 @@ if (substr($sapi_type, 0, 3) == 'cgi') {
 }
 
 // Include Dolibarr environment
-require_once($path."../../../dolibarr/htdocs/master.inc.php");
+require_once($path."../../htdocs/master.inc.php");
 // After this $db is a defined handler to database.
 
 // Main
@@ -93,7 +94,7 @@ if ($resql)
 		}
 		else
 		{
-			$property[$i]['primary']=1;
+			$property[$i]['primary']=0;
 		}
 		$property[$i]['type'] =$obj->Type;
 		$property[$i]['null'] =$obj->Null;
@@ -357,6 +358,68 @@ foreach($property as $key => $prop)
 }
 $targetcontent=preg_replace('/\$this->prop1=\'prop1\';/', $varprop, $targetcontent);
 $targetcontent=preg_replace('/\$this->prop2=\'prop2\';/', '', $targetcontent);
+
+/*
+ * substitute table lines
+ */
+
+$varprop="\n";
+$cleanparam='';
+$nbproperty=count($property);
+$i=0;
+foreach($property as $key => $prop)
+{
+	if ($prop['field'] != 'rowid' && $prop['field'] != 'id')
+	{
+                $varprop.=($i%2==0)?"\t\tprint \"<tr>\n\";\n":'';
+                
+		$varprop.="\t\tprint <td> \$langs->trans('";
+                $varprop.=preg_replace('/_/','',ucfirst($prop['field']));
+                $varprop.="') </td><td>;\n";
+                //suport the edit mode
+                $varprop.="\t\tif(\$edit==1){";
+                switch ($prop['type']) {
+                    case 'datetime':
+                    case 'date':
+                    case 'timestamp':
+                        $varprop.="\t\t\tprint \$form->select_date(\$obj->";
+                        $varprop.=$prop['field'].",'";
+                        $varprop.=preg_replace('/_/','',ucfirst($prop['field']))."');\n";  
+                        $varprop.="\t\t}else{\n";
+                        $varprop.="\t\t\tprint \$form->dol_print_date(\$obj->";
+                        $varprop.=$prop['field'].",'day');/n";
+                        
+                        break;
+                    default:
+                        $varprop.="\t\t\tprint \<input type=\"text\" value=\"\$obj->";
+                        $varprop.=$prop['field']."\" name=\"";
+                        $varprop.=preg_replace('/_/','',ucfirst($prop['field']))."\">";  
+                        $varprop.="\t\t}else{\n";
+                        $varprop.="\t\t\tprint \$obj->";
+                        $varprop.=$prop['field'].";/n";
+                        
+                        break;
+                }  
+                $varprop.="\t\t}\n";
+		$varprop.="</td>\n";
+                
+                $varprop.=( $i%2==1)?"\t\tprint \"</tr>\n\";\n":'';
+                $i++;
+	}
+        
+}
+//if there is an unpair number of line
+if($i%2==0)
+{
+    $varprop.="\t\tprint \"<td></td></tr>\n\";\n";
+                
+}
+
+
+
+$targetcontent=preg_replace('/print "<tr><td>prop1</td><td>".\$object->field1."</td></tr>";/', $varprop, $targetcontent);
+$targetcontent=preg_replace('/print "<tr><td>prop2</td><td>".\$object->field2."</td></tr>";/', '', $targetcontent);
+
 
 // Build file
 $fp=fopen($outfile,"w");

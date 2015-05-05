@@ -23,7 +23,8 @@ CREATE TABLE `llx_hr_salary_method` (
   `entity` int(11) NOT NULL DEFAULT '1',
   `datec` datetime NOT NULL,
   `datem` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `description` varchar(255) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `description` varchar(2048) NOT NULL,
   `fk_user_author` int(11) NOT NULL,
   `fk_user_modif` int(11) DEFAULT NULL,
   ct_custom_fields_1_desc varchar(255), -- contract type custom field  1 desc

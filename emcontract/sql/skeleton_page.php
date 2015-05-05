@@ -1,5 +1,6 @@
 <?php
-/* Copyright (C) 2007-2010 Laurent Destailleur  <eldy@users.sourceforge.net>
+/* 
+ * Copyright (C) 2007-2010 Laurent Destailleur  <eldy@users.sourceforge.net>
  * Copyright (C) ---Put here your own copyright and developer email---
  *
  * This program is free software; you can redistribute it and/or modify
@@ -17,10 +18,10 @@
  */
 
 /**
- *   	\file       dev/contractTypes/contractType_page.php
+ *   	\file       dev/skeletons/skeleton_page.php
  *		\ingroup    mymodule othermodule1 othermodule2
  *		\brief      This file is an example of a php page
- *					Initialy built by build_class_from_table on 2015-05-01 16:09
+ *					Put here some comments
  */
 
 //if (! defined('NOREQUIREUSER'))  define('NOREQUIREUSER','1');
@@ -44,7 +45,7 @@ if (! $res && file_exists("../../../../dolibarr/htdocs/main.inc.php")) $res=@inc
 if (! $res) die("Include of main fails");
 // Change this following line to use the correct relative path from htdocs
 include_once(DOL_DOCUMENT_ROOT.'/core/class/formcompany.class.php');
-dol_include_once('/module/class/hrcontracttype.class.php');
+dol_include_once('/module/class/skeleton_class.class.php');
 
 // Load traductions files requiredby by page
 $langs->load("companies");
@@ -65,7 +66,7 @@ if ($user->societe_id > 0)
 if (empty($action) && empty($id) && empty($ref)) $action='create';
 
 // Load object if id or ref is provided as parameter
-$object=new contractType($db);
+$object=new Skeleton_Class($db);
 if (($id > 0 || ! empty($ref)) && $action != 'add')
 {
 	$result=$object->fetch($id,$ref);
@@ -212,144 +213,15 @@ jQuery(document).ready(function() {
 	});
 });
 </script>';
-
-
-// Part to show a list
-if ($action == 'list' || empty($id))
-{
-    $sql = "SELECT";
-    $sql.= " t.rowid,";
-    
-		$sql.= " t.entity,";
-		$sql.= " t.datec,";
-		$sql.= " t.datem,";
-		$sql.= " t.type_contract,";
-		$sql.= " t.description,";
-		$sql.= " t.employee_status,";
-		$sql.= " t.fk_user_author,";
-		$sql.= " t.fk_user_modif,";
-		$sql.= " t.weekly_hours,";
-		$sql.= " t.modulation_period,";
-		$sql.= " t.working_days,";
-		$sql.= " t.normal_rate_days,";
-		$sql.= " t.daily_hours,";
-		$sql.= " t.night_hours_start,";
-		$sql.= " t.night_rate,";
-		$sql.= " t.night_hours_stop,";
-		$sql.= " t.holiday_weekly_generated,";
-		$sql.= " t.overtime_rate,";
-		$sql.= " t.overtime_recup_only,";
-		$sql.= " t.weekly_max_hours,";
-		$sql.= " t.weekly_min_hours,";
-		$sql.= " t.daily_max_hours,";
-		$sql.= " t.fk_salary_method,";
-		$sql.= " t.sm_custom_field_1_value,";
-		$sql.= " t.sm_custom_field_2_value";
-
-    
-    $sql.= " FROM ".MAIN_DB_PREFIX."hr_contract_type as t";
-    $sql.= " WHERE field3 = 'xxx'";
-    $sql.= " ORDER BY field1 ASC";
-
-    print '<table class="noborder">'."\n";
-    print '<tr class="liste_titre">';
-    print_liste_field_titre($langs->trans('field1'),$_SERVER['PHP_SELF'],'t.field1','',$param,'',$sortfield,$sortorder);
-    print_liste_field_titre($langs->trans('field2'),$_SERVER['PHP_SELF'],'t.field2','',$param,'',$sortfield,$sortorder);
-    print '</tr>';
-
-    dol_syslog($script_file, LOG_DEBUG);
-    $resql=$db->query($sql);
-    if ($resql)
+$edit=0;
+switch ($action) {
+    case "create":
+        $new=1;
+    case "edit":
+        $edit=1;
+    case "view":
     {
-        $num = $db->num_rows($resql);
-        $i = 0;
-        while ($i < $num)
-        {
-            $obj = $db->fetch_object($resql);
-            if ($obj)
-            {
-                // You can use here results
-                print '<tr><td>';
-                print $obj->field1;
-                print $obj->field2;
-                print '</td></tr>';
-            }
-            $i++;
-        }
-    }
-    else
-    {
-        $error++;
-        dol_print_error($db);
-    }
-
-    print '</table>'."\n";
-}
-
-
-
-// Part to create
-if ($action == 'create')
-{
-	print_fiche_titre($langs->trans("NewResidence"));
-
-	dol_fiche_head();
-
-	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
-	print '<input type="hidden" name="action" value="add">';
-	print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
-
-	print '<table class="border centpercent">'."\n";
-	print '<tr><td class="fieldrequired">'.$langs->trans("Label").'</td><td>';
-	print '<input class="flat" type="text" size="36" name="label" value="'.$label.'">';
-	print '</td></tr>';
-
-	print '</table>'."\n";
-
-	print '<br>';
-
-	print '<div class="center"><input type="submit" class="button" name="add" value="'.$langs->trans("Create").'"> &nbsp; <input type="submit" class="button" name="cancel" value="'.$langs->trans("Cancel").'"></div>';
-
-	print '</form>';
-
-	dol_fiche_end();
-}
-
-
-
-// Part to edit record
-if (($id || $ref) && $action == 'edit')
-{
-	dol_fiche_head();
-
-	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
-	print '<input type="hidden" name="action" value="add">';
-	print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
-	print '<input type="hidden" name="id" value="'.$object->id.'">';
-
-
-	print '<br>';
-
-	print '<div class="center"><input type="submit" class="button" name="add" value="'.$langs->trans("Create").'"></div>';
-
-	print '</form>';
-
-	dol_fiche_end();
-}
-
-
-
-// Part to show record
-if ($id && (empty($action) || $action == 'view'))
-{
-	dol_fiche_head();
-
-
-
-	dol_fiche_end();
-
-
-	// Buttons
+        	// Buttons
 	print '<div class="tabsAction">'."\n";
 	$parameters=array();
 	$reshook=$hookmanager->executeHooks('addMoreActionsButtons',$parameters,$object,$action);    // Note that $action and $object may have been modified by hook
@@ -375,13 +247,84 @@ if ($id && (empty($action) || $action == 'view'))
 		}
 	}
 	print '</div>'."\n";
+        
 
 
-	// Example 2 : Adding links to objects
-	// The class must extends CommonObject class to have this method available
-	//$somethingshown=$object->showLinkedObjectBlock();
+	print '<br>';
+        if($edit==1){
+            print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+            print '<input type="hidden" name="action" value="add">';
+            print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
+            if($new==0){
+                print '<input type="hidden" name="id" value="'.$object->id.'">';
+            }
+        }
+	print '<table class="border centpercent">'."\n";
 
+        print "<tr><td>prop1</td><td>".$object->field1."</td></tr>";
+        print "<tr><td>prop2</td><td>".$object->field2."</td></tr>";
+
+	print '</table>'."\n";
+	print '<br>';
+	print '<div class="center">';
+        if($edit==1){
+        if($new==1){
+                print '<input type="submit" class="button" name="add" value="'.$langs->trans("Create");
+            }else{
+                print '<input type="submit" value="'.$langs->trans("Update").'" class="button">';
+            }
+            print '"> &nbsp; <input type="submit" class="button" name="cancel" value="'.$langs->trans("Cancel").'"></div>';
+            print '</form>';
+        }
+        dol_fiche_end();
+    }
+        break;
+    case 'list':
+    default:
+        {
+    $sql = "SELECT";
+    $sql.= " t.rowid,";
+    $sql.= " t.field1,";
+    $sql.= " t.field2";
+    $sql.= " FROM ".MAIN_DB_PREFIX."mytable as t";
+    $sql.= " WHERE field3 = 'xxx'";
+    $sql.= " ORDER BY field1 ASC";
+
+    print '<table class="noborder">'."\n";
+    print '<tr class="liste_titre">';
+    print_liste_field_titre($langs->trans('field1'),$_SERVER['PHP_SELF'],'t.field1','',$param,'',$sortfield,$sortorder);
+    print_liste_field_titre($langs->trans('field2'),$_SERVER['PHP_SELF'],'t.field2','',$param,'',$sortfield,$sortorder);
+    print '</tr>';
+
+    dol_syslog($script_file, LOG_DEBUG);
+    $resql=$db->query($sql);
+    if ($resql)
+    {
+        $num = $db->num_rows($resql);
+        while ($i < $num)
+        {
+            $obj = $db->fetch_object($resql);
+            if ($obj)
+            {
+                // You can use here results
+                print "<tr><td>prop1</td><td>".$obj->field1."</td></tr>";
+                print "<tr><td>prop2</td><td>".$obj->field2."</td></tr>";
+
+            }
+            
+        }
+    }
+    else
+    {
+        $error++;
+        dol_print_error($db);
+    }
+
+    print '</table>'."\n";
 }
+        break;
+}
+
 
 
 // End of page

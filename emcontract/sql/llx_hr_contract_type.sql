@@ -26,7 +26,8 @@ entity	              	integer DEFAULT 1 NOT NULL,		-- multi company id
 datec                 	DATETIME NOT NULL,
 datem		      	TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 type_contract         	integer NOT NULL,      -- 0- admin, 1- CDI, 2- CDD, 3- apprentissage , 4- stage ,,          
-description           	VARCHAR( 255 ) NOT NULL,
+title           	VARCHAR( 255 ) NOT NULL,
+description           	VARCHAR( 2048 ) NOT NULL,
 employee_status         integer, -- cadre, assimilé cadre, non cadre, cadre dirigeant
 fk_user_author        	integer ,
 fk_user_modif         	integer ,

@@ -39,8 +39,8 @@ class contractType extends CommonObject
 	var $db;							//!< To store db handler
 	var $error;							//!< To return error code (or message)
 	var $errors=array();				//!< To return several error codes (or messages)
-	var $element='hrcontracttype';			//!< Id that identify managed objects
-	var $table_element='hrcontracttype';		//!< Name of table without prefix where object is stored
+	var $element='contracttype';			//!< Id that identify managed objects
+	var $table_element='hr_contract_type';		//!< Name of table without prefix where object is stored
 
     var $id;
     
@@ -49,6 +49,7 @@ class contractType extends CommonObject
 	var $datem='';
 	var $type_contract;
 	var $description;
+	var $title;
 	var $employee_status;
 	var $fk_user_author;
 	var $fk_user_modif;
@@ -102,6 +103,7 @@ class contractType extends CommonObject
 		if (isset($this->entity)) $this->entity=trim($this->entity);
 		if (isset($this->type_contract)) $this->type_contract=trim($this->type_contract);
 		if (isset($this->description)) $this->description=trim($this->description);
+		if (isset($this->title)) $this->title=trim($this->title);
 		if (isset($this->employee_status)) $this->employee_status=trim($this->employee_status);
 		if (isset($this->fk_user_author)) $this->fk_user_author=trim($this->fk_user_author);
 		if (isset($this->fk_user_modif)) $this->fk_user_modif=trim($this->fk_user_modif);
@@ -136,6 +138,7 @@ class contractType extends CommonObject
 		$sql.= "datem,";
 		$sql.= "type_contract,";
 		$sql.= "description,";
+		$sql.= "title,";
 		$sql.= "employee_status,";
 		$sql.= "fk_user_author,";
 		$sql.= "fk_user_modif,";
@@ -165,6 +168,7 @@ class contractType extends CommonObject
 		$sql.= " ".(! isset($this->datem) || dol_strlen($this->datem)==0?'NULL':"'".$this->db->idate($this->datem)."'").",";
 		$sql.= " ".(! isset($this->type_contract)?'NULL':"'".$this->type_contract."'").",";
 		$sql.= " ".(! isset($this->description)?'NULL':"'".$this->db->escape($this->description)."'").",";
+		$sql.= " ".(! isset($this->title)?'NULL':"'".$this->db->escape($this->title)."'").",";
 		$sql.= " ".(! isset($this->employee_status)?'NULL':"'".$this->employee_status."'").",";
 		$sql.= " ".(! isset($this->fk_user_author)?'NULL':"'".$this->fk_user_author."'").",";
 		$sql.= " ".(! isset($this->fk_user_modif)?'NULL':"'".$this->fk_user_modif."'").",";
@@ -248,6 +252,7 @@ class contractType extends CommonObject
 		$sql.= " t.datem,";
 		$sql.= " t.type_contract,";
 		$sql.= " t.description,";
+		$sql.= " t.title,";
 		$sql.= " t.employee_status,";
 		$sql.= " t.fk_user_author,";
 		$sql.= " t.fk_user_modif,";
@@ -289,6 +294,7 @@ class contractType extends CommonObject
 				$this->datem = $this->db->jdate($obj->datem);
 				$this->type_contract = $obj->type_contract;
 				$this->description = $obj->description;
+				$this->title = $obj->title;
 				$this->employee_status = $obj->employee_status;
 				$this->fk_user_author = $obj->fk_user_author;
 				$this->fk_user_modif = $obj->fk_user_modif;
@@ -341,6 +347,7 @@ class contractType extends CommonObject
 		if (isset($this->entity)) $this->entity=trim($this->entity);
 		if (isset($this->type_contract)) $this->type_contract=trim($this->type_contract);
 		if (isset($this->description)) $this->description=trim($this->description);
+                if (isset($this->title)) $this->title=trim($this->title);
 		if (isset($this->employee_status)) $this->employee_status=trim($this->employee_status);
 		if (isset($this->fk_user_author)) $this->fk_user_author=trim($this->fk_user_author);
 		if (isset($this->fk_user_modif)) $this->fk_user_modif=trim($this->fk_user_modif);
@@ -375,6 +382,7 @@ class contractType extends CommonObject
 		$sql.= " datem=".(dol_strlen($this->datem)!=0 ? "'".$this->db->idate($this->datem)."'" : 'null').",";
 		$sql.= " type_contract=".(isset($this->type_contract)?$this->type_contract:"null").",";
 		$sql.= " description=".(isset($this->description)?"'".$this->db->escape($this->description)."'":"null").",";
+		$sql.= " title=".(isset($this->title)?"'".$this->db->escape($this->title)."'":"null").",";
 		$sql.= " employee_status=".(isset($this->employee_status)?$this->employee_status:"null").",";
 		$sql.= " fk_user_author=".(isset($this->fk_user_author)?$this->fk_user_author:"null").",";
 		$sql.= " fk_user_modif=".(isset($this->fk_user_modif)?$this->fk_user_modif:"null").",";
@@ -565,6 +573,7 @@ class contractType extends CommonObject
 		$this->datem='';
 		$this->type_contract='';
 		$this->description='';
+		$this->title='';                
 		$this->employee_status='';
 		$this->fk_user_author='';
 		$this->fk_user_modif='';
