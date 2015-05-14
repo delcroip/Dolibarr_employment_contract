@@ -41,15 +41,15 @@ $res=0;
 if (! $res && file_exists("../main.inc.php")) $res=@include '../main.inc.php';					// to work if your module directory is into dolibarr root htdocs directory
 if (! $res && file_exists("../../main.inc.php")) $res=@include '../../main.inc.php';			// to work if your module directory is into a subdir of root htdocs directory
 if (! $res && file_exists("../../../dolibarr/htdocs/main.inc.php")) $res=@include '../../../dolibarr/htdocs/main.inc.php';     // Used on dev env only
-if (! $res && file_exists("../../../../dolibarr/htdocs/main.inc.php")) $res=@include '../../../../dolibarr/htdocs/main.inc.php';   // Used on dev env only
+if (! $res && file_exists("/var/www/dolibarr/htdocs/main.inc.php")) $res=@include '/var/www/dolibarr/htdocs/main.inc.php';   // Used on dev env only
 if (! $res) die("Include of main fails");
 // Change this following line to use the correct relative path from htdocs
-include_once(DOL_DOCUMENT_ROOT.'/core/class/formcompany.class.php');
+//include_once(DOL_DOCUMENT_ROOT.'/core/class/formcompany.class.php');
 dol_include_once('/module/class/skeleton_class.class.php');
 
 // Load traductions files requiredby by page
-$langs->load("companies");
-$langs->load("other");
+//$langs->load("companies");
+$langs->load("skeleton_class");
 
 // Get parameters
 $id			= GETPOST('id','int');
@@ -63,15 +63,10 @@ if ($user->societe_id > 0)
 	//accessforbidden();
 }
 
-if (empty($action) && empty($id) && empty($ref)) $action='create';
+//if (empty($action) && empty($id) && empty($ref)) $action='list';
 
 // Load object if id or ref is provided as parameter
 $object=new Skeleton_Class($db);
-if (($id > 0 || ! empty($ref)) && $action != 'add')
-{
-	$result=$object->fetch($id,$ref);
-	if ($result < 0) dol_print_error($db);
-}
 
 
 
@@ -82,108 +77,92 @@ if (($id > 0 || ! empty($ref)) && $action != 'add')
 ********************************************************************/
 
 // Action to add record
-if ($action == 'add')
+$error=0;
+if (GETPOST('cancel')){
+        if ($action == 'update'){
+            $action="view";
+        }else
+        {
+            $action="list";
+        }
+                  //$urltogo=$backtopage?$backtopage:dol_buildpath('?action=list',1);
+	//header("Location: ".$urltogo);
+}else if (($action == 'add') || ($action == 'create'))
 {
-	if (GETPOST('cancel'))
-	{
-		$urltogo=$backtopage?$backtopage:dol_buildpath('/buildingmanagement/list.php',1);
-		header("Location: ".$urltogo);
-		exit;
-	}
 
-	$error=0;
+        $object->prop1=GETPOST("field1");
+        $object->prop2=GETPOST("field2");
 
-	/* object_prop_getpost_prop */
-	$object->prop1=GETPOST("field1");
-	$object->prop2=GETPOST("field2");
-
-	if (empty($object->ref))
-	{
-		$error++;
-		setEventMessage($langs->trans("ErrorFieldRequired",$langs->transnoentitiesnoconv("Ref")),'errors');
-	}
-
-	if (! $error)
-	{
-		$result=$object->create($user);
-		if ($result > 0)
-		{
-			// Creation OK
-			$urltogo=$backtopage?$backtopage:dol_buildpath('/mymodule/list.php',1);
-			header("Location: ".$urltogo);
-			exit;
-		}
-		{
-			// Creation KO
-			if (! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
-			else  setEventMessages($object->error, null, 'errors');
-			$action='create';
-		}
-	}
-	else
-	{
-		$action='create';
-	}
-}
-
-// Cancel
-if ($action == 'update' && GETPOST('cancel')) $action='view';
-
-// Action to update record
-if ($action == 'update' && ! GETPOST('cancel'))
-{
-	$error=0;
-
-	$object->prop1=GETPOST("field1");
-	$object->prop2=GETPOST("field2");
-
-	if (empty($object->ref))
-	{
-		$error++;
-		setEventMessages($langs->trans("ErrorFieldRequired",$langs->transnoentitiesnoconv("Ref")),null,'errors');
-	}
-
-	if (! $error)
-	{
-		$result=$object->update($user);
-		if ($result > 0)
-		{
-			$action='view';
-		}
-		else
-		{
-			// Creation KO
-			if (! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
-			else setEventMessages($object->error, null, 'errors');
-			$action='edit';
-		}
-	}
-	else
-	{
-		$action='edit';
-	}
-}
-
-// Action to delete
-if ($action == 'confirm_delete')
-{
-	$result=$object->delete($user);
-	if ($result > 0)
-	{
-		// Delete OK
-		setEventMessages($langs->trans("RecordDeleted"), null, 'mesgs');
-		header("Location: ".dol_buildpath('/buildingmanagement/list.php',1));
-		exit;
-	}
-	else
-	{
-		if (! empty($object->errors)) setEventMessages(null,$object->errors,'errors');
-		else setEventMessages($object->error,null,'errors');
-	}
-}
-
-
-
+                  
+ }    
+ switch($action){		
+                    case 'update':
+                            $result=$object->update($user);
+                            if ($result > 0)
+                            {
+                                // Creation OK
+                                    setEventMessages('objectSucessfullyUpdated');
+                                    $action='view';
+                            }
+                            else
+                            {
+                                    // Creation KO
+                                    if (! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
+                                    else setEventMessages($object->error, null, 'errors');
+                                    $action='edit';
+                            }
+             
+                        break;
+                    case 'add':
+                            $result=$object->create($user);
+                            if ($result > 0)
+                            {
+                                    // Creation OK
+                                   setEventMessages('objectSucessfullyCreated');
+                                   $action='list';
+                                    exit;
+                            }else
+                            {
+                                    // Creation KO
+                                    if (! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
+                                    else  setEventMessages($object->error, null, 'errors');
+                                    $action='create';
+                            }                            
+                            break;
+                    case 'view':
+                    case 'edit':
+                            if ($id > 0 )
+                            {
+                                    $result=$object->fetch($id,$ref);
+                                    if ($result < 0) dol_print_error($db);
+                            }else
+                            {
+                                    setEventMessage( $langs->trans("noIdPresent"),'errors');
+                                    $action='list';
+                            }
+                            break;
+                     case 'confirm_delete':
+                            $result=$object->delete($user);
+                            if ($result > 0)
+                            {
+                                    // Delete OK
+                                    setEventMessages($langs->trans("RecordDeleted"), null, 'mesgs');
+                                    $action='list';
+                                    exit;
+                            }
+                            else
+                            {
+                                    // Delete NOK
+                                    if (! empty($object->errors)) setEventMessages(null,$object->errors,'errors');
+                                    else setEventMessages($object->error,null,'errors');
+                                    $action='view';
+                            }
+                         break;
+                    case 'list':
+                    case 'create':
+                    default:
+                            break;
+            } 
 
 
 /***************************************************
@@ -192,7 +171,7 @@ if ($action == 'confirm_delete')
 * Put here all code to build page
 ****************************************************/
 
-llxHeader('','MyPageName','');
+llxHeader('','skeleton','');
 
 $form=new Form($db);
 
@@ -261,8 +240,8 @@ switch ($action) {
         }
 	print '<table class="border centpercent">'."\n";
 
-        print "<tr><td>prop1</td><td>".$object->field1."</td></tr>";
-        print "<tr><td>prop2</td><td>".$object->field2."</td></tr>";
+            print "<tr><td>prop1</td><td>".$object->field1."</td></tr>";
+            print "<tr><td>prop2</td><td>".$object->field2."</td></tr>";
 
 	print '</table>'."\n";
 	print '<br>';
@@ -287,7 +266,7 @@ switch ($action) {
     $sql.= " t.field1,";
     $sql.= " t.field2";
     $sql.= " FROM ".MAIN_DB_PREFIX."mytable as t";
-    $sql.= " WHERE field3 = 'xxx'";
+//    $sql.= " WHERE field3 = 'xxx'";
     $sql.= " ORDER BY field1 ASC";
 
     print '<table class="noborder">'."\n";
@@ -300,6 +279,7 @@ switch ($action) {
     $resql=$db->query($sql);
     if ($resql)
     {
+       $i=0;
         $num = $db->num_rows($resql);
         while ($i < $num)
         {
@@ -311,7 +291,7 @@ switch ($action) {
                 print "<tr><td>prop2</td><td>".$obj->field2."</td></tr>";
 
             }
-            
+            $i++;
         }
     }
     else
@@ -324,8 +304,6 @@ switch ($action) {
 }
         break;
 }
-
-
 
 // End of page
 llxFooter();

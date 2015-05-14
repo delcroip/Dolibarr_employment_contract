@@ -39,7 +39,7 @@ class Skeleton_Class extends CommonObject
 	var $error;							//!< To return error code (or message)
 	var $errors=array();				//!< To return several error codes (or messages)
 	var $element='skeleton';			//!< Id that identify managed objects
-	var $table_element='skeleton';		//!< Name of table without prefix where object is stored
+	var $table_element='mytable';		//!< Name of table without prefix where object is stored
 
     var $id;
     var $prop1;
@@ -365,5 +365,139 @@ class Skeleton_Class extends CommonObject
 		$this->prop1='prop1';
 		$this->prop2='prop2';
 	}
+/*
+ * function to genegate a select list from a table, the showed text will be a concatenation of some 
+ * column defined in column bit, the Least sinificative bit will represent the first colum 
+ * ex: 14 = 1*2³+1*2²+1*2+ 0* 2⁰ so the text will be the concat of column 2 colum 3 colum4
+ * 
+ *  @param    string              	$table                 table which the fk refers to (without prefix)
+ *  @param    string              	$fieldValue         field of the table which the fk refers to, the one to put in the Valuepart
+ *  @param    string              	$htmlName        name to the form select
+ *  @param    string              	$fieldToShow1    first part of the concatenation
+ *  @param    string              	$fieldToShow1    second part of the concatenation
+ *  @param    string              	$selected            which value must be selected
+ *  @param    string              	$sqlTail              to limit per entity, to filter ...
+ *  @param    string              	$separator          separator between the tow contactened fileds
 
+ *  @return string                                                   html code
+ */
+function select_generic($table, $fieldValue,$htmlName,$fieldToShow1,$fieldToShow2="",$selected="",$sqlTail="",$separator=', '){
+     //
+    if($table=="" || $fieldValue=="" || $fieldToShow1==0 || $htmlName=="" )
+    {
+        return "error, one of the mandatory field of the function  select_generic is missing";
+    }
+    $select="<select class=\"flat\" id=\"".$htmlName." \" name=\"".$htmlName."\">";
+    
+    $sql="SELECT";
+    $sql.=" ".$fieldValue;
+    $sql.=" ,".$fieldToShow1;
+    if(!empty($fieldToShow2))
+        $sql.=" ,".$fieldToShow2;
+    $sql.= " FROM ".MAIN_DB_PREFIX.$table." as t";
+    if(!empty($sqlTail))
+            $sql.=" , ".$sqlTail;
+    //$sql.= " ORDER BY t.".$field;
+       
+    dol_syslog("form::select_generic sql=".$sql, LOG_DEBUG);
+    
+    $resql=$this->db->query($sql);
+   
+    if ($resql)
+    {
+        $select.= "<option value=\"-1\" ".(empty($selected)?"selected=\"selected\"":"").">&nbsp;</option>\n";
+        $i=0;
+         //return $table."this->db".$field;
+        $num = $this->db->num_rows($resql);
+        while ($i < $num)
+        {
+            
+            $obj = $this->db->fetch_object($resql);
+            
+            if ($obj)
+            {
+                
+                    
+                    $select.= "<option value=\"".$obj->{$fieldValue}."\" ".(($obj->{$fieldValue}===$selected)?"selected=\"selected\" >":">");
+                    foreach($keys as $index => $key){
+                            $select.=$obj->{$fieldToShow1};
+                            if(!empty($fieldToShow2))
+                                 $select.=$separator.$obj->{$fieldToShow2};                
+                    }
+                    $select.="</option>\n";
+            } 
+            $i++;
+        }
+    }
+    else
+    {
+        $error++;
+        dol_print_error($this->db);
+       $select.= "<option value=\"-1\" selected=\"selected\">ERROR</option>\n";
+    }
+      $select.="</select>\n";
+      return $select;
+    
+ }
+
+/*
+ * function to genegate a select list from a table, the showed text will be a concatenation of some 
+ * column defined in column bit, the Least sinificative bit will represent the first colum 
+ * ex: 14 = 1*2³+1*2²+1*2+ 0* 2⁰ so the text will be the concat of column 2 colum 3 colum4
+ * 
+ *  @param    string              	$table                 table which the fk refers to (without prefix)
+ *  @param    string              	$fieldValue         field of the table which the fk refers to, the one to put in the Valuepart
+ *  @param    string              	$fieldToShow1    first part of the concatenation
+ *  @param    string              	$fieldToShow1    second part of the concatenation
+ *  @param    string              	$separator          separator between the tow contactened fileds
+
+ *  @return string                                                   html code
+ */
+function print_generic($table, $fieldValue,$fieldToShow1,$fieldToShow2="",$separator=', '){
+   //return $table.$this->db.$field;
+    if($table=="" || $field=="" || $columnBit==0 || $selected==0)
+    {
+        return "error, one of the mandatory field of the function  select_generic is missing";
+    }
+    
+    $sql="SELECT";
+    $sql.=" ".$fieldValue;
+    $sql.=" ,".$fieldToShow1;
+    if(!empty($fieldToShow2))
+        $sql.=" ,".$fieldToShow2;
+    $sql.= " FROM ".MAIN_DB_PREFIX.$table." as t";
+    $sql.= " WHERE t.".$fieldValue."=".$selected;
+       
+    dol_syslog("form::print_generic sql=".$sql, LOG_DEBUG);
+    
+    $resql=$this->db->query($sql);
+    
+    if ($resql)
+    {
+        $select.= "<option value=\"-1\" ".(empty($selected)?"selected=\"selected\"":"").">&nbsp;</option>\n";
+
+        $num = $this->db->num_rows($resql);
+        if ( $num)
+        {
+            $obj = $this->db->fetch_object($resql);
+            
+            if ($obj)
+            {
+                            $select.=$obj->{$fieldToShow1};
+                            if(!empty($fieldToShow2))
+                                 $select.=$separator.$obj->{$fieldToShow2};        
+            } 
+        }
+    }
+    else
+    {
+        $error++;
+        dol_print_error($this->db);
+       $select.= "ERROR";
+    }
+      $select.="\n";
+      return $select;
+ }
+ 
+ 
 }

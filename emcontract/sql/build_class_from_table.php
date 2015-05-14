@@ -34,7 +34,7 @@ if (substr($sapi_type, 0, 3) == 'cgi') {
 }
 
 // Include Dolibarr environment
-require_once($path."../../htdocs/master.inc.php");
+require_once("/var/www/dolibarr/htdocs/master.inc.php");
 // After this $db is a defined handler to database.
 
 // Main
@@ -184,8 +184,8 @@ $targetcontent=preg_replace('/\s*\/\/\.\.\./', '', $targetcontent);
 $targetcontent=preg_replace('/Put here some comments/','Initialy built by build_class_from_table on '.strftime('%Y-%m-%d %H:%M',mktime()), $targetcontent);
 
 // Substitute table name
-$targetcontent=preg_replace('/MAIN_DB_PREFIX."mytable/', 'MAIN_DB_PREFIX."'.$tablenoprefix, $targetcontent);
-
+//$targetcontent=preg_replace('/MAIN_DB_PREFIX."mytable/', 'MAIN_DB_PREFIX."'.$tablenoprefix, $targetcontent);
+$targetcontent=preg_replace('/mytable/',$tablenoprefix, $targetcontent);
 // Substitute declaration parameters
 $varprop="\n";
 $cleanparam='';
@@ -358,69 +358,6 @@ foreach($property as $key => $prop)
 }
 $targetcontent=preg_replace('/\$this->prop1=\'prop1\';/', $varprop, $targetcontent);
 $targetcontent=preg_replace('/\$this->prop2=\'prop2\';/', '', $targetcontent);
-
-/*
- * substitute table lines
- */
-
-$varprop="\n";
-$cleanparam='';
-$nbproperty=count($property);
-$i=0;
-foreach($property as $key => $prop)
-{
-	if ($prop['field'] != 'rowid' && $prop['field'] != 'id')
-	{
-                $varprop.=($i%2==0)?"\t\tprint \"<tr>\n\";\n":'';
-                
-		$varprop.="\t\tprint <td> \$langs->trans('";
-                $varprop.=preg_replace('/_/','',ucfirst($prop['field']));
-                $varprop.="') </td><td>;\n";
-                //suport the edit mode
-                $varprop.="\t\tif(\$edit==1){";
-                switch ($prop['type']) {
-                    case 'datetime':
-                    case 'date':
-                    case 'timestamp':
-                        $varprop.="\t\t\tprint \$form->select_date(\$obj->";
-                        $varprop.=$prop['field'].",'";
-                        $varprop.=preg_replace('/_/','',ucfirst($prop['field']))."');\n";  
-                        $varprop.="\t\t}else{\n";
-                        $varprop.="\t\t\tprint \$form->dol_print_date(\$obj->";
-                        $varprop.=$prop['field'].",'day');/n";
-                        
-                        break;
-                    default:
-                        $varprop.="\t\t\tprint \<input type=\"text\" value=\"\$obj->";
-                        $varprop.=$prop['field']."\" name=\"";
-                        $varprop.=preg_replace('/_/','',ucfirst($prop['field']))."\">";  
-                        $varprop.="\t\t}else{\n";
-                        $varprop.="\t\t\tprint \$obj->";
-                        $varprop.=$prop['field'].";/n";
-                        
-                        break;
-                }  
-                $varprop.="\t\t}\n";
-		$varprop.="</td>\n";
-                
-                $varprop.=( $i%2==1)?"\t\tprint \"</tr>\n\";\n":'';
-                $i++;
-	}
-        
-}
-//if there is an unpair number of line
-if($i%2==0)
-{
-    $varprop.="\t\tprint \"<td></td></tr>\n\";\n";
-                
-}
-
-
-
-$targetcontent=preg_replace('/print "<tr><td>prop1</td><td>".\$object->field1."</td></tr>";/', $varprop, $targetcontent);
-$targetcontent=preg_replace('/print "<tr><td>prop2</td><td>".\$object->field2."</td></tr>";/', '', $targetcontent);
-
-
 // Build file
 $fp=fopen($outfile,"w");
 if ($fp)
@@ -431,7 +368,7 @@ if ($fp)
 	print "File '".$outfile."' has been built in current directory.\n";
 }
 else $error++;
-
+/*
 
 //--------------------------------
 // Build skeleton_script.php
@@ -478,7 +415,7 @@ if ($fp)
 else $error++;
 
 
-
+*/
 //--------------------------------
 // Build skeleton_page.php
 //--------------------------------
@@ -512,11 +449,155 @@ $targetcontent=preg_replace('/\s*\/\/\.\.\./', '', $targetcontent);
 $targetcontent=preg_replace('/Put here some comments/','Initialy built by build_class_from_table on '.strftime('%Y-%m-%d %H:%M',mktime()), $targetcontent);
 
 // Substitute table name
-$targetcontent=preg_replace('/MAIN_DB_PREFIX."mytable/', 'MAIN_DB_PREFIX."'.$tablenoprefix, $targetcontent);
+$targetcontent=preg_replace('/mytable/',$tablenoprefix, $targetcontent);
 
 // Substitute fetch/select parameters
 $targetcontent=preg_replace('/\$sql\.= " t\.field1,";/', $varpropselect, $targetcontent);
 $targetcontent=preg_replace('/\$sql\.= " t\.field2";/', '', $targetcontent);
+
+/*
+ * substitue GETPOST
+ */
+$varpropget="";
+$cleanparam='';
+foreach($property as $key => $prop)
+{
+        $varpropget.="\t\t\$object->".$prop['field']."=GETPOST(\"";
+        $varpropget.=preg_replace('/_/','',ucfirst($prop['field']))."\");\n";
+
+}
+        
+  $targetcontent=preg_replace('/\$object->prop1=GETPOST\("field1"\);/',$varpropget, $targetcontent);
+//    $targetcontent=preg_replace('/BALISEHERE/',$varpropget, $targetcontent);
+  $targetcontent=preg_replace('/\$object->prop2=GETPOST\("field2"\);/','', $targetcontent);
+/*
+ * substitute table lines
+ */
+
+$varprop="\n";
+$cleanparam='';
+$nbproperty=count($property);
+$i=0;
+foreach($property as $key => $prop)
+{
+	if ($prop['field'] != 'rowid' && $prop['field'] != 'id')
+	{
+                $varprop.=($i%2==0)?"\t\tprint \"<tr>\\n\";\n":'';
+                $varprop.="\n// show the field ".$prop['field']."\n\n";
+                if ($i>4) //some example of fieldrequired
+                    $varprop.="\t\tprint \"<td class='fieldrequired'>\".\$langs->trans('";
+                else
+                    $varprop.="\t\tprint \"<td class='fieldrequired'>\".\$langs->trans('";
+                $varprop.=preg_replace('/_/','',ucfirst($prop['field']));
+                $varprop.="').\" </td><td>\";\n";
+                //suport the edit mode
+                $varprop.="\t\tif(\$edit==1){\n";
+
+                switch ($prop['type']) {
+                    case 'datetime':
+                    case 'date':
+                    case 'timestamp':
+                        $varprop.="\t\t\tprint \$form->select_date(\$object->";
+                        $varprop.=$prop['field'].",'";
+                        $varprop.=preg_replace('/_/','',ucfirst($prop['field']))."');\n";  
+                        $varprop.="\t\t}else{\n";
+                        $varprop.="\t\t\tprint dol_print_date(\$obj->";
+                        $varprop.=$prop['field'].",'day');\n";
+                        
+                        break;
+                    default:
+                        // print $form->select_dolusers($em->fk_user, "fk_user", 1, "", 0 );	// By default, hierarchical parent
+                        // print $em->select_typec(GETPOST('fk_contract_type','int'),'fk_contract_type',0); /*FIXME*/
+
+                        if(strpos($prop['field'],'fk_user') ===0) 
+                         {
+                                $varprop.="\t\tprint \$form->select_dolusers(\$object->".$prop['field'].", '".$prop['field']."', 1, '', 0 );\n";
+                                $varprop.="\t\t}else{\n";
+                                $varprop.="\t\t\$object->print_generic('user', 'rowid','lastname','firstname',' ');\n";
+                         }else if(strpos($prop['field'],'fk_') ===0) 
+                        {
+                            
+                                $varprop.="\t\t\$object->print select_generic('".substr ( $prop['field'],3)."','rowid','";
+                                $varprop.= preg_replace('/_/','',ucfirst($prop['field']))."','rowid','description' );\n";
+                                $varprop.="\t\t}else{\n";
+                                $varprop.="\t\t\$object->print_generic('".substr ( $prop['field'],3)."','rowid',";
+                                $varprop.="\$object->".$prop['field'].",'rowid','description');\n";
+                        }else 
+                        {
+                                $varprop.="\t\t\tprint '<input type=\"text\" value=\"'.\$object->";
+                                $varprop.=$prop['field'].".'\" name=\"";
+                                $varprop.=preg_replace('/_/','',ucfirst($prop['field']))."\">';\n";  
+                                $varprop.="\t\t}else{\n";
+                                $varprop.="\t\t\tprint \$object->";
+                                $varprop.=$prop['field'].";\n";
+                        }
+                        break;
+                }  
+                $varprop.="\t\t}\n";
+                $varprop.="\t\tprint \"</td>\";\n";
+                
+                $varprop.=( $i%2==1)?"\t\tprint \"\\n</tr>\\n\";\n":'';
+                $i++;
+	}
+        
+}
+//if there is an unpair number of line
+if($i%2==1)
+{
+    $varprop.="\t\tprint \"<td></td></tr>\\n\";\n";
+                
+}
+
+
+
+$targetcontent=preg_replace('/print "<tr><td>prop1<\/td><td>".\$object->field1."<\/td><\/tr>";/', $varprop, $targetcontent);
+$targetcontent=preg_replace('/print "<tr><td>prop2<\/td><td>".\$object->field2."<\/td><\/tr>";/', '', $targetcontent);
+
+/*
+ * substitute list header
+ */
+$varprop='';
+$i=0;
+foreach($property as $key => $prop)
+{
+    if($i<4) // just to have some example
+    {
+    $varprop.="print_liste_field_titre(\$langs->trans('";
+    $varprop.=$prop['field']."'),\$_SERVER['PHP_SELF'],'t.";
+    $varprop.=$prop['field']."','',\$param,'',\$sortfield,\$sortorder);\n";
+    }
+    $i++;  
+}
+$targetcontent=preg_replace('/print_liste_field_titre\(\$langs->trans\(\'field1\'\),\$_SERVER\[\'PHP_SELF\'\],\'t\.field1\',\'\',\$param,\'\',\$sortfield,\$sortorder\);/', $varprop, $targetcontent);
+$targetcontent=preg_replace('/print_liste_field_titre\(\$langs->trans\(\'field2\'\),\$_SERVER\[\'PHP_SELF\'\],\'t\.field2\',\'\',\$param,\'\',\$sortfield,\$sortorder\);/','', $targetcontent);
+
+/*
+ * substitute list rows
+ */
+$varprop='';
+$i=0;
+foreach($property as $key => $prop)
+{
+if($i<4) // just to have some example
+    {
+
+    if($prop['istime']){
+        $varprop.="\t\tprint \"<tr><td>\".dol_print_date(\$obj->";
+        $varprop.=$prop['field'].",'day').\"</td>\";\n";      
+    }else if(strpos($prop['field'],'fk_') ===0) {
+        $varprop.="\t\tprint \"<tr><td>\"\.print_generic('".substr ( $prop['field'],3)."','rowid',";
+        $varprop.="\$object->".$prop['field'].").\"</td></tr>\";\n";
+    }else
+    {                     
+        $varprop.="\t\tprint \"<tr><td>\"\.\$obj->".$prop['field'].".\"</td></tr>\";\n";
+    }
+    }
+    $i++;  
+}
+$targetcontent=preg_replace('/print "<tr><td>prop1<\/td><td>"\.\$obj->field1\."<\/td><\/tr>";/', $varprop, $targetcontent);
+$targetcontent=preg_replace('/print "<tr><td>prop2<\/td><td>"\.\$obj->field2\."<\/td><\/tr>";/', '', $targetcontent);
+
+
 
 // Build file
 $fp=fopen($outfile,"w");
