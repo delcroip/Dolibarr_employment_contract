@@ -23,14 +23,14 @@ CREATE TABLE llx_hr_contract_type
 (
 rowid                 	integer NOT NULL AUTO_INCREMENT,
 entity	              	integer DEFAULT 1 NOT NULL,		-- multi company id
-datec                 	DATETIME NOT NULL,
-datem		      	TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+date_creation                 	DATETIME NOT NULL,
+date_modification		      	TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 type_contract         	integer NOT NULL,      -- 0- admin, 1- CDI, 2- CDD, 3- apprentissage , 4- stage ,,          
 title           	VARCHAR( 255 ) NOT NULL,
 description           	VARCHAR( 2048 ) NOT NULL,
 employee_status         integer, -- cadre, assimilé cadre, non cadre, cadre dirigeant
-fk_user_author        	integer ,
-fk_user_modif         	integer ,
+fk_user_creation        	integer ,
+fk_user_modification         	integer ,
 weekly_hours	      	DECIMAL(5,3) NOT NULL, -- operand 1 |
 modulation_period      	integer DEFAULT 0, -- operand 2 | 0 - one week, 1- one month, 2- two month ...
 working_days           	integer DEFAULT 31, -- operand 3 | (2^0)=1- monday, (2^1)=2- tuesday, (2^2)=4- Wednesday ... ex M+T+W+T+F=1+2+4+8+16=31, 

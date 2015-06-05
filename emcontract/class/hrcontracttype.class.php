@@ -1,6 +1,5 @@
 <?php
-/* Copyright (C) 2015 delcroip <pmpdelcroix@gmail.com>
- * Copyright (C) 2007-2012 Laurent Destailleur  <eldy@users.sourceforge.net>
+/* Copyright (C) 2007-2012 Laurent Destailleur  <eldy@users.sourceforge.net>
  * Copyright (C) 2014	   Juanjo Menent		<jmenent@2byte.es>
  * Copyright (C) ---Put here your own copyright and developer email---
  *
@@ -19,10 +18,10 @@
  */
 
 /**
- *  \file       dev/skeletons/hrcontracttype.class.php
- *  \ingroup    mymodule othermodule1 othermodule2
+ *  \file       dev/hrcontracttypes/hrcontracttype.class.php
+ *  \ingroup    emcontract othermodule1 othermodule2
  *  \brief      This file is an example for a CRUD class file (Create/Read/Update/Delete)
- *				Initialy built by build_class_from_table on 2015-05-01 16:09
+ *				Initialy built by build_class_from_table on 2015-06-05 20:13
  */
 
 // Put here all includes required by your class file
@@ -34,25 +33,25 @@ require_once(DOL_DOCUMENT_ROOT."/core/class/commonobject.class.php");
 /**
  *	Put here description of your class
  */
-class contractType extends CommonObject
+class Hrcontracttype extends CommonObject
 {
 	var $db;							//!< To store db handler
 	var $error;							//!< To return error code (or message)
 	var $errors=array();				//!< To return several error codes (or messages)
-	var $element='contracttype';			//!< Id that identify managed objects
+	var $element='hrcontracttype';			//!< Id that identify managed objects
 	var $table_element='hr_contract_type';		//!< Name of table without prefix where object is stored
 
     var $id;
     
 	var $entity;
-	var $datec='';
-	var $datem='';
+	var $date_creation='';
+	var $date_modification='';
 	var $type_contract;
-	var $description;
 	var $title;
+	var $description;
 	var $employee_status;
-	var $fk_user_author;
-	var $fk_user_modif;
+	var $user_creation;
+	var $user_modification;
 	var $weekly_hours;
 	var $modulation_period;
 	var $working_days;
@@ -67,7 +66,7 @@ class contractType extends CommonObject
 	var $weekly_max_hours;
 	var $weekly_min_hours;
 	var $daily_max_hours;
-	var $fk_salary_method;
+	var $salary_method;
 	var $sm_custom_field_1_value;
 	var $sm_custom_field_2_value;
 
@@ -102,11 +101,11 @@ class contractType extends CommonObject
         
 		if (isset($this->entity)) $this->entity=trim($this->entity);
 		if (isset($this->type_contract)) $this->type_contract=trim($this->type_contract);
-		if (isset($this->description)) $this->description=trim($this->description);
 		if (isset($this->title)) $this->title=trim($this->title);
+		if (isset($this->description)) $this->description=trim($this->description);
 		if (isset($this->employee_status)) $this->employee_status=trim($this->employee_status);
-		if (isset($this->fk_user_author)) $this->fk_user_author=trim($this->fk_user_author);
-		if (isset($this->fk_user_modif)) $this->fk_user_modif=trim($this->fk_user_modif);
+		if (isset($this->user_creation)) $this->user_creation=trim($this->user_creation);
+		if (isset($this->user_modification)) $this->user_modification=trim($this->user_modification);
 		if (isset($this->weekly_hours)) $this->weekly_hours=trim($this->weekly_hours);
 		if (isset($this->modulation_period)) $this->modulation_period=trim($this->modulation_period);
 		if (isset($this->working_days)) $this->working_days=trim($this->working_days);
@@ -121,7 +120,7 @@ class contractType extends CommonObject
 		if (isset($this->weekly_max_hours)) $this->weekly_max_hours=trim($this->weekly_max_hours);
 		if (isset($this->weekly_min_hours)) $this->weekly_min_hours=trim($this->weekly_min_hours);
 		if (isset($this->daily_max_hours)) $this->daily_max_hours=trim($this->daily_max_hours);
-		if (isset($this->fk_salary_method)) $this->fk_salary_method=trim($this->fk_salary_method);
+		if (isset($this->salary_method)) $this->salary_method=trim($this->salary_method);
 		if (isset($this->sm_custom_field_1_value)) $this->sm_custom_field_1_value=trim($this->sm_custom_field_1_value);
 		if (isset($this->sm_custom_field_2_value)) $this->sm_custom_field_2_value=trim($this->sm_custom_field_2_value);
 
@@ -134,14 +133,12 @@ class contractType extends CommonObject
 		$sql = "INSERT INTO ".MAIN_DB_PREFIX.$this->table_element."(";
 		
 		$sql.= "entity,";
-		$sql.= "datec,";
-		$sql.= "datem,";
+		$sql.= "date_creation,";
 		$sql.= "type_contract,";
-		$sql.= "description,";
 		$sql.= "title,";
+		$sql.= "description,";
 		$sql.= "employee_status,";
-		$sql.= "fk_user_author,";
-		$sql.= "fk_user_modif,";
+		$sql.= "fk_user_creation,";
 		$sql.= "weekly_hours,";
 		$sql.= "modulation_period,";
 		$sql.= "working_days,";
@@ -164,14 +161,12 @@ class contractType extends CommonObject
         $sql.= ") VALUES (";
         
 		$sql.= " ".(! isset($this->entity)?'NULL':"'".$this->entity."'").",";
-		$sql.= " ".(! isset($this->datec) || dol_strlen($this->datec)==0?'NULL':"'".$this->db->idate($this->datec)."'").",";
-		$sql.= " ".(! isset($this->datem) || dol_strlen($this->datem)==0?'NULL':"'".$this->db->idate($this->datem)."'").",";
+		$sql.= " NOW() ,";
 		$sql.= " ".(! isset($this->type_contract)?'NULL':"'".$this->type_contract."'").",";
-		$sql.= " ".(! isset($this->description)?'NULL':"'".$this->db->escape($this->description)."'").",";
 		$sql.= " ".(! isset($this->title)?'NULL':"'".$this->db->escape($this->title)."'").",";
+		$sql.= " ".(! isset($this->description)?'NULL':"'".$this->db->escape($this->description)."'").",";
 		$sql.= " ".(! isset($this->employee_status)?'NULL':"'".$this->employee_status."'").",";
-		$sql.= " ".(! isset($this->fk_user_author)?'NULL':"'".$this->fk_user_author."'").",";
-		$sql.= " ".(! isset($this->fk_user_modif)?'NULL':"'".$this->fk_user_modif."'").",";
+		$sql.= " '".$user->id."',";
 		$sql.= " ".(! isset($this->weekly_hours)?'NULL':"'".$this->weekly_hours."'").",";
 		$sql.= " ".(! isset($this->modulation_period)?'NULL':"'".$this->modulation_period."'").",";
 		$sql.= " ".(! isset($this->working_days)?'NULL':"'".$this->working_days."'").",";
@@ -186,7 +181,7 @@ class contractType extends CommonObject
 		$sql.= " ".(! isset($this->weekly_max_hours)?'NULL':"'".$this->weekly_max_hours."'").",";
 		$sql.= " ".(! isset($this->weekly_min_hours)?'NULL':"'".$this->weekly_min_hours."'").",";
 		$sql.= " ".(! isset($this->daily_max_hours)?'NULL':"'".$this->daily_max_hours."'").",";
-		$sql.= " ".(! isset($this->fk_salary_method)?'NULL':"'".$this->fk_salary_method."'").",";
+		$sql.= " ".(! isset($this->salary_method)?'NULL':"'".$this->salary_method."'").",";
 		$sql.= " ".(! isset($this->sm_custom_field_1_value)?'NULL':"'".$this->sm_custom_field_1_value."'").",";
 		$sql.= " ".(! isset($this->sm_custom_field_2_value)?'NULL':"'".$this->sm_custom_field_2_value."'")."";
 
@@ -248,14 +243,14 @@ class contractType extends CommonObject
 		$sql.= " t.rowid,";
 		
 		$sql.= " t.entity,";
-		$sql.= " t.datec,";
-		$sql.= " t.datem,";
+		$sql.= " t.date_creation,";
+		$sql.= " t.date_modification,";
 		$sql.= " t.type_contract,";
-		$sql.= " t.description,";
 		$sql.= " t.title,";
+		$sql.= " t.description,";
 		$sql.= " t.employee_status,";
-		$sql.= " t.fk_user_author,";
-		$sql.= " t.fk_user_modif,";
+		$sql.= " t.fk_user_creation,";
+		$sql.= " t.fk_user_modification,";
 		$sql.= " t.weekly_hours,";
 		$sql.= " t.modulation_period,";
 		$sql.= " t.working_days,";
@@ -290,14 +285,14 @@ class contractType extends CommonObject
                 $this->id    = $obj->rowid;
                 
 				$this->entity = $obj->entity;
-				$this->datec = $this->db->jdate($obj->datec);
-				$this->datem = $this->db->jdate($obj->datem);
+				$this->date_creation = $this->db->jdate($obj->date_creation);
+				$this->date_modification = $this->db->jdate($obj->date_modification);
 				$this->type_contract = $obj->type_contract;
-				$this->description = $obj->description;
 				$this->title = $obj->title;
+				$this->description = $obj->description;
 				$this->employee_status = $obj->employee_status;
-				$this->fk_user_author = $obj->fk_user_author;
-				$this->fk_user_modif = $obj->fk_user_modif;
+				$this->user_creation = $obj->fk_user_creation;
+				$this->user_modification = $obj->fk_user_modification;
 				$this->weekly_hours = $obj->weekly_hours;
 				$this->modulation_period = $obj->modulation_period;
 				$this->working_days = $obj->working_days;
@@ -312,7 +307,7 @@ class contractType extends CommonObject
 				$this->weekly_max_hours = $obj->weekly_max_hours;
 				$this->weekly_min_hours = $obj->weekly_min_hours;
 				$this->daily_max_hours = $obj->daily_max_hours;
-				$this->fk_salary_method = $obj->fk_salary_method;
+				$this->salary_method = $obj->fk_salary_method;
 				$this->sm_custom_field_1_value = $obj->sm_custom_field_1_value;
 				$this->sm_custom_field_2_value = $obj->sm_custom_field_2_value;
 
@@ -346,11 +341,11 @@ class contractType extends CommonObject
         
 		if (isset($this->entity)) $this->entity=trim($this->entity);
 		if (isset($this->type_contract)) $this->type_contract=trim($this->type_contract);
+		if (isset($this->title)) $this->title=trim($this->title);
 		if (isset($this->description)) $this->description=trim($this->description);
-                if (isset($this->title)) $this->title=trim($this->title);
 		if (isset($this->employee_status)) $this->employee_status=trim($this->employee_status);
-		if (isset($this->fk_user_author)) $this->fk_user_author=trim($this->fk_user_author);
-		if (isset($this->fk_user_modif)) $this->fk_user_modif=trim($this->fk_user_modif);
+		if (isset($this->user_creation)) $this->user_creation=trim($this->user_creation);
+		if (isset($this->user_modification)) $this->user_modification=trim($this->user_modification);
 		if (isset($this->weekly_hours)) $this->weekly_hours=trim($this->weekly_hours);
 		if (isset($this->modulation_period)) $this->modulation_period=trim($this->modulation_period);
 		if (isset($this->working_days)) $this->working_days=trim($this->working_days);
@@ -365,7 +360,7 @@ class contractType extends CommonObject
 		if (isset($this->weekly_max_hours)) $this->weekly_max_hours=trim($this->weekly_max_hours);
 		if (isset($this->weekly_min_hours)) $this->weekly_min_hours=trim($this->weekly_min_hours);
 		if (isset($this->daily_max_hours)) $this->daily_max_hours=trim($this->daily_max_hours);
-		if (isset($this->fk_salary_method)) $this->fk_salary_method=trim($this->fk_salary_method);
+		if (isset($this->salary_method)) $this->salary_method=trim($this->salary_method);
 		if (isset($this->sm_custom_field_1_value)) $this->sm_custom_field_1_value=trim($this->sm_custom_field_1_value);
 		if (isset($this->sm_custom_field_2_value)) $this->sm_custom_field_2_value=trim($this->sm_custom_field_2_value);
 
@@ -378,14 +373,12 @@ class contractType extends CommonObject
         $sql = "UPDATE ".MAIN_DB_PREFIX.$this->table_element." SET";
         
 		$sql.= " entity=".(isset($this->entity)?$this->entity:"null").",";
-		$sql.= " datec=".(dol_strlen($this->datec)!=0 ? "'".$this->db->idate($this->datec)."'" : 'null').",";
-		$sql.= " datem=".(dol_strlen($this->datem)!=0 ? "'".$this->db->idate($this->datem)."'" : 'null').",";
+		$sql.= " date_modification=NOW() ,";
 		$sql.= " type_contract=".(isset($this->type_contract)?$this->type_contract:"null").",";
-		$sql.= " description=".(isset($this->description)?"'".$this->db->escape($this->description)."'":"null").",";
 		$sql.= " title=".(isset($this->title)?"'".$this->db->escape($this->title)."'":"null").",";
+		$sql.= " description=".(isset($this->description)?"'".$this->db->escape($this->description)."'":"null").",";
 		$sql.= " employee_status=".(isset($this->employee_status)?$this->employee_status:"null").",";
-		$sql.= " fk_user_author=".(isset($this->fk_user_author)?$this->fk_user_author:"null").",";
-		$sql.= " fk_user_modif=".(isset($this->fk_user_modif)?$this->fk_user_modif:"null").",";
+		$sql.= " fk_user_modification='".$user->id."',";
 		$sql.= " weekly_hours=".(isset($this->weekly_hours)?$this->weekly_hours:"null").",";
 		$sql.= " modulation_period=".(isset($this->modulation_period)?$this->modulation_period:"null").",";
 		$sql.= " working_days=".(isset($this->working_days)?$this->working_days:"null").",";
@@ -400,7 +393,7 @@ class contractType extends CommonObject
 		$sql.= " weekly_max_hours=".(isset($this->weekly_max_hours)?$this->weekly_max_hours:"null").",";
 		$sql.= " weekly_min_hours=".(isset($this->weekly_min_hours)?$this->weekly_min_hours:"null").",";
 		$sql.= " daily_max_hours=".(isset($this->daily_max_hours)?$this->daily_max_hours:"null").",";
-		$sql.= " fk_salary_method=".(isset($this->fk_salary_method)?$this->fk_salary_method:"null").",";
+		$sql.= " fk_salary_method=".(isset($this->salary_method)?$this->salary_method:"null").",";
 		$sql.= " sm_custom_field_1_value=".(isset($this->sm_custom_field_1_value)?$this->sm_custom_field_1_value:"null").",";
 		$sql.= " sm_custom_field_2_value=".(isset($this->sm_custom_field_2_value)?$this->sm_custom_field_2_value:"null")."";
 
@@ -445,7 +438,46 @@ class contractType extends CommonObject
 		}
     }
 
+    /**
+     *	Return clicable name (with picto eventually)
+     *
+     *	@param		int			$withpicto		0=_No picto, 1=Includes the picto in the linkn, 2=Picto only
+     *	@return		string						String with URL
+     */
+    function getNomUrl($withpicto=0)
+    {
+    	global $langs;
 
+    	$result='';
+        $id=0;
+        $ref='';
+        if(isset($this->id))  
+            $id=$this->id;
+        else if (isset($this->rowid))
+            $id=$this->rowid;
+        if(isset($this->ref))
+            $ref=$this->ref;
+        if($id)
+            $lien = '<a href="'.DOL_URL_ROOT.'/emcontract/hrcontracttype.php?id='.$id.'&action=view">';
+    	else if ($ref)
+            $lien = '<a href="'.DOL_URL_ROOT.'/emcontract/hrcontracttype.php?ref='.$ref.'&action=view">';
+    	else
+            return "Error";
+        $lienfin='</a>';
+
+    	$picto='emcontract@emcontract';
+        
+        if($ref)
+            $label=$langs->trans("Show").': '.$ref;
+        else if($id)
+            $label=$langs->trans("Show").': '.$id;
+        
+    	if ($withpicto) $result.=($lien.img_object($label,$picto).$lienfin);
+    	if ($withpicto && $withpicto != 2) $result.=' ';
+    	if ($withpicto != 2) $result.=$lien.$ref.$lienfin;
+    	return $result;
+    }
+    
  	/**
 	 *  Delete object in database
 	 *
@@ -516,7 +548,7 @@ class contractType extends CommonObject
 
 		$error=0;
 
-		$object=new contractType($this->db);
+		$object=new Hrcontracttype($this->db);
 
 		$this->db->begin();
 
@@ -569,14 +601,14 @@ class contractType extends CommonObject
 		$this->id=0;
 		
 		$this->entity='';
-		$this->datec='';
-		$this->datem='';
+		$this->date_creation='';
+		$this->date_modification='';
 		$this->type_contract='';
+		$this->title='';
 		$this->description='';
-		$this->title='';                
 		$this->employee_status='';
-		$this->fk_user_author='';
-		$this->fk_user_modif='';
+		$this->user_creation='';
+		$this->user_modification='';
 		$this->weekly_hours='';
 		$this->modulation_period='';
 		$this->working_days='';
@@ -591,11 +623,213 @@ class contractType extends CommonObject
 		$this->weekly_max_hours='';
 		$this->weekly_min_hours='';
 		$this->daily_max_hours='';
-		$this->fk_salary_method='';
+		$this->salary_method='';
 		$this->sm_custom_field_1_value='';
 		$this->sm_custom_field_2_value='';
 
 		
 	}
+/*
+ * function to genegate a select list from a table, the showed text will be a concatenation of some 
+ * column defined in column bit, the Least sinificative bit will represent the first colum 
+ * 
+ *  @param    string              	$table                 table which the fk refers to (without prefix)
+ *  @param    string              	$fieldValue         field of the table which the fk refers to, the one to put in the Valuepart
+ *  @param    string              	$htmlName        name to the form select
+ *  @param    string              	$fieldToShow1    first part of the concatenation
+ *  @param    string              	$fieldToShow1    second part of the concatenation
+ *  @param    string              	$selected            which value must be selected
+ *  @param    string              	$sqlTail              to limit per entity, to filter ...
+ *  @param    string              	$separator          separator between the tow contactened fileds
 
+ *  @return string                                                   html code
+ */
+function select_generic($table, $fieldValue,$htmlName,$fieldToShow1,$fieldToShow2="",$selected="",$sqlTail="",$separator=', '){
+     //
+    if($table=="" || $fieldValue=="" || $fieldToShow1=="" || $htmlName=="" )
+    {
+        return "error, one of the mandatory field of the function  select_generic is missing";
+    }
+    $select="<select class=\"flat\" id=\"".$htmlName." \" name=\"".$htmlName."\">";
+    
+    $sql="SELECT";
+    $sql.=" ".$fieldValue;
+    $sql.=" ,".$fieldToShow1;
+    if(!empty($fieldToShow2))
+        $sql.=" ,".$fieldToShow2;
+    $sql.= " FROM ".MAIN_DB_PREFIX.$table." as t";
+    if(!empty($sqlTail))
+            $sql.=" , ".$sqlTail;
+    //$sql.= " ORDER BY t.".$field;
+       
+    dol_syslog("form::select_generic sql=".$sql, LOG_DEBUG);
+    
+    $resql=$this->db->query($sql);
+   
+    if ($resql)
+    {
+        $select.= "<option value=\"-1\" ".(empty($selected)?"selected=\"selected\"":"").">&nbsp;</option>\n";
+        $i=0;
+         //return $table."this->db".$field;
+        $num = $this->db->num_rows($resql);
+        while ($i < $num)
+        {
+            
+            $obj = $this->db->fetch_object($resql);
+            
+            if ($obj)
+            {
+                    $select.= "<option value=\"".$obj->{$fieldValue}."\" ";
+                    $select.=(($obj->{$fieldValue}===$selected)?"selected=\"selected\" >":">");                    
+                    $select.=$obj->{$fieldToShow1};
+                    if(!empty($fieldToShow2))
+                         $select.=$separator.$obj->{$fieldToShow2};            
+                    $select.="</option>\n";
+            } 
+            $i++;
+        }
+    }
+    else
+    {
+        $error++;
+        dol_print_error($this->db);
+       $select.= "<option value=\"-1\" selected=\"selected\">ERROR</option>\n";
+    }
+      $select.="</select>\n";
+      return $select;
+    
+ }
+/*
+ * function to genegate a select list from a table, the showed text will be a concatenation of some 
+ * column defined in column bit, the Least sinificative bit will represent the first colum 
+ * 
+ *  @param    string              	$table              table which the enum refers to (without prefix)
+ *  @param    string              	$fieldValue         field of the table which the enum refers to
+ *  @param    string              	$htmlName           name to the form select
+ *  @param    string              	$selected           which value must be selected
+ *  @return string                                                   html code
+ */
+ 
+function select_enum($table, $fieldValue,$htmlName,$selected=""){
+     global $langs;
+    if($table=="" || $fieldValue=="" || $htmlName=="" )
+    {
+        return "error, one of the mandatory field of the function  select_enum is missing";
+    }    
+    $sql="SHOW COLUMNS FROM ";//llx_hr_event_time LIKE 'audience'";
+    $sql.=MAIN_DB_PREFIX.$table." WHERE Field='";
+    $sql.=$fieldValue."'";
+    //$sql.= " ORDER BY t.".$field;
+       
+    dol_syslog("form::select_enum sql=".$sql, LOG_DEBUG);
+    
+    $resql=$this->db->query($sql);
+    
+    if ($resql)
+    {
+        $i=0;
+         //return $table."this->db".$field;
+        $num = $this->db->num_rows($resql);
+        if($num)
+        {
+           
+            $obj = $this->db->fetch_object($resql);
+            if ($obj && strpos($obj->Type,'enum(')===0)
+            {
+                if(empty($selected) && !empty($obj->Default))$selected="'{$obj->Default}'";
+                $select="<select class=\"flat\" id=\"{$htmlName}\" name=\"{$htmlName}\">";
+                $select.= "<option value=\"-1\" ".(empty($selected)?"selected=\"selected\"":"").">&nbsp;</option>\n";
+
+                $enums= explode(',',substr($obj->Type, 5,-1));
+                foreach ($enums as $enum){
+                    $select.= "<option value=\"{$enum}\" ";
+                    $select.=((substr($enum,1,-1)===$selected)?"selected=\"selected\" >":">");                    
+                    $select.=$langs->trans(substr($enum,1,-1));          
+                    $select.="</option>\n";
+                }  
+                $select.="</select>\n";
+            }else{
+                $select="<input selected=\"{$selected}\" id=\"{$htmlName} \" name=\"{$htmlName}\">";
+            }
+ 
+        }else{
+                $select="<input selected=\"{$selected}\" id=\"{$htmlName} \" name=\"{$htmlName}\">";
+        }
+    }
+    else
+    {
+        $error++;
+        dol_print_error($this->db);
+       $select="<input selected=\"{$selected}\" id=\"{$htmlName} \" name=\"{$htmlName}\">";
+    }
+      
+      return $select;
+    
+ }
+
+/*
+ * function to genegate a select list from a table, the showed text will be a concatenation of some 
+ * column defined in column bit, the Least sinificative bit will represent the first colum 
+ * 
+ *  @param    string              	$table                 table which the fk refers to (without prefix)
+ *  @param    string              	$fieldValue         field of the table which the fk refers to, the one to put in the Valuepart
+ *  @param    string              	$selected           value selected of the field value column
+ *  @param    string              	$fieldToShow1    first part of the concatenation
+ *  @param    string              	$fieldToShow1    second part of the concatenation
+ *  @param    string              	$separator          separator between the tow contactened fileds
+
+ *  @return string                                                   html code
+ */
+function print_generic($table, $fieldValue,$selected,$fieldToShow1,$fieldToShow2="",$separator=', '){
+   //return $table.$this->db.$field;
+    if($table=="" || $fieldValue=="" || $fieldToShow1=='')
+    {
+        return "error, one of the mandatory field of the function  print_generic is missing";
+    }else if (empty($selected)){
+        return "NuLL";
+    }
+    
+    $sql="SELECT";
+    $sql.=" ".$fieldValue;
+    $sql.=" ,".$fieldToShow1;
+    if(!empty($fieldToShow2))
+        $sql.=" ,".$fieldToShow2;
+    $sql.= " FROM ".MAIN_DB_PREFIX.$table." as t";
+    $sql.= " WHERE t.".$fieldValue."=".$selected;
+       
+    dol_syslog("form::print_generic sql=".$sql, LOG_DEBUG);
+    
+    $resql=$this->db->query($sql);
+    
+    if ($resql)
+    {
+
+        $num = $this->db->num_rows($resql);
+        if ( $num)
+        {
+            $obj = $this->db->fetch_object($resql);
+            
+            if ($obj)
+            {
+                            $select=$obj->{$fieldToShow1};
+                            if(!empty($fieldToShow2))
+                                 $select.=$separator.$obj->{$fieldToShow2};        
+            }else{
+                $select= "NULL";
+            }
+        }else{
+            $select= "NULL";
+        }
+    }
+    else
+    {
+        $error++;
+        dol_print_error($this->db);
+       $select.= "ERROR";
+    }
+      $select.="\n";
+      return $select;
+ }
+ 
+ 
 }

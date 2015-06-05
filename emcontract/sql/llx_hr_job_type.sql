@@ -21,16 +21,17 @@
 
 
 
-CREATE TABLE llx_hr_job_type 
+CREATE TABLE llx_hr_job_type -- Table to document the type of jobs
 (
 rowid                 integer NOT NULL AUTO_INCREMENT,
+`ref`                 VARCHAR (63),
 entity                integer DEFAULT 1 NOT NULL,		-- multi company id
-datec                 DATETIME NOT NULL,
-datem		      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,                
-title                       VARCHAR( 255 ),
-description           VARCHAR( 2048 ),
-fk_user_author        integer,
-fk_user_modif         integer, 
+date_creation                 DATETIME NOT NULL,
+date_modification		      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,                
+title                 VARCHAR( 255 ),
+description           VARCHAR( 2047 ),
+fk_user_creation        integer,
+fk_user_modification         integer, 
 PRIMARY KEY (rowid)
 ) 
 ENGINE=innodb;

@@ -21,5 +21,5 @@
 
 ALTER TABLE llx_hr_job_skills
 ADD FOREIGN KEY (fk_job_type) REFERENCES llx_hr_job_type(rowid),
-ADD FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
-ADD FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
+ADD FOREIGN KEY (fk_user_creation) REFERENCES llx_user(rowid),
+ADD FOREIGN KEY (fk_skill) REFERENCES llx_hr_skill(rowid)

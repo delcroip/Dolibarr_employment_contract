@@ -18,10 +18,10 @@
  */
 
 /**
- *  \file       dev/skeletons/skeleton_class.class.php
- *  \ingroup    mymodule othermodule1 othermodule2
+ *  \file       dev/hruserskillss/hruserskills.class.php
+ *  \ingroup    emcontract othermodule1 othermodule2
  *  \brief      This file is an example for a CRUD class file (Create/Read/Update/Delete)
- *				Put here some comments
+ *				Initialy built by build_class_from_table on 2015-06-05 20:12
  */
 
 // Put here all includes required by your class file
@@ -33,18 +33,23 @@ require_once(DOL_DOCUMENT_ROOT."/core/class/commonobject.class.php");
 /**
  *	Put here description of your class
  */
-class Skeleton_Class extends CommonObject
+class Hruserskills extends CommonObject
 {
 	var $db;							//!< To store db handler
 	var $error;							//!< To return error code (or message)
 	var $errors=array();				//!< To return several error codes (or messages)
-	var $element='skeleton';			//!< Id that identify managed objects
-	var $table_element='mytable';		//!< Name of table without prefix where object is stored
+	var $element='hruserskills';			//!< Id that identify managed objects
+	var $table_element='hr_user_skills';		//!< Name of table without prefix where object is stored
 
     var $id;
-    var $prop1;
-    var $prop2;
-	//...
+    
+	var $entity;
+	var $date_creation='';
+	var $user_creation;
+	var $user;
+	var $skill;
+
+    
 
 
     /**
@@ -72,22 +77,36 @@ class Skeleton_Class extends CommonObject
 		$error=0;
 
 		// Clean parameters
-        if (isset($this->prop1)) $this->prop1=trim($this->prop1);
-        if (isset($this->prop2)) $this->prop2=trim($this->prop2);
-		//...
+        
+		if (isset($this->entity)) $this->entity=trim($this->entity);
+		if (isset($this->user_creation)) $this->user_creation=trim($this->user_creation);
+		if (isset($this->user)) $this->user=trim($this->user);
+		if (isset($this->skill)) $this->skill=trim($this->skill);
+
+        
 
 		// Check parameters
 		// Put here code to add control on parameters values
 
         // Insert request
 		$sql = "INSERT INTO ".MAIN_DB_PREFIX.$this->table_element."(";
-		$sql.= " field1,";
-		$sql.= " field2";
-		//...
+		
+		$sql.= "entity,";
+		$sql.= "date_creation,";
+		$sql.= "fk_user_creation,";
+		$sql.= "fk_user,";
+		$sql.= "fk_skill";
+
+		
         $sql.= ") VALUES (";
-        $sql.= " '".$this->prop1."',";
-        $sql.= " '".$this->prop2."'";
-		//...
+        
+		$sql.= " ".(! isset($this->entity)?'NULL':"'".$this->entity."'").",";
+		$sql.= " NOW() ,";
+		$sql.= " '".$user->id."',";
+		$sql.= " ".(! isset($this->user)?'NULL':"'".$this->user."'").",";
+		$sql.= " ".(! isset($this->skill)?'NULL':"'".$this->skill."'")."";
+
+        
 		$sql.= ")";
 
 		$this->db->begin();
@@ -143,9 +162,14 @@ class Skeleton_Class extends CommonObject
     	global $langs;
         $sql = "SELECT";
 		$sql.= " t.rowid,";
-		$sql.= " t.field1,";
-		$sql.= " t.field2";
-		//...
+		
+		$sql.= " t.entity,";
+		$sql.= " t.date_creation,";
+		$sql.= " t.fk_user_creation,";
+		$sql.= " t.fk_user,";
+		$sql.= " t.fk_skill";
+
+		
         $sql.= " FROM ".MAIN_DB_PREFIX.$this->table_element." as t";
         if ($ref) $sql.= " WHERE t.ref = '".$ref."'";
         else $sql.= " WHERE t.rowid = ".$id;
@@ -159,9 +183,14 @@ class Skeleton_Class extends CommonObject
                 $obj = $this->db->fetch_object($resql);
 
                 $this->id    = $obj->rowid;
-                $this->prop1 = $obj->field1;
-                $this->prop2 = $obj->field2;
-				//...
+                
+				$this->entity = $obj->entity;
+				$this->date_creation = $this->db->jdate($obj->date_creation);
+				$this->user_creation = $obj->fk_user_creation;
+				$this->user = $obj->fk_user;
+				$this->skill = $obj->fk_skill;
+
+                
             }
             $this->db->free($resql);
 
@@ -188,18 +217,25 @@ class Skeleton_Class extends CommonObject
 		$error=0;
 
 		// Clean parameters
-        if (isset($this->prop1)) $this->prop1=trim($this->prop1);
-        if (isset($this->prop2)) $this->prop2=trim($this->prop2);
-		//...
+        
+		if (isset($this->entity)) $this->entity=trim($this->entity);
+		if (isset($this->user_creation)) $this->user_creation=trim($this->user_creation);
+		if (isset($this->user)) $this->user=trim($this->user);
+		if (isset($this->skill)) $this->skill=trim($this->skill);
+
+        
 
 		// Check parameters
 		// Put here code to add a control on parameters values
 
         // Update request
         $sql = "UPDATE ".MAIN_DB_PREFIX.$this->table_element." SET";
-        $sql.= " field1=".(isset($this->field1)?"'".$this->db->escape($this->field1)."'":"null").",";
-        $sql.= " field2=".(isset($this->field2)?"'".$this->db->escape($this->field2)."'":"null")."";
-		//...
+        
+		$sql.= " entity=".(isset($this->entity)?$this->entity:"null").",";
+		$sql.= " fk_user=".(isset($this->user)?$this->user:"null").",";
+		$sql.= " fk_skill=".(isset($this->skill)?$this->skill:"null")."";
+
+        
         $sql.= " WHERE rowid=".$this->id;
 
 		$this->db->begin();
@@ -260,14 +296,14 @@ class Skeleton_Class extends CommonObject
         if(isset($this->ref))
             $ref=$this->ref;
         if($id)
-            $lien = '<a href="'.DOL_URL_ROOT.'/mymodule/skeleton_page.php?id='.$id.'&action=view">';
+            $lien = '<a href="'.DOL_URL_ROOT.'/emcontract/hruserskills.php?id='.$id.'&action=view">';
     	else if ($ref)
-            $lien = '<a href="'.DOL_URL_ROOT.'/mymodule/skeleton_page.php?ref='.$ref.'&action=view">';
+            $lien = '<a href="'.DOL_URL_ROOT.'/emcontract/hruserskills.php?ref='.$ref.'&action=view">';
     	else
             return "Error";
         $lienfin='</a>';
 
-    	$picto='mymodule@mymodule';
+    	$picto='emcontract@emcontract';
         
         if($ref)
             $label=$langs->trans("Show").': '.$ref;
@@ -350,7 +386,7 @@ class Skeleton_Class extends CommonObject
 
 		$error=0;
 
-		$object=new Skeleton_Class($this->db);
+		$object=new Hruserskills($this->db);
 
 		$this->db->begin();
 
@@ -401,8 +437,14 @@ class Skeleton_Class extends CommonObject
 	function initAsSpecimen()
 	{
 		$this->id=0;
-		$this->prop1='prop1';
-		$this->prop2='prop2';
+		
+		$this->entity='';
+		$this->date_creation='';
+		$this->user_creation='';
+		$this->user='';
+		$this->skill='';
+
+		
 	}
 /*
  * function to genegate a select list from a table, the showed text will be a concatenation of some 

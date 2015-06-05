@@ -22,15 +22,14 @@
 CREATE TABLE llx_hr_contract_event -- use for try period, year vacancy, to document a contract update ...
 (
 rowid                 	integer NOT NULL AUTO_INCREMENT,
-entity	              	integer DEFAULT 1 NOT NULL,		-- multi company id
-datec                 	DATETIME NOT NULL,
-datem		      	TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-fk_user_author        integer,
-fk_user_modif         integer, 
+date_creation                 	DATETIME NOT NULL,
+date_modification		      	TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+fk_user_creation        integer,
+fk_user_modification         integer, 
 date_start              DATETIME NOT NULL,
 date_stop               DATETIME NOT NULL,
 title                   varchar(255) NOT NULL,
-description             varchar(2048),
+description             varchar(2047),
 PRIMARY KEY (rowid)
 ) 
 ENGINE=innodb;

@@ -18,14 +18,23 @@
 -- HR Revision 0.1.0
 
 
-CREATE TABLE llx_hr_user_skills -- tqble to link the user to skill
+
+CREATE TABLE llx_hr_event_time --table to document the holiday, company holiday, sick leave ...
 (
 rowid                 integer NOT NULL AUTO_INCREMENT,
-entity                integer DEFAULT 1 NOT NULL,		-- multi company id
+audience              ENUM('GLOBAL', 'ENTITY', 'GROUP','USER') DEFAULT 'USER' NOT NULL ,		-- multi company id
+fk_audience_item           integer DEFAULT NULL, -- link to the user / group if applicable
 date_creation                 DATETIME NOT NULL,
-fk_user_creation        integer,
-fk_user               integer,
-fk_skill              integer,
+date_modification		      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,                
+event_type            ENUM('WORK','HOLIDAY','SICK_LEAVE','UNPAID_HOLIDAY','NATIONAL_HOLIDAY','TRAINING','UNION'),
+description           VARCHAR( 255 ),
+fk_user_creation      integer,
+fk_user_modification  integer, 
+status                ENUM('SAVED','SUBMITTED','ACCEPTED','REJECTED'), 
+day_date              DATE not NULL,
+duration              TIME DEFAULT "8:00:00",
+fk_country            integer DEFAULT NULL, -- null if the country doesn't matter
 PRIMARY KEY (rowid)
-) 
+)
 ENGINE=innodb;
+

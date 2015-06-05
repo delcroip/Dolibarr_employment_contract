@@ -87,6 +87,16 @@ if ($resql)
 		//var_dump($obj);
 		$i++;
 		$property[$i]['field']=$obj->Field;
+                // sve the default value from the dB
+                $property[$i]['default']=$obj->Default;
+                
+                // object variable name
+                if(strpos($obj->Field,"fk_")===0){
+                    $property[$i]['var']=substr($obj->Field,3);
+                }else{
+                    $property[$i]['var']=$obj->Field;
+                }
+                
 		if ($obj->Key == 'PRI')
 		{
 			$property[$i]['primary']=1;
@@ -174,8 +184,8 @@ $targetcontent=$sourcecontent;
 
 // Substitute class name
 $targetcontent=preg_replace('/skeleton_class\.class\.php/', $classmin.'.class.php', $targetcontent);
-$targetcontent=preg_replace('/\$element=\'skeleton\'/', '\$element=\''.$classmin.'\'', $targetcontent);
-$targetcontent=preg_replace('/\$table_element=\'skeleton\'/', '\$table_element=\''.$classmin.'\'', $targetcontent);
+$targetcontent=preg_replace('/skeleton/', $classmin, $targetcontent);
+//$targetcontent=preg_replace('/\$table_element=\'skeleton\'/', '\$table_element=\''.$classmin.'\'', $targetcontent);
 $targetcontent=preg_replace('/Skeleton_Class/', $classname, $targetcontent);
 
 // Substitute comments
@@ -193,7 +203,7 @@ foreach($property as $key => $prop)
 {
 	if ($prop['field'] != 'rowid' && $prop['field'] != 'id')
 	{
-		$varprop.="\tvar \$".$prop['field'];
+		$varprop.="\tvar \$".$prop['var'];
 		if ($prop['istime']) $varprop.="=''";
 		$varprop.=";";
 		if ($prop['comment']) $varprop.="\t// ".$prop['extra'];
@@ -210,14 +220,14 @@ foreach($property as $key => $prop)
 {
 	if ($prop['field'] != 'rowid' && $prop['field'] != 'id' && ! $prop['istime'])
 	{
-		$varprop.="\t\tif (isset(\$this->".$prop['field'].")) \$this->".$prop['field']."=trim(\$this->".$prop['field'].");";
+		$varprop.="\t\tif (isset(\$this->".$prop['var'].")) \$this->".$prop['var']."=trim(\$this->".$prop['var'].");";
 		$varprop.="\n";
 	}
 }
 $targetcontent=preg_replace('/if \(isset\(\$this->prop1\)\) \$this->prop1=trim\(\$this->prop1\);/', $varprop, $targetcontent);
 $targetcontent=preg_replace('/if \(isset\(\$this->prop2\)\) \$this->prop2=trim\(\$this->prop2\);/', '', $targetcontent);
 
-// Substitute insert into parameters
+// Substitute insert into parameters for the create
 $varprop="\n";
 $cleanparam='';
 $i=0;
@@ -225,9 +235,11 @@ foreach($property as $key => $prop)
 {
 	$i++;
 	$addfield=1;
+        if($prop['var']=='user_modification') $addfield=0;
+        if($prop['var']=='date_modification') $addfield=0;
 	if ($prop['field'] == 'tms') $addfield=0;	// This is a field of type timestamp edited automatically
 	if ($prop['extra'] == 'auto_increment') $addfield=0;
-
+        
 	if ($addfield)
 	{
 		$varprop.="\t\t\$sql.= \"".$prop['field'];
@@ -249,34 +261,38 @@ foreach($property as $key => $prop)
 	$addfield=1;
 	if ($prop['field'] == 'tms') $addfield=0;	// This is a field of type timestamp edited automatically
 	if ($prop['extra'] == 'auto_increment') $addfield=0;
+        if($prop['var']=='user_modification')$addfield=0;
+        if($prop['var']=='date_modification')$addfield=0;
 
 	if ($addfield)
 	{
 		$varprop.="\t\t\$sql.= \" ";
-		if ($prop['istime'])
+		
+                if($prop['var']=='date_creation'){
+                        $varprop.='NOW() ';
+                }else if($prop['var']=='user_creation'){
+                        $varprop.='\'".\$user->id."\'';
+                       // $varprop.='{\$user->id}'; //FIXME ?
+                }else if ($prop['istime'])
 		{
-			$varprop.='".(! isset($this->'.$prop['field'].') || dol_strlen($this->'.$prop['field'].')==0?\'NULL\':"\'".$this->db->idate(';
-			$varprop.="\$this->".$prop['field']."";
+			$varprop.='".(! isset($this->'.$prop['var'].') || dol_strlen($this->'.$prop['var'].')==0?\'NULL\':"\'".$this->db->idate(';
+			$varprop.="\$this->".$prop['var']."";
 			$varprop.=')."\'")."';
-			if ($i < count($property)) $varprop.=",";
-			$varprop.='";';
 		}
 		elseif ($prop['ischar'])
 		{
-			$varprop.='".(! isset($this->'.$prop['field'].')?\'NULL\':"\'".';
-			$varprop.='$this->db->escape($this->'.$prop['field'].')';
+			$varprop.='".(! isset($this->'.$prop['var'].')?\'NULL\':"\'".';
+			$varprop.='$this->db->escape($this->'.$prop['var'].')';
 			$varprop.='."\'")."';
-			if ($i < count($property)) $varprop.=",";
-			$varprop.='";';
 		}
 		else
 		{
-			$varprop.='".(! isset($this->'.$prop['field'].')?\'NULL\':"\'".';
-			$varprop.="\$this->".$prop['field']."";
+			$varprop.='".(! isset($this->'.$prop['var'].')?\'NULL\':"\'".';
+			$varprop.="\$this->".$prop['var']."";
 			$varprop.='."\'")."';
-			if ($i < count($property)) $varprop.=",";
-			$varprop.='";';
 		}
+                if ($i < count($property)) $varprop.=",";
+                $varprop.='";';
 		$varprop.="\n";
 	}
 }
@@ -290,31 +306,48 @@ $i=0;
 foreach($property as $key => $prop)
 {
 	$i++;
-	if ($prop['field'] != 'rowid' && $prop['field'] != 'id')
+        $addfield=1;
+        if($prop['var']=='user_creation') $addfield=0;
+        if($prop['var']=='date_creation') $addfield=0;
+        if($prop['var']=='rowid') $addfield=0;
+        if($prop['var']=='id') $addfield=0;
+            
+	if ($addfield)
 	{
-		$varprop.="\t\t\$sql.= \" ";
-		$varprop.=$prop['field'].'=';
-		if ($prop['istime'])
-		{
-			// (dol_strlen($this->datep)!=0 ? "'".$this->db->idate($this->datep)."'" : 'null')
-			$varprop.='".(dol_strlen($this->'.$prop['field'].')!=0 ? "\'".$this->db->idate(';
-			$varprop.='$this->'.$prop['field'];
-			$varprop.=')."\'" : \'null\').';
-			$varprop.='"';
-		}
-		else
-		{
-			$varprop.="\".";
-			// $sql.= " field1=".(isset($this->field1)?"'".$this->db->escape($this->field1)."'":"null").",";
-			if ($prop['ischar']) $varprop.='(isset($this->'.$prop['field'].')?"\'".$this->db->escape($this->'.$prop['field'].')."\'":"null")';
-			// $sql.= " field1=".(isset($this->field1)?$this->field1:"null").",";
-			else $varprop.='(isset($this->'.$prop['field'].')?$this->'.$prop['field'].':"null")';
-			$varprop.=".\"";
-		}
 
-		if ($i < count($property)) $varprop.=',';
-		$varprop.='";';
-		$varprop.="\n";
+                    //don't update date & user creation fields
+                
+                $varprop.="\t\t\$sql.= \" ";
+                $varprop.=$prop['field'].'=';
+                if($prop['var']=='date_modification'){
+                    $varprop.='NOW() ';
+                }else if($prop['var']=='user_modification'){
+                    $varprop.='\'".\$user->id."\'';
+                     // $varprop.='".\$user."'; //FIXME ?
+                }else if ($prop['istime'])
+                {
+                        // (dol_strlen($this->datep)!=0 ? "'".$this->db->idate($this->datep)."'" : 'null')
+                        $varprop.='".(dol_strlen($this->'.$prop['var'].')!=0 ? "\'".$this->db->idate(';
+                        $varprop.='$this->'.$prop['var'];
+                        $varprop.=')."\'" : \'null\').';
+                        $varprop.='"';
+                }else
+                {
+                        $varprop.="\".";
+                        // $sql.= " field1=".(isset($this->field1)?"'".$this->db->escape($this->field1)."'":"null").",";
+                        if ($prop['ischar']){
+                            $varprop.='(isset($this->'.$prop['var'].')?"\'".$this->db->escape($this->'.$prop['var'].')."\'":"null")';
+                            // $sql.= " field1=".(isset($this->field1)?$this->field1:"null").",";                           
+                        }else{
+                            $varprop.='(isset($this->'.$prop['var'].')?$this->'.$prop['var'].':"null")';
+                        }
+                        $varprop.=".\"";
+                }
+
+                if ($i < count($property)) $varprop.=',';
+                $varprop.='";';
+                $varprop.="\n";
+
 	}
 }
 $targetcontent=preg_replace('/\$sql.= " field1=".\(isset\(\$this->field1\)\?"\'".\$this->db->escape\(\$this->field1\)."\'":"null"\).",";/', $varprop, $targetcontent);
@@ -333,7 +366,7 @@ foreach($property as $key => $prop)
 	$i++;
 	if ($prop['field'] != 'rowid' && $prop['field'] != 'id')
 	{
-		$varprop.="\t\t\t\t\$this->".$prop['field']." = ";
+		$varprop.="\t\t\t\t\$this->".$prop['var']." = ";
 		if ($prop['istime']) $varprop.='$this->db->jdate(';
 		$varprop.='$obj->'.$prop['field'];
 		if ($prop['istime']) $varprop.=')';
@@ -352,7 +385,7 @@ foreach($property as $key => $prop)
 {
 	if ($prop['field'] != 'rowid' && $prop['field'] != 'id')
 	{
-		$varprop.="\t\t\$this->".$prop['field']."='';";
+		$varprop.="\t\t\$this->".$prop['var']."='';";
 		$varprop.="\n";
 	}
 }
@@ -441,7 +474,7 @@ $targetcontent=preg_replace('/skeleton_script\.php/', $classmin.'_script.php', $
 $targetcontent=preg_replace('/\$element=\'skeleton\'/', '\$element=\''.$classmin.'\'', $targetcontent);
 $targetcontent=preg_replace('/\$table_element=\'skeleton\'/', '\$table_element=\''.$classmin.'\'', $targetcontent);
 $targetcontent=preg_replace('/Skeleton_Class/', $classname, $targetcontent);
-$targetcontent=preg_replace('/skeleton/', $classname, $targetcontent);
+$targetcontent=preg_replace('/Skeleton/', $classname, $targetcontent);
 
 // Substitute comments
 $targetcontent=preg_replace('/This file is an example to create a new class file/', 'Put here description of this class', $targetcontent);
@@ -462,9 +495,23 @@ $varpropget="";
 $cleanparam='';
 foreach($property as $key => $prop)
 {
-        $varpropget.="\t\t\$object->".$prop['field']."=GETPOST(\"";
-        $varpropget.=preg_replace('/_/','',ucfirst($prop['field']))."\");\n";
-
+    if ($prop['var']!='user_creation'&& $prop['var']!='date_creation'
+            && $prop['var']!='user_modification' && $prop['var']!='date_modification')
+    switch($prop['type'])
+    {
+        case 'datetime':
+        case 'date':
+        case 'timestamp':
+            $varpropget.="\t\t\$object->".$prop['var']."=dol_mktime(0, 0, 0,'";
+            $varpropget.=preg_replace('/_/','',ucfirst($prop['var']))."month','";
+            $varpropget.=preg_replace('/_/','',ucfirst($prop['var']))."day','";
+            $varpropget.=preg_replace('/_/','',ucfirst($prop['var']))."year');\n";
+            break;
+        default:
+            $varpropget.="\t\t\$object->".$prop['var']."=GETPOST(\"";
+            $varpropget.=preg_replace('/_/','',ucfirst($prop['var']))."\");\n";
+            break;
+    }
 }
         
   $targetcontent=preg_replace('/\$object->prop1=GETPOST\("field1"\);/',$varpropget, $targetcontent);
@@ -480,29 +527,33 @@ $nbproperty=count($property);
 $i=0;
 foreach($property as $key => $prop)
 {
-	if ($prop['field'] != 'rowid' && $prop['field'] != 'id')
+	if ($prop['field'] != 'rowid' && $prop['field'] != 'id' && $prop['var']!='user_creation'&& $prop['var']!='date_creation'
+                       && $prop['var']!='user_modification' && $prop['var']!='date_modification')
 	{
                 $varprop.=($i%2==0)?"\t\tprint \"<tr>\\n\";\n":'';
-                $varprop.="\n// show the field ".$prop['field']."\n\n";
+                $varprop.="\n// show the field ".$prop['var']."\n\n";
                 if ($i>4) //some example of fieldrequired
-                    $varprop.="\t\tprint \"<td class='fieldrequired'>\".\$langs->trans('";
+                    $varprop.="\t\tprint \"<td>\".\$langs->trans('";
                 else
                     $varprop.="\t\tprint \"<td class='fieldrequired'>\".\$langs->trans('";
-                $varprop.=preg_replace('/_/','',ucfirst($prop['field']));
+                $varprop.=preg_replace('/_/','',ucfirst($prop['var']));
                 $varprop.="').\" </td><td>\";\n";
                 //suport the edit mode
                 $varprop.="\t\tif(\$edit==1){\n";
-
+                
                 switch ($prop['type']) {
                     case 'datetime':
                     case 'date':
                     case 'timestamp':
-                        $varprop.="\t\t\tprint \$form->select_date(\$object->";
-                        $varprop.=$prop['field'].",'";
-                        $varprop.=preg_replace('/_/','',ucfirst($prop['field']))."');\n";  
-                        $varprop.="\t\t}else{\n";
-                        $varprop.="\t\t\tprint dol_print_date(\$obj->";
-                        $varprop.=$prop['field'].",'day');\n";
+                        $varprop.="\t\tif(\$new==1){\n";
+                        $varprop.="\t\t\tprint \$form->select_date(-1,'";
+                        $varprop.=preg_replace('/_/','',ucfirst($prop['var']))."');\n";
+                        $varprop.="\t\t}else{\n";                                               $varprop.="\t\t\tprint \$form->select_date(\$object->";
+                        $varprop.=$prop['var'].",'";
+                        $varprop.=preg_replace('/_/','',ucfirst($prop['var']))."');\n";  
+                        $varprop.="\t\t}\n\t\t}else{\n";
+                        $varprop.="\t\t\tprint dol_print_date(\$object->";
+                        $varprop.=$prop['var'].",'day');\n";
                         
                         break;
                     default:
@@ -511,25 +562,40 @@ foreach($property as $key => $prop)
 
                         if(strpos($prop['field'],'fk_user') ===0) 
                          {
-                                $varprop.="\t\tprint \$form->select_dolusers(\$object->".$prop['field'].", '".$prop['field']."', 1, '', 0 );\n";
+                                $varprop.="\t\tprint \$form->select_dolusers(\$object->".$prop['var'].", '";
+                                $varprop.=preg_replace('/_/','',ucfirst($prop['var']))."', 1, '', 0 );\n";
                                 $varprop.="\t\t}else{\n";
-                                $varprop.="\t\t\$object->print_generic('user', 'rowid','lastname','firstname',' ');\n";
+                                $varprop.="\t\tprint \$object->print_generic('user', 'rowid',\$object->".$prop['var'].",'lastname','firstname',' ');\n";
                          }else if(strpos($prop['field'],'fk_') ===0) 
-                        {
-                            
-                                $varprop.="\t\t\$object->print select_generic('".substr ( $prop['field'],3)."','rowid','";
-                                $varprop.= preg_replace('/_/','',ucfirst($prop['field']))."','rowid','description' );\n";
+                        {                           
+                                $varprop.="\t\tprint \$object->select_generic('".$prop['var']."','rowid','";
+                                $varprop.= preg_replace('/_/','',ucfirst($prop['var']))."','rowid','description',";
+                                $varprop.= "\$object->".$prop['var'].");\n";
                                 $varprop.="\t\t}else{\n";
-                                $varprop.="\t\t\$object->print_generic('".substr ( $prop['field'],3)."','rowid',";
-                                $varprop.="\$object->".$prop['field'].",'rowid','description');\n";
-                        }else 
+                                $varprop.="\t\tprint \$object->print_generic('".$prop['var']."','rowid',";
+                                $varprop.="\$object->".$prop['var'].",'rowid','description');\n";
+                        }else if(strpos($property[$i]['type'],'enum')===0){
+                                $varprop.="\t\tprint \$object->select_enum('{$table}','{$prop['field']}','";
+                                $varprop.= preg_replace('/_/','',ucfirst($prop['var']))."',";
+                                $varprop.= "\$object->".$prop['var'].");\n";
+                                $varprop.="\t\t}else{\n";
+                                $varprop.="\t\tprint \$langs->trans(\$object->".$prop['var'].");\n";
+                        }else                            
                         {
+                                if(!empty($prop['default'])){
+                                    $varprop.="\t\tif (\$new==1)\n";
+                                    $varprop.="\t\t\tprint '<input type=\"text\" value=\"";
+                                    $varprop.=$prop['default']."\" name=\"";
+                                    $varprop.=preg_replace('/_/','',ucfirst($prop['var']));
+                                    $varprop.="\">';\n\t\telse\n\t";
+                                }
                                 $varprop.="\t\t\tprint '<input type=\"text\" value=\"'.\$object->";
-                                $varprop.=$prop['field'].".'\" name=\"";
-                                $varprop.=preg_replace('/_/','',ucfirst($prop['field']))."\">';\n";  
+                                $varprop.=$prop['var'].".'\" name=\"";
+                                $varprop.=preg_replace('/_/','',ucfirst($prop['var']))."\">';\n";  
+
                                 $varprop.="\t\t}else{\n";
                                 $varprop.="\t\t\tprint \$object->";
-                                $varprop.=$prop['field'].";\n";
+                                $varprop.=$prop['var'].";\n";
                         }
                         break;
                 }  
@@ -563,8 +629,8 @@ foreach($property as $key => $prop)
     if($i<4) // just to have some example
     {
     $varprop.="print_liste_field_titre(\$langs->trans('";
-    $varprop.=$prop['field']."'),\$_SERVER['PHP_SELF'],'t.";
-    $varprop.=$prop['field']."','',\$param,'',\$sortfield,\$sortorder);\n";
+    $varprop.=$prop['var']."'),\$_SERVER['PHP_SELF'],'t.";
+    $varprop.=$prop['var']."','',\$param,'',\$sortfield,\$sortorder);\n";
     }
     $i++;  
 }
@@ -576,24 +642,28 @@ $targetcontent=preg_replace('/print_liste_field_titre\(\$langs->trans\(\'field2\
  */
 $varprop='';
 $i=0;
+$varprop.="\t\tprint \"<tr class='\".((\$i%2==0)?'pair':'impair').\" >\";\n";
 foreach($property as $key => $prop)
 {
 if($i<4) // just to have some example
     {
-
+    
     if($prop['istime']){
-        $varprop.="\t\tprint \"<tr><td>\".dol_print_date(\$obj->";
+        $varprop.="\t\tprint \"<td>\".dol_print_date(\$obj->";
         $varprop.=$prop['field'].",'day').\"</td>\";\n";      
     }else if(strpos($prop['field'],'fk_') ===0) {
-        $varprop.="\t\tprint \"<tr><td>\"\.print_generic('".substr ( $prop['field'],3)."','rowid',";
-        $varprop.="\$object->".$prop['field'].").\"</td></tr>\";\n";
+        $varprop.="\t\tprint \"<td>\".\$object->print_generic('".$prop['var']."','rowid',";
+        $varprop.="\$obj->".$prop['field'].",'rowid','description').\"</td>\";\n";
+    }else if($prop['field']=='id' || $prop['field']=='rowin'){
+        $varprop.="\t\tprint \"<td>\".\$object->getNomUrl().\"<td>\";\n";
     }else
     {                     
-        $varprop.="\t\tprint \"<tr><td>\"\.\$obj->".$prop['field'].".\"</td></tr>\";\n";
+        $varprop.="\t\tprint \"<td>\".\$obj->".$prop['field'].".\"</td>\";\n";
     }
     }
     $i++;  
 }
+$varprop.="\t\tprint \"</tr>\";\n";
 $targetcontent=preg_replace('/print "<tr><td>prop1<\/td><td>"\.\$obj->field1\."<\/td><\/tr>";/', $varprop, $targetcontent);
 $targetcontent=preg_replace('/print "<tr><td>prop2<\/td><td>"\.\$obj->field2\."<\/td><\/tr>";/', '', $targetcontent);
 

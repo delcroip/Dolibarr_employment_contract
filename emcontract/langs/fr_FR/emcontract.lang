@@ -22,7 +22,7 @@ CP=Contrat de professionnalisation
 DateSignEmployee=Signature salarié
 DateSignManagement=Signature direction
 DateDPAE=Déclaration préalable à l'embauche
-DateMedicalExam=Visite médicale
+date_modificationedicalExam=Visite médicale
 
 SendContract=Valider le contrat
 

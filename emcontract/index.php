@@ -135,15 +135,15 @@ if($year_end > 0) {
 /*
 if($year_create > 0) {
     if($month_create > 0) {
-    	$filter .= " AND (em.datec BETWEEN '".$db->idate(dol_get_first_day($year_create,$month_create,1))."' AND '".$db->idate(dol_get_last_day($year_create,$month_create,1))."')";
-    	//$filter.= " AND date_format(em.datec, '%Y-%m') = '$year_create-$month_create'";
+    	$filter .= " AND (em.date_creation BETWEEN '".$db->idate(dol_get_first_day($year_create,$month_create,1))."' AND '".$db->idate(dol_get_last_day($year_create,$month_create,1))."')";
+    	//$filter.= " AND date_format(em.date_creation, '%Y-%m') = '$year_create-$month_create'";
     } else {
-    	$filter .= " AND (em.datec BETWEEN '".$db->idate(dol_get_first_day($year_create,1,1))."' AND '".$db->idate(dol_get_last_day($year_create,12,1))."')";
-    	//$filter.= " AND date_format(em.datec, '%Y') = '$year_create'";
+    	$filter .= " AND (em.date_creation BETWEEN '".$db->idate(dol_get_first_day($year_create,1,1))."' AND '".$db->idate(dol_get_last_day($year_create,12,1))."')";
+    	//$filter.= " AND date_format(em.date_creation, '%Y') = '$year_create'";
     }
 } else {
     if($month_create > 0) {
-        $filter.= " AND date_format(em.datec, '%m') = '$month_create'";
+        $filter.= " AND date_format(em.date_creation, '%m') = '$month_create'";
     }
 }
 */
@@ -239,7 +239,7 @@ print '<form method="get" action="'.$_SERVER["PHP_SELF"].'">'."\n";
 print '<table class="noborder" width="100%;">';
 print '<tr class="liste_titre">';
 print_liste_field_titre($langs->trans("Ref"),$_SERVER["PHP_SELF"],"em.rowid","",'','',$sortfield,$sortorder);
-//print_liste_field_titre($langs->trans("DateCreate"),$_SERVER["PHP_SELF"],"em.datec","",'','align="center"',$sortfield,$sortorder);
+//print_liste_field_titre($langs->trans("date_creationreate"),$_SERVER["PHP_SELF"],"em.date_creation","",'','align="center"',$sortfield,$sortorder);
 print_liste_field_titre($langs->trans("Employee"),$_SERVER["PHP_SELF"],"em.fk_user","",'','',$sortfield,$sortorder);
 print_liste_field_titre($langs->trans("Typecontract"),$_SERVER["PHP_SELF"],"em.fk_contract_type","",'','',$sortfield,$sortorder);
 print_liste_field_titre($langs->trans("DateStart"),$_SERVER["PHP_SELF"],"em.date_start_contract","",'','align="center"',$sortfield,$sortorder);
@@ -316,7 +316,7 @@ if (! empty($emcontract->emcontract))
 		$emcontractstatic->ref=$infos_em['rowid'];
 		print $emcontractstatic->getNomUrl(1);
 		print '</td>';
-		//print '<td style="text-align: center;">'.dol_print_date($infos_em['datec'],'day').'</td>';
+		//print '<td style="text-align: center;">'.dol_print_date($infos_em['date_creation'],'day').'</td>';
 		print '<td>'.$userstatic->getNomUrl('1').'</td>';
 		//print '<td>'.$emcontractstatic->getNomUrl('1').'</td>';
     print '<td>'.$emcontractstatic->LibTypeContract($infos_em['fk_contract_type']).'</td>';

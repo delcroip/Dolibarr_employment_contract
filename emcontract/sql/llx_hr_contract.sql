@@ -18,13 +18,16 @@
 -- ===================================================================
 -- HR Revision 0.1.0
 
+-- this tqble is used to store the data of an employee contract
+
 CREATE TABLE llx_hr_contract 
 (
 rowid                 integer NOT NULL AUTO_INCREMENT,
+`ref`                 VARCHAR(63),
 fk_user               integer NOT NULL,
 entity                integer DEFAULT 1 NOT NULL,		-- multi company id
-datec                 DATETIME NOT NULL,
-datem		      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,   
+date_creation         DATETIME NOT NULL,
+date_modification     TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,   
 fk_contract_type    integer,   
 fk_job_type           integer, 
 fk_job_Location       integer,             
@@ -35,10 +38,10 @@ date_sign_management  date NULL,
 description           VARCHAR( 255 ),
 date_start_contract   date NOT NULL,
 date_end_contract     date NULL,
-fk_user_author        integer,
-fk_user_modif         integer, 
+fk_user_creation        integer,
+fk_user_modification         integer, 
 base_rate             DECIMAL(8,4) NOT NULL, -- operand 0 |
-motif                 varchar(2048), -- coulb be used for cdd
+reason                 varchar(2047), -- coulb be used to document why the contrqct was made
 sm_custom_field_1_value DECIMAL(16,4),
 sm_custom_field_2_value DECIMAL(16,4),
 PRIMARY KEY (rowid)

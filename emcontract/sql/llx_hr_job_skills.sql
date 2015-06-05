@@ -18,15 +18,13 @@
 -- HR Revision 0.1.0
 
 
-CREATE TABLE llx_hr_job_skills
+CREATE TABLE llx_hr_job_skills -- table to link the skills to the job type
 (
 rowid                 integer NOT NULL AUTO_INCREMENT,
 entity                integer DEFAULT 1 NOT NULL,		-- multi company id
-datec                 DATETIME NOT NULL,
-datem		      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,                
-description           VARCHAR( 255 ),
-fk_user_author        integer,
-fk_user_modif         integer, 
+date_creation                 DATETIME NOT NULL,
+fk_user_creation        integer,
+fk_skill               integer,
 fk_job_type               integer,
 PRIMARY KEY (rowid)
 ) 

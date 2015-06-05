@@ -18,10 +18,10 @@
  */
 
 /**
- *   	\file       dev/skeletons/skeleton_page.php
- *		\ingroup    mymodule othermodule1 othermodule2
+ *   	\file       dev/skeletons/skeleton.php
+ *		\ingroup    emcontract othermodule1 othermodule2
  *		\brief      This file is an example of a php page
- *					Put here some comments
+ *					Initialy built by build_class_from_table on 2015-06-05 20:13
  */
 
 //if (! defined('NOREQUIREUSER'))  define('NOREQUIREUSER','1');
@@ -45,7 +45,7 @@ if (! $res && file_exists("/var/www/dolibarr/htdocs/main.inc.php")) $res=@includ
 if (! $res) die("Include of main fails");
 // Change this following line to use the correct relative path from htdocs
 //include_once(DOL_DOCUMENT_ROOT.'/core/class/formcompany.class.php');
-dol_include_once('/mymodule/class/skeleton_class.class.php');
+dol_include_once('/emcontract/class/hrcontracttype.class.php');
 dol_include_once('/core/lib/functions2.lib.php');
 //document handling
 dol_include_once('/core/lib/files.lib.php');
@@ -56,7 +56,7 @@ dol_include_once('/core/class/html.formfile.class.php');
 
 // Load traductions files requiredby by page
 //$langs->load("companies");
-$langs->load("Skeleton_class");
+$langs->load("Hrcontracttype_class");
 
 // Get parameters
 $id			= GETPOST('id','int');
@@ -76,34 +76,34 @@ $pageprev = $page - 1;
 $pagenext = $page + 1;
 
 
-$upload_dir = $conf->mymodule->dir_output.'/Skeleton/'.dol_sanitizeFileName($object->ref);
+$upload_dir = $conf->emcontract->dir_output.'/Hrcontracttype/'.dol_sanitizeFileName($object->ref);
 
 
  // uncomment to avoid resubmision
-//if(isset( $_SESSION['Skeleton_class'][$tms]))
+//if(isset( $_SESSION['Hrcontracttype_class'][$tms]))
 //{
 
  //   $cancel=TRUE;
  //  setEventMessages('Internal error, POST not exptected', null, 'errors');
 //}
  $tms= time();
- $_SESSION['Skeleton_class'][$tms]= array();
+ $_SESSION['Hrcontracttype_class'][$tms]= array();
 
 
 // Right Management
  /*
 if ($user->societe_id > 0 || 
-       (!$user->rights->mymodule->add && ($action=='add' || $action='create')) ||
-       (!$user->rights->mymodule->view && ($action=='list' || $action='view')) ||
-       (!$user->rights->mymodule->delete && ($action=='confirm_delete')) ||
-       (!$user->rights->mymodule->edit && ($action=='edit' || $action='update')))
+       (!$user->rights->emcontract->add && ($action=='add' || $action='create')) ||
+       (!$user->rights->emcontract->view && ($action=='list' || $action='view')) ||
+       (!$user->rights->emcontract->delete && ($action=='confirm_delete')) ||
+       (!$user->rights->emcontract->edit && ($action=='edit' || $action='update')))
 {
 	accessforbidden();
 }
 */
 
 // create object and set id or ref if provided as parameter
-$object=new Skeleton_Class($db);
+$object=new Hrcontracttype($db);
 if($id>0)
 {
     $object->id=$id; 
@@ -127,8 +127,31 @@ if ($cancel){
 }else if (($action == 'add') || ($action == 'update' && ($id>0 || !empty($ref))))
 {
         //retrive the data
-        $object->prop1=GETPOST("field1");
-        $object->prop2=GETPOST("field2");
+        		$object->rowid=GETPOST("Rowid");
+		$object->entity=GETPOST("Entity");
+		$object->type_contract=GETPOST("Typecontract");
+		$object->title=GETPOST("Title");
+		$object->description=GETPOST("Description");
+		$object->employee_status=GETPOST("Employeestatus");
+		$object->weekly_hours=GETPOST("Weeklyhours");
+		$object->modulation_period=GETPOST("Modulationperiod");
+		$object->working_days=GETPOST("Workingdays");
+		$object->normal_rate_days=GETPOST("Normalratedays");
+		$object->daily_hours=GETPOST("Dailyhours");
+		$object->night_hours_start=GETPOST("Nighthoursstart");
+		$object->night_rate=GETPOST("Nightrate");
+		$object->night_hours_stop=GETPOST("Nighthoursstop");
+		$object->holiday_weekly_generated=GETPOST("Holidayweeklygenerated");
+		$object->overtime_rate=GETPOST("Overtimerate");
+		$object->overtime_recup_only=GETPOST("Overtimerecuponly");
+		$object->weekly_max_hours=GETPOST("Weeklymaxhours");
+		$object->weekly_min_hours=GETPOST("Weeklyminhours");
+		$object->daily_max_hours=GETPOST("Dailymaxhours");
+		$object->salary_method=GETPOST("Salarymethod");
+		$object->sm_custom_field_1_value=GETPOST("Smcustomfield1value");
+		$object->sm_custom_field_2_value=GETPOST("Smcustomfield2value");
+
+        
         
 // test here if the post data is valide
  /*
@@ -225,9 +248,9 @@ if ($cancel){
                             break;
             }             
 //Removing the tms array so the order can't be submitted two times
-if(isset( $_SESSION['Skeleton_class'][$tms]))
+if(isset( $_SESSION['Hrcontracttype_class'][$tms]))
 {
-    unset($_SESSION['Skeleton_class'][$tms]);
+    unset($_SESSION['Hrcontracttype_class'][$tms]);
 }
 
 /***************************************************
@@ -236,7 +259,7 @@ if(isset( $_SESSION['Skeleton_class'][$tms]))
 * Put here all code to build page
 ****************************************************/
 
-llxHeader('','Skeleton','');
+llxHeader('','Hrcontracttype','');
 
 $form=new Form($db);
 
@@ -265,17 +288,17 @@ switch ($action) {
         $edit=1;
    case "delete";
         if( $action=='delete' && ($id>0 || $ref!="")){
-         $ret=$form->form_confirm($_SERVER["PHP_SELF"].'?action=confirm_delete&id='.$id,$langs->trans("DeleteSkeleton"),$langs->trans("ConfirmDelete"),"confirm_delete", '', 0, 1);
+         $ret=$form->form_confirm($_SERVER["PHP_SELF"].'?action=confirm_delete&id='.$id,$langs->trans("DeleteHrcontracttype"),$langs->trans("ConfirmDelete"),"confirm_delete", '', 0, 1);
          if ($ret == 'html') print '<br />';
          //to have the object to be deleted in the background\
         }
     case "view":
     {
-        //print_fiche_titre($langs->trans('Skeleton'));
+        //print_fiche_titre($langs->trans('Hrcontracttype'));
         	// tabs
         if($edit==0 && $new==0){ //show tabs
-            $head=Skeleton_prepare_head($object);
-            dol_fiche_head($head,'card',$langs->trans("Skeleton"),0,'mymodule@mymodule');            
+            $head=Hrcontracttype_prepare_head($object);
+            dol_fiche_head($head,'card',$langs->trans("Hrcontracttype"),0,'emcontract@emcontract');            
         }
 	print '<br>';
         if($edit==1){
@@ -292,8 +315,290 @@ switch ($action) {
 
 	print '<table class="border centpercent">'."\n";
 
-            print "<tr><td>prop1</td><td>".$object->field1."</td></tr>";
-            print "<tr><td>prop2</td><td>".$object->field2."</td></tr>";
+            
+		print "<tr>\n";
+
+// show the field entity
+
+		print "<td class='fieldrequired'>".$langs->trans('Entity')." </td><td>";
+		if($edit==1){
+		if ($new==1)
+			print '<input type="text" value="1" name="Entity">';
+		else
+				print '<input type="text" value="'.$object->entity.'" name="Entity">';
+		}else{
+			print $object->entity;
+		}
+		print "</td>";
+
+// show the field type_contract
+
+		print "<td class='fieldrequired'>".$langs->trans('Typecontract')." </td><td>";
+		if($edit==1){
+			print '<input type="text" value="'.$object->type_contract.'" name="Typecontract">';
+		}else{
+			print $object->type_contract;
+		}
+		print "</td>";
+		print "\n</tr>\n";
+		print "<tr>\n";
+
+// show the field title
+
+		print "<td class='fieldrequired'>".$langs->trans('Title')." </td><td>";
+		if($edit==1){
+			print '<input type="text" value="'.$object->title.'" name="Title">';
+		}else{
+			print $object->title;
+		}
+		print "</td>";
+
+// show the field description
+
+		print "<td class='fieldrequired'>".$langs->trans('Description')." </td><td>";
+		if($edit==1){
+			print '<input type="text" value="'.$object->description.'" name="Description">';
+		}else{
+			print $object->description;
+		}
+		print "</td>";
+		print "\n</tr>\n";
+		print "<tr>\n";
+
+// show the field employee_status
+
+		print "<td class='fieldrequired'>".$langs->trans('Employeestatus')." </td><td>";
+		if($edit==1){
+			print '<input type="text" value="'.$object->employee_status.'" name="Employeestatus">';
+		}else{
+			print $object->employee_status;
+		}
+		print "</td>";
+
+// show the field weekly_hours
+
+		print "<td>".$langs->trans('Weeklyhours')." </td><td>";
+		if($edit==1){
+			print '<input type="text" value="'.$object->weekly_hours.'" name="Weeklyhours">';
+		}else{
+			print $object->weekly_hours;
+		}
+		print "</td>";
+		print "\n</tr>\n";
+		print "<tr>\n";
+
+// show the field modulation_period
+
+		print "<td>".$langs->trans('Modulationperiod')." </td><td>";
+		if($edit==1){
+			print '<input type="text" value="'.$object->modulation_period.'" name="Modulationperiod">';
+		}else{
+			print $object->modulation_period;
+		}
+		print "</td>";
+
+// show the field working_days
+
+		print "<td>".$langs->trans('Workingdays')." </td><td>";
+		if($edit==1){
+		if ($new==1)
+			print '<input type="text" value="31" name="Workingdays">';
+		else
+				print '<input type="text" value="'.$object->working_days.'" name="Workingdays">';
+		}else{
+			print $object->working_days;
+		}
+		print "</td>";
+		print "\n</tr>\n";
+		print "<tr>\n";
+
+// show the field normal_rate_days
+
+		print "<td>".$langs->trans('Normalratedays')." </td><td>";
+		if($edit==1){
+		if ($new==1)
+			print '<input type="text" value="31" name="Normalratedays">';
+		else
+				print '<input type="text" value="'.$object->normal_rate_days.'" name="Normalratedays">';
+		}else{
+			print $object->normal_rate_days;
+		}
+		print "</td>";
+
+// show the field daily_hours
+
+		print "<td>".$langs->trans('Dailyhours')." </td><td>";
+		if($edit==1){
+		if ($new==1)
+			print '<input type="text" value="8.000" name="Dailyhours">';
+		else
+				print '<input type="text" value="'.$object->daily_hours.'" name="Dailyhours">';
+		}else{
+			print $object->daily_hours;
+		}
+		print "</td>";
+		print "\n</tr>\n";
+		print "<tr>\n";
+
+// show the field night_hours_start
+
+		print "<td>".$langs->trans('Nighthoursstart')." </td><td>";
+		if($edit==1){
+		if ($new==1)
+			print '<input type="text" value="21:00:00" name="Nighthoursstart">';
+		else
+				print '<input type="text" value="'.$object->night_hours_start.'" name="Nighthoursstart">';
+		}else{
+			print $object->night_hours_start;
+		}
+		print "</td>";
+
+// show the field night_rate
+
+		print "<td>".$langs->trans('Nightrate')." </td><td>";
+		if($edit==1){
+		if ($new==1)
+			print '<input type="text" value="1.500" name="Nightrate">';
+		else
+				print '<input type="text" value="'.$object->night_rate.'" name="Nightrate">';
+		}else{
+			print $object->night_rate;
+		}
+		print "</td>";
+		print "\n</tr>\n";
+		print "<tr>\n";
+
+// show the field night_hours_stop
+
+		print "<td>".$langs->trans('Nighthoursstop')." </td><td>";
+		if($edit==1){
+		if ($new==1)
+			print '<input type="text" value="06:00:00" name="Nighthoursstop">';
+		else
+				print '<input type="text" value="'.$object->night_hours_stop.'" name="Nighthoursstop">';
+		}else{
+			print $object->night_hours_stop;
+		}
+		print "</td>";
+
+// show the field holiday_weekly_generated
+
+		print "<td>".$langs->trans('Holidayweeklygenerated')." </td><td>";
+		if($edit==1){
+		if ($new==1)
+			print '<input type="text" value="0.500" name="Holidayweeklygenerated">';
+		else
+				print '<input type="text" value="'.$object->holiday_weekly_generated.'" name="Holidayweeklygenerated">';
+		}else{
+			print $object->holiday_weekly_generated;
+		}
+		print "</td>";
+		print "\n</tr>\n";
+		print "<tr>\n";
+
+// show the field overtime_rate
+
+		print "<td>".$langs->trans('Overtimerate')." </td><td>";
+		if($edit==1){
+		if ($new==1)
+			print '<input type="text" value="1.250" name="Overtimerate">';
+		else
+				print '<input type="text" value="'.$object->overtime_rate.'" name="Overtimerate">';
+		}else{
+			print $object->overtime_rate;
+		}
+		print "</td>";
+
+// show the field overtime_recup_only
+
+		print "<td>".$langs->trans('Overtimerecuponly')." </td><td>";
+		if($edit==1){
+		if ($new==1)
+			print '<input type="text" value="1" name="Overtimerecuponly">';
+		else
+				print '<input type="text" value="'.$object->overtime_recup_only.'" name="Overtimerecuponly">';
+		}else{
+			print $object->overtime_recup_only;
+		}
+		print "</td>";
+		print "\n</tr>\n";
+		print "<tr>\n";
+
+// show the field weekly_max_hours
+
+		print "<td>".$langs->trans('Weeklymaxhours')." </td><td>";
+		if($edit==1){
+		if ($new==1)
+			print '<input type="text" value="48.000" name="Weeklymaxhours">';
+		else
+				print '<input type="text" value="'.$object->weekly_max_hours.'" name="Weeklymaxhours">';
+		}else{
+			print $object->weekly_max_hours;
+		}
+		print "</td>";
+
+// show the field weekly_min_hours
+
+		print "<td>".$langs->trans('Weeklyminhours')." </td><td>";
+		if($edit==1){
+		if ($new==1)
+			print '<input type="text" value="16.000" name="Weeklyminhours">';
+		else
+				print '<input type="text" value="'.$object->weekly_min_hours.'" name="Weeklyminhours">';
+		}else{
+			print $object->weekly_min_hours;
+		}
+		print "</td>";
+		print "\n</tr>\n";
+		print "<tr>\n";
+
+// show the field daily_max_hours
+
+		print "<td>".$langs->trans('Dailymaxhours')." </td><td>";
+		if($edit==1){
+		if ($new==1)
+			print '<input type="text" value="12.000" name="Dailymaxhours">';
+		else
+				print '<input type="text" value="'.$object->daily_max_hours.'" name="Dailymaxhours">';
+		}else{
+			print $object->daily_max_hours;
+		}
+		print "</td>";
+
+// show the field salary_method
+
+		print "<td>".$langs->trans('Salarymethod')." </td><td>";
+		if($edit==1){
+		print $object->select_generic('salary_method','rowid','Salarymethod','rowid','description',$object->salary_method);
+		}else{
+		print $object->print_generic('salary_method','rowid',$object->salary_method,'rowid','description');
+		}
+		print "</td>";
+		print "\n</tr>\n";
+		print "<tr>\n";
+
+// show the field sm_custom_field_1_value
+
+		print "<td>".$langs->trans('Smcustomfield1value')." </td><td>";
+		if($edit==1){
+			print '<input type="text" value="'.$object->sm_custom_field_1_value.'" name="Smcustomfield1value">';
+		}else{
+			print $object->sm_custom_field_1_value;
+		}
+		print "</td>";
+
+// show the field sm_custom_field_2_value
+
+		print "<td>".$langs->trans('Smcustomfield2value')." </td><td>";
+		if($edit==1){
+			print '<input type="text" value="'.$object->sm_custom_field_2_value.'" name="Smcustomfield2value">';
+		}else{
+			print $object->sm_custom_field_2_value;
+		}
+		print "</td>";
+		print "\n</tr>\n";
+
+            
 
 	print '</table>'."\n";
 	print '<br>';
@@ -316,12 +621,12 @@ switch ($action) {
                 print '<div class="tabsAction">';
 
                 // Boutons d'actions
-                //if($user->rights->Skeleton->edit)
+                //if($user->rights->Hrcontracttype->edit)
                 //{
                     print '<a href="'.$_SERVER["PHP_SELF"].'?id='.$_GET['id'].'&action=edit" class="butAction">'.$langs->trans("Update").'</a>';
                 //}
                 
-                //if ($user->rights->Skeleton->delete)
+                //if ($user->rights->Hrcontracttype->delete)
                 //{
                     print '<a class="butActionDelete" href="'.$_SERVER["PHP_SELF"].'?id='.$_GET['id'].'&action=delete">'.$langs->trans('Delete').'</a>';
                 //}
@@ -341,9 +646,9 @@ switch ($action) {
     }
         break;
         case 'viewinfo':
-        //print_fiche_titre($langs->trans('Skeleton'));
-        $head=Skeleton_prepare_head($object);
-        dol_fiche_head($head,'info',$langs->trans("Skeleton"),0,'mymodule@mymodule');            
+        //print_fiche_titre($langs->trans('Hrcontracttype'));
+        $head=Hrcontracttype_prepare_head($object);
+        dol_fiche_head($head,'info',$langs->trans("Hrcontracttype"),0,'emcontract@emcontract');            
         print '<table width="100%"><tr><td>';
         dol_print_object_info($object);
         print '</td></tr></table>';
@@ -357,9 +662,9 @@ switch ($action) {
         if (! $sortfield) $sortfield="name";
 	$object->fetch_thirdparty();
 
-        //print_fiche_titre($langs->trans('Skeleton'));
-        $head=Skeleton_prepare_head($object);
-        dol_fiche_head($head,'documents',$langs->trans("Skeleton"),0,'mymodule@mymodule');            
+        //print_fiche_titre($langs->trans('Hrcontracttype'));
+        $head=Hrcontracttype_prepare_head($object);
+        dol_fiche_head($head,'documents',$langs->trans("Hrcontracttype"),0,'emcontract@emcontract');            
         
         $filearray=dol_dir_list($upload_dir,"files",0,'','\.meta$',$sortfield,(strtolower($sortorder)=='desc'?SORT_DESC:SORT_ASC),1);
 	$totalsize=0;
@@ -381,8 +686,8 @@ switch ($action) {
 
         print '</div>';
 
-        $modulepart = 'mymodule';
-        $permission = $user->rights->mymodule->add;
+        $modulepart = 'emcontract';
+        $permission = $user->rights->emcontract->add;
         $param = '&id='.$object->id;
         include_once DOL_DOCUMENT_ROOT . '/core/tpl/document_actions_post_headers.tpl.php';
 
@@ -390,7 +695,7 @@ switch ($action) {
         break;
     case "delete";
         if( ($id>0 || $ref!="")){
-         $ret=$form->form_confirm($_SERVER["PHP_SELF"].'?action=confirm_delete&id='.$id,$langs->trans("DeleteSkeleton"),$langs->trans("ConfirmDelete"),"confirm_delete", '', 0, 1);
+         $ret=$form->form_confirm($_SERVER["PHP_SELF"].'?action=confirm_delete&id='.$id,$langs->trans("DeleteHrcontracttype"),$langs->trans("ConfirmDelete"),"confirm_delete", '', 0, 1);
          if ($ret == 'html') print '<br />';
          //to have the object to be deleted in the background        
         }
@@ -399,16 +704,47 @@ switch ($action) {
         {
     $sql = "SELECT";
     $sql.= " t.rowid,";
-    $sql.= " t.field1,";
-    $sql.= " t.field2";
-    $sql.= " FROM ".MAIN_DB_PREFIX."mytable as t";
+    
+		$sql.= " t.entity,";
+		$sql.= " t.date_creation,";
+		$sql.= " t.date_modification,";
+		$sql.= " t.type_contract,";
+		$sql.= " t.title,";
+		$sql.= " t.description,";
+		$sql.= " t.employee_status,";
+		$sql.= " t.fk_user_creation,";
+		$sql.= " t.fk_user_modification,";
+		$sql.= " t.weekly_hours,";
+		$sql.= " t.modulation_period,";
+		$sql.= " t.working_days,";
+		$sql.= " t.normal_rate_days,";
+		$sql.= " t.daily_hours,";
+		$sql.= " t.night_hours_start,";
+		$sql.= " t.night_rate,";
+		$sql.= " t.night_hours_stop,";
+		$sql.= " t.holiday_weekly_generated,";
+		$sql.= " t.overtime_rate,";
+		$sql.= " t.overtime_recup_only,";
+		$sql.= " t.weekly_max_hours,";
+		$sql.= " t.weekly_min_hours,";
+		$sql.= " t.daily_max_hours,";
+		$sql.= " t.fk_salary_method,";
+		$sql.= " t.sm_custom_field_1_value,";
+		$sql.= " t.sm_custom_field_2_value";
+
+    
+    $sql.= " FROM ".MAIN_DB_PREFIX."hr_contract_type as t";
 //    $sql.= " WHERE field3 = 'xxx'";
 //    $sql.= " ORDER BY field1 ASC";
 
     print '<table class="noborder">'."\n";
     print '<tr class="liste_titre">';
-    print_liste_field_titre($langs->trans('field1'),$_SERVER['PHP_SELF'],'t.field1','',$param,'',$sortfield,$sortorder);
-    print_liste_field_titre($langs->trans('field2'),$_SERVER['PHP_SELF'],'t.field2','',$param,'',$sortfield,$sortorder);
+    print_liste_field_titre($langs->trans('rowid'),$_SERVER['PHP_SELF'],'t.rowid','',$param,'',$sortfield,$sortorder);
+print_liste_field_titre($langs->trans('entity'),$_SERVER['PHP_SELF'],'t.entity','',$param,'',$sortfield,$sortorder);
+print_liste_field_titre($langs->trans('date_creation'),$_SERVER['PHP_SELF'],'t.date_creation','',$param,'',$sortfield,$sortorder);
+print_liste_field_titre($langs->trans('date_modification'),$_SERVER['PHP_SELF'],'t.date_modification','',$param,'',$sortfield,$sortorder);
+
+    
     print '</tr>';
 
     dol_syslog($script_file, LOG_DEBUG);
@@ -423,8 +759,14 @@ switch ($action) {
             if ($obj)
             {
                 // You can use here results
-                print "<tr><td>prop1</td><td>".$obj->field1."</td></tr>";
-                print "<tr><td>prop2</td><td>".$obj->field2."</td></tr>";
+                		print "<tr class='".(($i%2==0)?'pair':'impair')." >";
+		print "<td>".$obj->rowid."</td>";
+		print "<td>".$obj->entity."</td>";
+		print "<td>".dol_print_date($obj->date_creation,'day')."</td>";
+		print "<td>".dol_print_date($obj->date_modification,'day')."</td>";
+		print "</tr>";
+
+                
 
             }
             $i++;
@@ -455,7 +797,7 @@ function reloadpage($backtopage,$id,$ref){
         }
 
 }
-function Skeleton_prepare_head($object)
+function Hrcontracttype_prepare_head($object)
 {
     global $langs, $conf, $user;
     $h = 0;
@@ -468,10 +810,10 @@ function Skeleton_prepare_head($object)
 
     // Show more tabs from modules
     // Entries must be declared in modules descriptor with line
-    // $this->tabs = array('entity:+tabname:Title:@mymodule:/mymodule/mypage.php?id=__ID__');   to add new tab
+    // $this->tabs = array('entity:+tabname:Title:@emcontract:/emcontract/mypage.php?id=__ID__');   to add new tab
     // $this->tabs = array('entity:-tabname);   												to remove a tab
-    complete_head_from_modules($conf,$langs,$object,$head,$h,'mymodule');
-    complete_head_from_modules($conf,$langs,$object,$head,$h,'mymodule','remove');
+    complete_head_from_modules($conf,$langs,$object,$head,$h,'emcontract');
+    complete_head_from_modules($conf,$langs,$object,$head,$h,'emcontract','remove');
     $head[$h][0] = $_SERVER["PHP_SELF"].'?action=viewdoc&id='.$object->id;
     $head[$h][1] = $langs->trans("Documents");
     $head[$h][2] = 'documents';

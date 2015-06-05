@@ -22,10 +22,10 @@ CREATE TABLE llx_hr_salary_steps
 (
 rowid                   integer NOT NULL AUTO_INCREMENT,
 entity	                integer DEFAULT 1 NOT NULL,		-- multi company id
-datec                   DATETIME NOT NULL,
-datem		        TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,                
-fk_user_author          integer NOT NULL,
-fk_user_modif           integer ,
+date_creation                   DATETIME NOT NULL,
+date_modification		        TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,                
+fk_user_creation          integer NOT NULL,
+fk_user_modification           integer ,
 description             VARCHAR( 255 ) NOT NULL,
 fk_salary_method        integer NOT NULL,
 step		        integer NOT NULL,

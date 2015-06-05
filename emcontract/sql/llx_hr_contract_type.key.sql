@@ -20,5 +20,5 @@
 
 ALTER TABLE llx_hr_contract_type  
 ADD FOREIGN KEY (fk_salary_method) REFERENCES llx_hr_salary_method(rowid),
-ADD FOREIGN KEY (fk_user_author) REFERENCES llx_user(rowid),
-ADD FOREIGN KEY (fk_user_modif) REFERENCES llx_user(rowid)
+ADD FOREIGN KEY (fk_user_creation) REFERENCES llx_user(rowid),
+ADD FOREIGN KEY (fk_user_modification) REFERENCES llx_user(rowid)

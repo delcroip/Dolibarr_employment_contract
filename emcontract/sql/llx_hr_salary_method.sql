@@ -20,13 +20,14 @@
 
 CREATE TABLE `llx_hr_salary_method` (
   `rowid` int(11) NOT NULL AUTO_INCREMENT,
+  `ref`    VARCHAR(63),
   `entity` int(11) NOT NULL DEFAULT '1',
-  `datec` datetime NOT NULL,
-  `datem` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `date_creation` datetime NOT NULL,
+  `date_modification` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `title` varchar(255) NOT NULL,
-  `description` varchar(2048) NOT NULL,
-  `fk_user_author` int(11) NOT NULL,
-  `fk_user_modif` int(11) DEFAULT NULL,
+  `description` varchar(2047) NOT NULL,
+  `fk_user_creation` int(11) NOT NULL,
+  `fk_user_modification` int(11) DEFAULT NULL,
   ct_custom_fields_1_desc varchar(255), -- contract type custom field  1 desc
   ct_custom_fields_2_desc varchar(255),-- contract type custom field  2 desc
   c_custom_fields_1_desc  varchar(255),-- contract custom field  1 desc

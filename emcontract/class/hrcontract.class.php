@@ -18,10 +18,10 @@
  */
 
 /**
- *  \file       dev/skeletons/skeleton_class.class.php
- *  \ingroup    mymodule othermodule1 othermodule2
+ *  \file       dev/hrcontracts/hrcontract.class.php
+ *  \ingroup    emcontract othermodule1 othermodule2
  *  \brief      This file is an example for a CRUD class file (Create/Read/Update/Delete)
- *				Put here some comments
+ *				Initialy built by build_class_from_table on 2015-06-05 20:13
  */
 
 // Put here all includes required by your class file
@@ -33,18 +33,39 @@ require_once(DOL_DOCUMENT_ROOT."/core/class/commonobject.class.php");
 /**
  *	Put here description of your class
  */
-class Skeleton_Class extends CommonObject
+class Hrcontract extends CommonObject
 {
 	var $db;							//!< To store db handler
 	var $error;							//!< To return error code (or message)
 	var $errors=array();				//!< To return several error codes (or messages)
-	var $element='skeleton';			//!< Id that identify managed objects
-	var $table_element='mytable';		//!< Name of table without prefix where object is stored
+	var $element='hrcontract';			//!< Id that identify managed objects
+	var $table_element='hr_contract';		//!< Name of table without prefix where object is stored
 
     var $id;
-    var $prop1;
-    var $prop2;
-	//...
+    
+	var $ref;
+	var $user;
+	var $entity;
+	var $date_creation='';
+	var $date_modification='';
+	var $contract_type;
+	var $job_type;
+	var $job_Location;
+	var $date_dpae='';
+	var $date_medicalexam='';
+	var $date_sign_employee='';
+	var $date_sign_management='';
+	var $description;
+	var $date_start_contract='';
+	var $date_end_contract='';
+	var $user_creation;
+	var $user_modification;
+	var $base_rate;
+	var $reason;
+	var $sm_custom_field_1_value;
+	var $sm_custom_field_2_value;
+
+    
 
 
     /**
@@ -72,22 +93,73 @@ class Skeleton_Class extends CommonObject
 		$error=0;
 
 		// Clean parameters
-        if (isset($this->prop1)) $this->prop1=trim($this->prop1);
-        if (isset($this->prop2)) $this->prop2=trim($this->prop2);
-		//...
+        
+		if (isset($this->ref)) $this->ref=trim($this->ref);
+		if (isset($this->user)) $this->user=trim($this->user);
+		if (isset($this->entity)) $this->entity=trim($this->entity);
+		if (isset($this->contract_type)) $this->contract_type=trim($this->contract_type);
+		if (isset($this->job_type)) $this->job_type=trim($this->job_type);
+		if (isset($this->job_Location)) $this->job_Location=trim($this->job_Location);
+		if (isset($this->description)) $this->description=trim($this->description);
+		if (isset($this->user_creation)) $this->user_creation=trim($this->user_creation);
+		if (isset($this->user_modification)) $this->user_modification=trim($this->user_modification);
+		if (isset($this->base_rate)) $this->base_rate=trim($this->base_rate);
+		if (isset($this->reason)) $this->reason=trim($this->reason);
+		if (isset($this->sm_custom_field_1_value)) $this->sm_custom_field_1_value=trim($this->sm_custom_field_1_value);
+		if (isset($this->sm_custom_field_2_value)) $this->sm_custom_field_2_value=trim($this->sm_custom_field_2_value);
+
+        
 
 		// Check parameters
 		// Put here code to add control on parameters values
 
         // Insert request
 		$sql = "INSERT INTO ".MAIN_DB_PREFIX.$this->table_element."(";
-		$sql.= " field1,";
-		$sql.= " field2";
-		//...
+		
+		$sql.= "ref,";
+		$sql.= "fk_user,";
+		$sql.= "entity,";
+		$sql.= "date_creation,";
+		$sql.= "fk_contract_type,";
+		$sql.= "fk_job_type,";
+		$sql.= "fk_job_Location,";
+		$sql.= "date_dpae,";
+		$sql.= "date_medicalexam,";
+		$sql.= "date_sign_employee,";
+		$sql.= "date_sign_management,";
+		$sql.= "description,";
+		$sql.= "date_start_contract,";
+		$sql.= "date_end_contract,";
+		$sql.= "fk_user_creation,";
+		$sql.= "base_rate,";
+		$sql.= "reason,";
+		$sql.= "sm_custom_field_1_value,";
+		$sql.= "sm_custom_field_2_value";
+
+		
         $sql.= ") VALUES (";
-        $sql.= " '".$this->prop1."',";
-        $sql.= " '".$this->prop2."'";
-		//...
+        
+		$sql.= " ".(! isset($this->ref)?'NULL':"'".$this->db->escape($this->ref)."'").",";
+		$sql.= " ".(! isset($this->user)?'NULL':"'".$this->user."'").",";
+		$sql.= " ".(! isset($this->entity)?'NULL':"'".$this->entity."'").",";
+		$sql.= " NOW() ,";
+		$sql.= " ".(! isset($this->contract_type)?'NULL':"'".$this->contract_type."'").",";
+		$sql.= " ".(! isset($this->job_type)?'NULL':"'".$this->job_type."'").",";
+		$sql.= " ".(! isset($this->job_Location)?'NULL':"'".$this->job_Location."'").",";
+		$sql.= " ".(! isset($this->date_dpae) || dol_strlen($this->date_dpae)==0?'NULL':"'".$this->db->idate($this->date_dpae)."'").",";
+		$sql.= " ".(! isset($this->date_medicalexam) || dol_strlen($this->date_medicalexam)==0?'NULL':"'".$this->db->idate($this->date_medicalexam)."'").",";
+		$sql.= " ".(! isset($this->date_sign_employee) || dol_strlen($this->date_sign_employee)==0?'NULL':"'".$this->db->idate($this->date_sign_employee)."'").",";
+		$sql.= " ".(! isset($this->date_sign_management) || dol_strlen($this->date_sign_management)==0?'NULL':"'".$this->db->idate($this->date_sign_management)."'").",";
+		$sql.= " ".(! isset($this->description)?'NULL':"'".$this->db->escape($this->description)."'").",";
+		$sql.= " ".(! isset($this->date_start_contract) || dol_strlen($this->date_start_contract)==0?'NULL':"'".$this->db->idate($this->date_start_contract)."'").",";
+		$sql.= " ".(! isset($this->date_end_contract) || dol_strlen($this->date_end_contract)==0?'NULL':"'".$this->db->idate($this->date_end_contract)."'").",";
+		$sql.= " '".$user->id."',";
+		$sql.= " ".(! isset($this->base_rate)?'NULL':"'".$this->base_rate."'").",";
+		$sql.= " ".(! isset($this->reason)?'NULL':"'".$this->db->escape($this->reason)."'").",";
+		$sql.= " ".(! isset($this->sm_custom_field_1_value)?'NULL':"'".$this->sm_custom_field_1_value."'").",";
+		$sql.= " ".(! isset($this->sm_custom_field_2_value)?'NULL':"'".$this->sm_custom_field_2_value."'")."";
+
+        
 		$sql.= ")";
 
 		$this->db->begin();
@@ -143,9 +215,30 @@ class Skeleton_Class extends CommonObject
     	global $langs;
         $sql = "SELECT";
 		$sql.= " t.rowid,";
-		$sql.= " t.field1,";
-		$sql.= " t.field2";
-		//...
+		
+		$sql.= " t.ref,";
+		$sql.= " t.fk_user,";
+		$sql.= " t.entity,";
+		$sql.= " t.date_creation,";
+		$sql.= " t.date_modification,";
+		$sql.= " t.fk_contract_type,";
+		$sql.= " t.fk_job_type,";
+		$sql.= " t.fk_job_Location,";
+		$sql.= " t.date_dpae,";
+		$sql.= " t.date_medicalexam,";
+		$sql.= " t.date_sign_employee,";
+		$sql.= " t.date_sign_management,";
+		$sql.= " t.description,";
+		$sql.= " t.date_start_contract,";
+		$sql.= " t.date_end_contract,";
+		$sql.= " t.fk_user_creation,";
+		$sql.= " t.fk_user_modification,";
+		$sql.= " t.base_rate,";
+		$sql.= " t.reason,";
+		$sql.= " t.sm_custom_field_1_value,";
+		$sql.= " t.sm_custom_field_2_value";
+
+		
         $sql.= " FROM ".MAIN_DB_PREFIX.$this->table_element." as t";
         if ($ref) $sql.= " WHERE t.ref = '".$ref."'";
         else $sql.= " WHERE t.rowid = ".$id;
@@ -159,9 +252,30 @@ class Skeleton_Class extends CommonObject
                 $obj = $this->db->fetch_object($resql);
 
                 $this->id    = $obj->rowid;
-                $this->prop1 = $obj->field1;
-                $this->prop2 = $obj->field2;
-				//...
+                
+				$this->ref = $obj->ref;
+				$this->user = $obj->fk_user;
+				$this->entity = $obj->entity;
+				$this->date_creation = $this->db->jdate($obj->date_creation);
+				$this->date_modification = $this->db->jdate($obj->date_modification);
+				$this->contract_type = $obj->fk_contract_type;
+				$this->job_type = $obj->fk_job_type;
+				$this->job_Location = $obj->fk_job_Location;
+				$this->date_dpae = $this->db->jdate($obj->date_dpae);
+				$this->date_medicalexam = $this->db->jdate($obj->date_medicalexam);
+				$this->date_sign_employee = $this->db->jdate($obj->date_sign_employee);
+				$this->date_sign_management = $this->db->jdate($obj->date_sign_management);
+				$this->description = $obj->description;
+				$this->date_start_contract = $this->db->jdate($obj->date_start_contract);
+				$this->date_end_contract = $this->db->jdate($obj->date_end_contract);
+				$this->user_creation = $obj->fk_user_creation;
+				$this->user_modification = $obj->fk_user_modification;
+				$this->base_rate = $obj->base_rate;
+				$this->reason = $obj->reason;
+				$this->sm_custom_field_1_value = $obj->sm_custom_field_1_value;
+				$this->sm_custom_field_2_value = $obj->sm_custom_field_2_value;
+
+                
             }
             $this->db->free($resql);
 
@@ -188,18 +302,50 @@ class Skeleton_Class extends CommonObject
 		$error=0;
 
 		// Clean parameters
-        if (isset($this->prop1)) $this->prop1=trim($this->prop1);
-        if (isset($this->prop2)) $this->prop2=trim($this->prop2);
-		//...
+        
+		if (isset($this->ref)) $this->ref=trim($this->ref);
+		if (isset($this->user)) $this->user=trim($this->user);
+		if (isset($this->entity)) $this->entity=trim($this->entity);
+		if (isset($this->contract_type)) $this->contract_type=trim($this->contract_type);
+		if (isset($this->job_type)) $this->job_type=trim($this->job_type);
+		if (isset($this->job_Location)) $this->job_Location=trim($this->job_Location);
+		if (isset($this->description)) $this->description=trim($this->description);
+		if (isset($this->user_creation)) $this->user_creation=trim($this->user_creation);
+		if (isset($this->user_modification)) $this->user_modification=trim($this->user_modification);
+		if (isset($this->base_rate)) $this->base_rate=trim($this->base_rate);
+		if (isset($this->reason)) $this->reason=trim($this->reason);
+		if (isset($this->sm_custom_field_1_value)) $this->sm_custom_field_1_value=trim($this->sm_custom_field_1_value);
+		if (isset($this->sm_custom_field_2_value)) $this->sm_custom_field_2_value=trim($this->sm_custom_field_2_value);
+
+        
 
 		// Check parameters
 		// Put here code to add a control on parameters values
 
         // Update request
         $sql = "UPDATE ".MAIN_DB_PREFIX.$this->table_element." SET";
-        $sql.= " field1=".(isset($this->field1)?"'".$this->db->escape($this->field1)."'":"null").",";
-        $sql.= " field2=".(isset($this->field2)?"'".$this->db->escape($this->field2)."'":"null")."";
-		//...
+        
+		$sql.= " ref=".(isset($this->ref)?"'".$this->db->escape($this->ref)."'":"null").",";
+		$sql.= " fk_user=".(isset($this->user)?$this->user:"null").",";
+		$sql.= " entity=".(isset($this->entity)?$this->entity:"null").",";
+		$sql.= " date_modification=NOW() ,";
+		$sql.= " fk_contract_type=".(isset($this->contract_type)?$this->contract_type:"null").",";
+		$sql.= " fk_job_type=".(isset($this->job_type)?$this->job_type:"null").",";
+		$sql.= " fk_job_Location=".(isset($this->job_Location)?$this->job_Location:"null").",";
+		$sql.= " date_dpae=".(dol_strlen($this->date_dpae)!=0 ? "'".$this->db->idate($this->date_dpae)."'" : 'null').",";
+		$sql.= " date_medicalexam=".(dol_strlen($this->date_medicalexam)!=0 ? "'".$this->db->idate($this->date_medicalexam)."'" : 'null').",";
+		$sql.= " date_sign_employee=".(dol_strlen($this->date_sign_employee)!=0 ? "'".$this->db->idate($this->date_sign_employee)."'" : 'null').",";
+		$sql.= " date_sign_management=".(dol_strlen($this->date_sign_management)!=0 ? "'".$this->db->idate($this->date_sign_management)."'" : 'null').",";
+		$sql.= " description=".(isset($this->description)?"'".$this->db->escape($this->description)."'":"null").",";
+		$sql.= " date_start_contract=".(dol_strlen($this->date_start_contract)!=0 ? "'".$this->db->idate($this->date_start_contract)."'" : 'null').",";
+		$sql.= " date_end_contract=".(dol_strlen($this->date_end_contract)!=0 ? "'".$this->db->idate($this->date_end_contract)."'" : 'null').",";
+		$sql.= " fk_user_modification='".$user->id."',";
+		$sql.= " base_rate=".(isset($this->base_rate)?$this->base_rate:"null").",";
+		$sql.= " reason=".(isset($this->reason)?"'".$this->db->escape($this->reason)."'":"null").",";
+		$sql.= " sm_custom_field_1_value=".(isset($this->sm_custom_field_1_value)?$this->sm_custom_field_1_value:"null").",";
+		$sql.= " sm_custom_field_2_value=".(isset($this->sm_custom_field_2_value)?$this->sm_custom_field_2_value:"null")."";
+
+        
         $sql.= " WHERE rowid=".$this->id;
 
 		$this->db->begin();
@@ -260,14 +406,14 @@ class Skeleton_Class extends CommonObject
         if(isset($this->ref))
             $ref=$this->ref;
         if($id)
-            $lien = '<a href="'.DOL_URL_ROOT.'/mymodule/skeleton_page.php?id='.$id.'&action=view">';
+            $lien = '<a href="'.DOL_URL_ROOT.'/emcontract/hrcontract.php?id='.$id.'&action=view">';
     	else if ($ref)
-            $lien = '<a href="'.DOL_URL_ROOT.'/mymodule/skeleton_page.php?ref='.$ref.'&action=view">';
+            $lien = '<a href="'.DOL_URL_ROOT.'/emcontract/hrcontract.php?ref='.$ref.'&action=view">';
     	else
             return "Error";
         $lienfin='</a>';
 
-    	$picto='mymodule@mymodule';
+    	$picto='emcontract@emcontract';
         
         if($ref)
             $label=$langs->trans("Show").': '.$ref;
@@ -350,7 +496,7 @@ class Skeleton_Class extends CommonObject
 
 		$error=0;
 
-		$object=new Skeleton_Class($this->db);
+		$object=new Hrcontract($this->db);
 
 		$this->db->begin();
 
@@ -401,8 +547,30 @@ class Skeleton_Class extends CommonObject
 	function initAsSpecimen()
 	{
 		$this->id=0;
-		$this->prop1='prop1';
-		$this->prop2='prop2';
+		
+		$this->ref='';
+		$this->user='';
+		$this->entity='';
+		$this->date_creation='';
+		$this->date_modification='';
+		$this->contract_type='';
+		$this->job_type='';
+		$this->job_Location='';
+		$this->date_dpae='';
+		$this->date_medicalexam='';
+		$this->date_sign_employee='';
+		$this->date_sign_management='';
+		$this->description='';
+		$this->date_start_contract='';
+		$this->date_end_contract='';
+		$this->user_creation='';
+		$this->user_modification='';
+		$this->base_rate='';
+		$this->reason='';
+		$this->sm_custom_field_1_value='';
+		$this->sm_custom_field_2_value='';
+
+		
 	}
 /*
  * function to genegate a select list from a table, the showed text will be a concatenation of some 

@@ -18,10 +18,8 @@
 -- HR Revision 0.1.0
 
 
-ALTER TABLE llx_hr_contract   
-ADD FOREIGN KEY (fk_user) REFERENCES llx_user(rowid),
-ADD FOREIGN KEY (fk_contract_type ) REFERENCES llx_hr_contract_type(rowid),
-ADD FOREIGN KEY (fk_job_location ) REFERENCES llx_societe_address(rowid),
+
+ALTER TABLE llx_hr_skill
 ADD UNIQUE(`ref`) ,
 ADD FOREIGN KEY (fk_user_creation) REFERENCES llx_user(rowid),
 ADD FOREIGN KEY (fk_user_modification) REFERENCES llx_user(rowid)

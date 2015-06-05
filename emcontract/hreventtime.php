@@ -18,10 +18,10 @@
  */
 
 /**
- *   	\file       dev/skeletons/skeleton_page.php
- *		\ingroup    mymodule othermodule1 othermodule2
+ *   	\file       dev/skeletons/skeleton.php
+ *		\ingroup    emcontract othermodule1 othermodule2
  *		\brief      This file is an example of a php page
- *					Put here some comments
+ *					Initialy built by build_class_from_table on 2015-06-05 20:13
  */
 
 //if (! defined('NOREQUIREUSER'))  define('NOREQUIREUSER','1');
@@ -45,7 +45,7 @@ if (! $res && file_exists("/var/www/dolibarr/htdocs/main.inc.php")) $res=@includ
 if (! $res) die("Include of main fails");
 // Change this following line to use the correct relative path from htdocs
 //include_once(DOL_DOCUMENT_ROOT.'/core/class/formcompany.class.php');
-dol_include_once('/mymodule/class/skeleton_class.class.php');
+dol_include_once('/emcontract/class/hreventtime.class.php');
 dol_include_once('/core/lib/functions2.lib.php');
 //document handling
 dol_include_once('/core/lib/files.lib.php');
@@ -56,7 +56,7 @@ dol_include_once('/core/class/html.formfile.class.php');
 
 // Load traductions files requiredby by page
 //$langs->load("companies");
-$langs->load("Skeleton_class");
+$langs->load("Hreventtime_class");
 
 // Get parameters
 $id			= GETPOST('id','int');
@@ -76,34 +76,34 @@ $pageprev = $page - 1;
 $pagenext = $page + 1;
 
 
-$upload_dir = $conf->mymodule->dir_output.'/Skeleton/'.dol_sanitizeFileName($object->ref);
+$upload_dir = $conf->emcontract->dir_output.'/Hreventtime/'.dol_sanitizeFileName($object->ref);
 
 
  // uncomment to avoid resubmision
-//if(isset( $_SESSION['Skeleton_class'][$tms]))
+//if(isset( $_SESSION['Hreventtime_class'][$tms]))
 //{
 
  //   $cancel=TRUE;
  //  setEventMessages('Internal error, POST not exptected', null, 'errors');
 //}
  $tms= time();
- $_SESSION['Skeleton_class'][$tms]= array();
+ $_SESSION['Hreventtime_class'][$tms]= array();
 
 
 // Right Management
  /*
 if ($user->societe_id > 0 || 
-       (!$user->rights->mymodule->add && ($action=='add' || $action='create')) ||
-       (!$user->rights->mymodule->view && ($action=='list' || $action='view')) ||
-       (!$user->rights->mymodule->delete && ($action=='confirm_delete')) ||
-       (!$user->rights->mymodule->edit && ($action=='edit' || $action='update')))
+       (!$user->rights->emcontract->add && ($action=='add' || $action='create')) ||
+       (!$user->rights->emcontract->view && ($action=='list' || $action='view')) ||
+       (!$user->rights->emcontract->delete && ($action=='confirm_delete')) ||
+       (!$user->rights->emcontract->edit && ($action=='edit' || $action='update')))
 {
 	accessforbidden();
 }
 */
 
 // create object and set id or ref if provided as parameter
-$object=new Skeleton_Class($db);
+$object=new Hreventtime($db);
 if($id>0)
 {
     $object->id=$id; 
@@ -127,8 +127,17 @@ if ($cancel){
 }else if (($action == 'add') || ($action == 'update' && ($id>0 || !empty($ref))))
 {
         //retrive the data
-        $object->prop1=GETPOST("field1");
-        $object->prop2=GETPOST("field2");
+        		$object->rowid=GETPOST("Rowid");
+		$object->audience=GETPOST("Audience");
+		$object->audience_item=GETPOST("Audienceitem");
+		$object->event_type=GETPOST("Eventtype");
+		$object->description=GETPOST("Description");
+		$object->status=GETPOST("Status");
+		$object->day_date=dol_mktime(0, 0, 0,'Daydatemonth','Daydateday','Daydateyear');
+		$object->duration=GETPOST("Duration");
+		$object->country=GETPOST("Country");
+
+        
         
 // test here if the post data is valide
  /*
@@ -225,9 +234,9 @@ if ($cancel){
                             break;
             }             
 //Removing the tms array so the order can't be submitted two times
-if(isset( $_SESSION['Skeleton_class'][$tms]))
+if(isset( $_SESSION['Hreventtime_class'][$tms]))
 {
-    unset($_SESSION['Skeleton_class'][$tms]);
+    unset($_SESSION['Hreventtime_class'][$tms]);
 }
 
 /***************************************************
@@ -236,7 +245,7 @@ if(isset( $_SESSION['Skeleton_class'][$tms]))
 * Put here all code to build page
 ****************************************************/
 
-llxHeader('','Skeleton','');
+llxHeader('','Hreventtime','');
 
 $form=new Form($db);
 
@@ -265,17 +274,17 @@ switch ($action) {
         $edit=1;
    case "delete";
         if( $action=='delete' && ($id>0 || $ref!="")){
-         $ret=$form->form_confirm($_SERVER["PHP_SELF"].'?action=confirm_delete&id='.$id,$langs->trans("DeleteSkeleton"),$langs->trans("ConfirmDelete"),"confirm_delete", '', 0, 1);
+         $ret=$form->form_confirm($_SERVER["PHP_SELF"].'?action=confirm_delete&id='.$id,$langs->trans("DeleteHreventtime"),$langs->trans("ConfirmDelete"),"confirm_delete", '', 0, 1);
          if ($ret == 'html') print '<br />';
          //to have the object to be deleted in the background\
         }
     case "view":
     {
-        //print_fiche_titre($langs->trans('Skeleton'));
+        //print_fiche_titre($langs->trans('Hreventtime'));
         	// tabs
         if($edit==0 && $new==0){ //show tabs
-            $head=Skeleton_prepare_head($object);
-            dol_fiche_head($head,'card',$langs->trans("Skeleton"),0,'mymodule@mymodule');            
+            $head=Hreventtime_prepare_head($object);
+            dol_fiche_head($head,'card',$langs->trans("Hreventtime"),0,'emcontract@emcontract');            
         }
 	print '<br>';
         if($edit==1){
@@ -292,8 +301,104 @@ switch ($action) {
 
 	print '<table class="border centpercent">'."\n";
 
-            print "<tr><td>prop1</td><td>".$object->field1."</td></tr>";
-            print "<tr><td>prop2</td><td>".$object->field2."</td></tr>";
+            
+		print "<tr>\n";
+
+// show the field audience
+
+		print "<td class='fieldrequired'>".$langs->trans('Audience')." </td><td>";
+		if($edit==1){
+		if ($new==1)
+			print '<input type="text" value="USER" name="Audience">';
+		else
+				print '<input type="text" value="'.$object->audience.'" name="Audience">';
+		}else{
+			print $object->audience;
+		}
+		print "</td>";
+
+// show the field audience_item
+
+		print "<td class='fieldrequired'>".$langs->trans('Audienceitem')." </td><td>";
+		if($edit==1){
+		print $object->select_generic('audience_item','rowid','Audienceitem','rowid','description',$object->audience_item);
+		}else{
+		print $object->print_generic('audience_item','rowid',$object->audience_item,'rowid','description');
+		}
+		print "</td>";
+		print "\n</tr>\n";
+		print "<tr>\n";
+
+// show the field event_type
+
+		print "<td class='fieldrequired'>".$langs->trans('Eventtype')." </td><td>";
+		if($edit==1){
+		print $object->select_enum('llx_hr_event_time','event_type','Eventtype',$object->event_type);
+		}else{
+		print $langs->trans($object->event_type);
+		}
+		print "</td>";
+
+// show the field description
+
+		print "<td class='fieldrequired'>".$langs->trans('Description')." </td><td>";
+		if($edit==1){
+			print '<input type="text" value="'.$object->description.'" name="Description">';
+		}else{
+			print $object->description;
+		}
+		print "</td>";
+		print "\n</tr>\n";
+		print "<tr>\n";
+
+// show the field status
+
+		print "<td class='fieldrequired'>".$langs->trans('Status')." </td><td>";
+		if($edit==1){
+			print '<input type="text" value="'.$object->status.'" name="Status">';
+		}else{
+			print $object->status;
+		}
+		print "</td>";
+
+// show the field day_date
+
+		print "<td>".$langs->trans('Daydate')." </td><td>";
+		if($edit==1){
+		if($new==1){
+			print $form->select_date(-1,'Daydate');
+		}else{
+			print $form->select_date($object->day_date,'Daydate');
+		}
+		}else{
+			print dol_print_date($object->day_date,'day');
+		}
+		print "</td>";
+		print "\n</tr>\n";
+		print "<tr>\n";
+
+// show the field duration
+
+		print "<td>".$langs->trans('Duration')." </td><td>";
+		if($edit==1){
+		print $object->select_enum('llx_hr_event_time','duration','Duration',$object->duration);
+		}else{
+		print $langs->trans($object->duration);
+		}
+		print "</td>";
+
+// show the field country
+
+		print "<td>".$langs->trans('Country')." </td><td>";
+		if($edit==1){
+		print $object->select_generic('country','rowid','Country','rowid','description',$object->country);
+		}else{
+		print $object->print_generic('country','rowid',$object->country,'rowid','description');
+		}
+		print "</td>";
+		print "\n</tr>\n";
+
+            
 
 	print '</table>'."\n";
 	print '<br>';
@@ -316,12 +421,12 @@ switch ($action) {
                 print '<div class="tabsAction">';
 
                 // Boutons d'actions
-                //if($user->rights->Skeleton->edit)
+                //if($user->rights->Hreventtime->edit)
                 //{
                     print '<a href="'.$_SERVER["PHP_SELF"].'?id='.$_GET['id'].'&action=edit" class="butAction">'.$langs->trans("Update").'</a>';
                 //}
                 
-                //if ($user->rights->Skeleton->delete)
+                //if ($user->rights->Hreventtime->delete)
                 //{
                     print '<a class="butActionDelete" href="'.$_SERVER["PHP_SELF"].'?id='.$_GET['id'].'&action=delete">'.$langs->trans('Delete').'</a>';
                 //}
@@ -341,9 +446,9 @@ switch ($action) {
     }
         break;
         case 'viewinfo':
-        //print_fiche_titre($langs->trans('Skeleton'));
-        $head=Skeleton_prepare_head($object);
-        dol_fiche_head($head,'info',$langs->trans("Skeleton"),0,'mymodule@mymodule');            
+        //print_fiche_titre($langs->trans('Hreventtime'));
+        $head=Hreventtime_prepare_head($object);
+        dol_fiche_head($head,'info',$langs->trans("Hreventtime"),0,'emcontract@emcontract');            
         print '<table width="100%"><tr><td>';
         dol_print_object_info($object);
         print '</td></tr></table>';
@@ -357,9 +462,9 @@ switch ($action) {
         if (! $sortfield) $sortfield="name";
 	$object->fetch_thirdparty();
 
-        //print_fiche_titre($langs->trans('Skeleton'));
-        $head=Skeleton_prepare_head($object);
-        dol_fiche_head($head,'documents',$langs->trans("Skeleton"),0,'mymodule@mymodule');            
+        //print_fiche_titre($langs->trans('Hreventtime'));
+        $head=Hreventtime_prepare_head($object);
+        dol_fiche_head($head,'documents',$langs->trans("Hreventtime"),0,'emcontract@emcontract');            
         
         $filearray=dol_dir_list($upload_dir,"files",0,'','\.meta$',$sortfield,(strtolower($sortorder)=='desc'?SORT_DESC:SORT_ASC),1);
 	$totalsize=0;
@@ -381,8 +486,8 @@ switch ($action) {
 
         print '</div>';
 
-        $modulepart = 'mymodule';
-        $permission = $user->rights->mymodule->add;
+        $modulepart = 'emcontract';
+        $permission = $user->rights->emcontract->add;
         $param = '&id='.$object->id;
         include_once DOL_DOCUMENT_ROOT . '/core/tpl/document_actions_post_headers.tpl.php';
 
@@ -390,7 +495,7 @@ switch ($action) {
         break;
     case "delete";
         if( ($id>0 || $ref!="")){
-         $ret=$form->form_confirm($_SERVER["PHP_SELF"].'?action=confirm_delete&id='.$id,$langs->trans("DeleteSkeleton"),$langs->trans("ConfirmDelete"),"confirm_delete", '', 0, 1);
+         $ret=$form->form_confirm($_SERVER["PHP_SELF"].'?action=confirm_delete&id='.$id,$langs->trans("DeleteHreventtime"),$langs->trans("ConfirmDelete"),"confirm_delete", '', 0, 1);
          if ($ret == 'html') print '<br />';
          //to have the object to be deleted in the background        
         }
@@ -399,16 +504,33 @@ switch ($action) {
         {
     $sql = "SELECT";
     $sql.= " t.rowid,";
-    $sql.= " t.field1,";
-    $sql.= " t.field2";
-    $sql.= " FROM ".MAIN_DB_PREFIX."mytable as t";
+    
+		$sql.= " t.audience,";
+		$sql.= " t.fk_audience_item,";
+		$sql.= " t.date_creation,";
+		$sql.= " t.date_modification,";
+		$sql.= " t.event_type,";
+		$sql.= " t.description,";
+		$sql.= " t.fk_user_creation,";
+		$sql.= " t.fk_user_modification,";
+		$sql.= " t.status,";
+		$sql.= " t.day_date,";
+		$sql.= " t.duration,";
+		$sql.= " t.fk_country";
+
+    
+    $sql.= " FROM ".MAIN_DB_PREFIX."hr_event_time as t";
 //    $sql.= " WHERE field3 = 'xxx'";
 //    $sql.= " ORDER BY field1 ASC";
 
     print '<table class="noborder">'."\n";
     print '<tr class="liste_titre">';
-    print_liste_field_titre($langs->trans('field1'),$_SERVER['PHP_SELF'],'t.field1','',$param,'',$sortfield,$sortorder);
-    print_liste_field_titre($langs->trans('field2'),$_SERVER['PHP_SELF'],'t.field2','',$param,'',$sortfield,$sortorder);
+    print_liste_field_titre($langs->trans('rowid'),$_SERVER['PHP_SELF'],'t.rowid','',$param,'',$sortfield,$sortorder);
+print_liste_field_titre($langs->trans('audience'),$_SERVER['PHP_SELF'],'t.audience','',$param,'',$sortfield,$sortorder);
+print_liste_field_titre($langs->trans('audience_item'),$_SERVER['PHP_SELF'],'t.audience_item','',$param,'',$sortfield,$sortorder);
+print_liste_field_titre($langs->trans('date_creation'),$_SERVER['PHP_SELF'],'t.date_creation','',$param,'',$sortfield,$sortorder);
+
+    
     print '</tr>';
 
     dol_syslog($script_file, LOG_DEBUG);
@@ -423,8 +545,14 @@ switch ($action) {
             if ($obj)
             {
                 // You can use here results
-                print "<tr><td>prop1</td><td>".$obj->field1."</td></tr>";
-                print "<tr><td>prop2</td><td>".$obj->field2."</td></tr>";
+                		print "<tr class='".(($i%2==0)?'pair':'impair')." >";
+		print "<td>".$obj->rowid."</td>";
+		print "<td>".$obj->audience."</td>";
+		print "<td>".$object->print_generic('audience_item','rowid',$obj->fk_audience_item,'rowid','description')."</td>";
+		print "<td>".dol_print_date($obj->date_creation,'day')."</td>";
+		print "</tr>";
+
+                
 
             }
             $i++;
@@ -455,7 +583,7 @@ function reloadpage($backtopage,$id,$ref){
         }
 
 }
-function Skeleton_prepare_head($object)
+function Hreventtime_prepare_head($object)
 {
     global $langs, $conf, $user;
     $h = 0;
@@ -468,10 +596,10 @@ function Skeleton_prepare_head($object)
 
     // Show more tabs from modules
     // Entries must be declared in modules descriptor with line
-    // $this->tabs = array('entity:+tabname:Title:@mymodule:/mymodule/mypage.php?id=__ID__');   to add new tab
+    // $this->tabs = array('entity:+tabname:Title:@emcontract:/emcontract/mypage.php?id=__ID__');   to add new tab
     // $this->tabs = array('entity:-tabname);   												to remove a tab
-    complete_head_from_modules($conf,$langs,$object,$head,$h,'mymodule');
-    complete_head_from_modules($conf,$langs,$object,$head,$h,'mymodule','remove');
+    complete_head_from_modules($conf,$langs,$object,$head,$h,'emcontract');
+    complete_head_from_modules($conf,$langs,$object,$head,$h,'emcontract','remove');
     $head[$h][0] = $_SERVER["PHP_SELF"].'?action=viewdoc&id='.$object->id;
     $head[$h][1] = $langs->trans("Documents");
     $head[$h][2] = 'documents';

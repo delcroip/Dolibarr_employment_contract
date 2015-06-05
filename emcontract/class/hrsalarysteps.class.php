@@ -18,10 +18,10 @@
  */
 
 /**
- *  \file       dev/skeletons/hrsalarysteps.class.php
- *  \ingroup    mymodule othermodule1 othermodule2
+ *  \file       dev/hrsalarystepss/hrsalarysteps.class.php
+ *  \ingroup    emcontract othermodule1 othermodule2
  *  \brief      This file is an example for a CRUD class file (Create/Read/Update/Delete)
- *				Initialy built by build_class_from_table on 2015-05-01 16:19
+ *				Initialy built by build_class_from_table on 2015-06-05 20:12
  */
 
 // Put here all includes required by your class file
@@ -39,17 +39,17 @@ class Hrsalarysteps extends CommonObject
 	var $error;							//!< To return error code (or message)
 	var $errors=array();				//!< To return several error codes (or messages)
 	var $element='hrsalarysteps';			//!< Id that identify managed objects
-	var $table_element='hrsalarysteps';		//!< Name of table without prefix where object is stored
+	var $table_element='hr_salary_steps';		//!< Name of table without prefix where object is stored
 
     var $id;
     
 	var $entity;
-	var $datec='';
-	var $datem='';
-	var $fk_user_author;
-	var $fk_user_modif;
+	var $date_creation='';
+	var $date_modification='';
+	var $user_creation;
+	var $user_modification;
 	var $description;
-	var $fk_salary_method;
+	var $salary_method;
 	var $step;
 	var $operand_1_type;
 	var $operand_1_value;
@@ -59,10 +59,6 @@ class Hrsalarysteps extends CommonObject
 	var $operand_3_type;
 	var $operand_3_value;
 	var $accounting_account;
-	var $ct_custom_fields_1_desc;
-	var $ct_custom_fields_2_desc;
-	var $c_custom_fields_1_desc;
-	var $c_custom_fields_2_desc;
 	var $toshow;
 
     
@@ -95,10 +91,10 @@ class Hrsalarysteps extends CommonObject
 		// Clean parameters
         
 		if (isset($this->entity)) $this->entity=trim($this->entity);
-		if (isset($this->fk_user_author)) $this->fk_user_author=trim($this->fk_user_author);
-		if (isset($this->fk_user_modif)) $this->fk_user_modif=trim($this->fk_user_modif);
+		if (isset($this->user_creation)) $this->user_creation=trim($this->user_creation);
+		if (isset($this->user_modification)) $this->user_modification=trim($this->user_modification);
 		if (isset($this->description)) $this->description=trim($this->description);
-		if (isset($this->fk_salary_method)) $this->fk_salary_method=trim($this->fk_salary_method);
+		if (isset($this->salary_method)) $this->salary_method=trim($this->salary_method);
 		if (isset($this->step)) $this->step=trim($this->step);
 		if (isset($this->operand_1_type)) $this->operand_1_type=trim($this->operand_1_type);
 		if (isset($this->operand_1_value)) $this->operand_1_value=trim($this->operand_1_value);
@@ -108,10 +104,6 @@ class Hrsalarysteps extends CommonObject
 		if (isset($this->operand_3_type)) $this->operand_3_type=trim($this->operand_3_type);
 		if (isset($this->operand_3_value)) $this->operand_3_value=trim($this->operand_3_value);
 		if (isset($this->accounting_account)) $this->accounting_account=trim($this->accounting_account);
-		if (isset($this->ct_custom_fields_1_desc)) $this->ct_custom_fields_1_desc=trim($this->ct_custom_fields_1_desc);
-		if (isset($this->ct_custom_fields_2_desc)) $this->ct_custom_fields_2_desc=trim($this->ct_custom_fields_2_desc);
-		if (isset($this->c_custom_fields_1_desc)) $this->c_custom_fields_1_desc=trim($this->c_custom_fields_1_desc);
-		if (isset($this->c_custom_fields_2_desc)) $this->c_custom_fields_2_desc=trim($this->c_custom_fields_2_desc);
 		if (isset($this->toshow)) $this->toshow=trim($this->toshow);
 
         
@@ -123,10 +115,8 @@ class Hrsalarysteps extends CommonObject
 		$sql = "INSERT INTO ".MAIN_DB_PREFIX.$this->table_element."(";
 		
 		$sql.= "entity,";
-		$sql.= "datec,";
-		$sql.= "datem,";
-		$sql.= "fk_user_author,";
-		$sql.= "fk_user_modif,";
+		$sql.= "date_creation,";
+		$sql.= "fk_user_creation,";
 		$sql.= "description,";
 		$sql.= "fk_salary_method,";
 		$sql.= "step,";
@@ -138,22 +128,16 @@ class Hrsalarysteps extends CommonObject
 		$sql.= "operand_3_type,";
 		$sql.= "operand_3_value,";
 		$sql.= "accounting_account,";
-		$sql.= "ct_custom_fields_1_desc,";
-		$sql.= "ct_custom_fields_2_desc,";
-		$sql.= "c_custom_fields_1_desc,";
-		$sql.= "c_custom_fields_2_desc,";
 		$sql.= "toshow";
 
 		
         $sql.= ") VALUES (";
         
 		$sql.= " ".(! isset($this->entity)?'NULL':"'".$this->entity."'").",";
-		$sql.= " ".(! isset($this->datec) || dol_strlen($this->datec)==0?'NULL':"'".$this->db->idate($this->datec)."'").",";
-		$sql.= " ".(! isset($this->datem) || dol_strlen($this->datem)==0?'NULL':"'".$this->db->idate($this->datem)."'").",";
-		$sql.= " ".(! isset($this->fk_user_author)?'NULL':"'".$this->fk_user_author."'").",";
-		$sql.= " ".(! isset($this->fk_user_modif)?'NULL':"'".$this->fk_user_modif."'").",";
+		$sql.= " NOW() ,";
+		$sql.= " '".$user->id."',";
 		$sql.= " ".(! isset($this->description)?'NULL':"'".$this->db->escape($this->description)."'").",";
-		$sql.= " ".(! isset($this->fk_salary_method)?'NULL':"'".$this->fk_salary_method."'").",";
+		$sql.= " ".(! isset($this->salary_method)?'NULL':"'".$this->salary_method."'").",";
 		$sql.= " ".(! isset($this->step)?'NULL':"'".$this->step."'").",";
 		$sql.= " ".(! isset($this->operand_1_type)?'NULL':"'".$this->operand_1_type."'").",";
 		$sql.= " ".(! isset($this->operand_1_value)?'NULL':"'".$this->operand_1_value."'").",";
@@ -163,10 +147,6 @@ class Hrsalarysteps extends CommonObject
 		$sql.= " ".(! isset($this->operand_3_type)?'NULL':"'".$this->operand_3_type."'").",";
 		$sql.= " ".(! isset($this->operand_3_value)?'NULL':"'".$this->operand_3_value."'").",";
 		$sql.= " ".(! isset($this->accounting_account)?'NULL':"'".$this->accounting_account."'").",";
-		$sql.= " ".(! isset($this->ct_custom_fields_1_desc)?'NULL':"'".$this->db->escape($this->ct_custom_fields_1_desc)."'").",";
-		$sql.= " ".(! isset($this->ct_custom_fields_2_desc)?'NULL':"'".$this->db->escape($this->ct_custom_fields_2_desc)."'").",";
-		$sql.= " ".(! isset($this->c_custom_fields_1_desc)?'NULL':"'".$this->db->escape($this->c_custom_fields_1_desc)."'").",";
-		$sql.= " ".(! isset($this->c_custom_fields_2_desc)?'NULL':"'".$this->db->escape($this->c_custom_fields_2_desc)."'").",";
 		$sql.= " ".(! isset($this->toshow)?'NULL':"'".$this->toshow."'")."";
 
         
@@ -227,10 +207,10 @@ class Hrsalarysteps extends CommonObject
 		$sql.= " t.rowid,";
 		
 		$sql.= " t.entity,";
-		$sql.= " t.datec,";
-		$sql.= " t.datem,";
-		$sql.= " t.fk_user_author,";
-		$sql.= " t.fk_user_modif,";
+		$sql.= " t.date_creation,";
+		$sql.= " t.date_modification,";
+		$sql.= " t.fk_user_creation,";
+		$sql.= " t.fk_user_modification,";
 		$sql.= " t.description,";
 		$sql.= " t.fk_salary_method,";
 		$sql.= " t.step,";
@@ -242,10 +222,6 @@ class Hrsalarysteps extends CommonObject
 		$sql.= " t.operand_3_type,";
 		$sql.= " t.operand_3_value,";
 		$sql.= " t.accounting_account,";
-		$sql.= " t.ct_custom_fields_1_desc,";
-		$sql.= " t.ct_custom_fields_2_desc,";
-		$sql.= " t.c_custom_fields_1_desc,";
-		$sql.= " t.c_custom_fields_2_desc,";
 		$sql.= " t.toshow";
 
 		
@@ -264,12 +240,12 @@ class Hrsalarysteps extends CommonObject
                 $this->id    = $obj->rowid;
                 
 				$this->entity = $obj->entity;
-				$this->datec = $this->db->jdate($obj->datec);
-				$this->datem = $this->db->jdate($obj->datem);
-				$this->fk_user_author = $obj->fk_user_author;
-				$this->fk_user_modif = $obj->fk_user_modif;
+				$this->date_creation = $this->db->jdate($obj->date_creation);
+				$this->date_modification = $this->db->jdate($obj->date_modification);
+				$this->user_creation = $obj->fk_user_creation;
+				$this->user_modification = $obj->fk_user_modification;
 				$this->description = $obj->description;
-				$this->fk_salary_method = $obj->fk_salary_method;
+				$this->salary_method = $obj->fk_salary_method;
 				$this->step = $obj->step;
 				$this->operand_1_type = $obj->operand_1_type;
 				$this->operand_1_value = $obj->operand_1_value;
@@ -279,10 +255,6 @@ class Hrsalarysteps extends CommonObject
 				$this->operand_3_type = $obj->operand_3_type;
 				$this->operand_3_value = $obj->operand_3_value;
 				$this->accounting_account = $obj->accounting_account;
-				$this->ct_custom_fields_1_desc = $obj->ct_custom_fields_1_desc;
-				$this->ct_custom_fields_2_desc = $obj->ct_custom_fields_2_desc;
-				$this->c_custom_fields_1_desc = $obj->c_custom_fields_1_desc;
-				$this->c_custom_fields_2_desc = $obj->c_custom_fields_2_desc;
 				$this->toshow = $obj->toshow;
 
                 
@@ -314,10 +286,10 @@ class Hrsalarysteps extends CommonObject
 		// Clean parameters
         
 		if (isset($this->entity)) $this->entity=trim($this->entity);
-		if (isset($this->fk_user_author)) $this->fk_user_author=trim($this->fk_user_author);
-		if (isset($this->fk_user_modif)) $this->fk_user_modif=trim($this->fk_user_modif);
+		if (isset($this->user_creation)) $this->user_creation=trim($this->user_creation);
+		if (isset($this->user_modification)) $this->user_modification=trim($this->user_modification);
 		if (isset($this->description)) $this->description=trim($this->description);
-		if (isset($this->fk_salary_method)) $this->fk_salary_method=trim($this->fk_salary_method);
+		if (isset($this->salary_method)) $this->salary_method=trim($this->salary_method);
 		if (isset($this->step)) $this->step=trim($this->step);
 		if (isset($this->operand_1_type)) $this->operand_1_type=trim($this->operand_1_type);
 		if (isset($this->operand_1_value)) $this->operand_1_value=trim($this->operand_1_value);
@@ -327,10 +299,6 @@ class Hrsalarysteps extends CommonObject
 		if (isset($this->operand_3_type)) $this->operand_3_type=trim($this->operand_3_type);
 		if (isset($this->operand_3_value)) $this->operand_3_value=trim($this->operand_3_value);
 		if (isset($this->accounting_account)) $this->accounting_account=trim($this->accounting_account);
-		if (isset($this->ct_custom_fields_1_desc)) $this->ct_custom_fields_1_desc=trim($this->ct_custom_fields_1_desc);
-		if (isset($this->ct_custom_fields_2_desc)) $this->ct_custom_fields_2_desc=trim($this->ct_custom_fields_2_desc);
-		if (isset($this->c_custom_fields_1_desc)) $this->c_custom_fields_1_desc=trim($this->c_custom_fields_1_desc);
-		if (isset($this->c_custom_fields_2_desc)) $this->c_custom_fields_2_desc=trim($this->c_custom_fields_2_desc);
 		if (isset($this->toshow)) $this->toshow=trim($this->toshow);
 
         
@@ -342,12 +310,10 @@ class Hrsalarysteps extends CommonObject
         $sql = "UPDATE ".MAIN_DB_PREFIX.$this->table_element." SET";
         
 		$sql.= " entity=".(isset($this->entity)?$this->entity:"null").",";
-		$sql.= " datec=".(dol_strlen($this->datec)!=0 ? "'".$this->db->idate($this->datec)."'" : 'null').",";
-		$sql.= " datem=".(dol_strlen($this->datem)!=0 ? "'".$this->db->idate($this->datem)."'" : 'null').",";
-		$sql.= " fk_user_author=".(isset($this->fk_user_author)?$this->fk_user_author:"null").",";
-		$sql.= " fk_user_modif=".(isset($this->fk_user_modif)?$this->fk_user_modif:"null").",";
+		$sql.= " date_modification=NOW() ,";
+		$sql.= " fk_user_modification='".$user->id."',";
 		$sql.= " description=".(isset($this->description)?"'".$this->db->escape($this->description)."'":"null").",";
-		$sql.= " fk_salary_method=".(isset($this->fk_salary_method)?$this->fk_salary_method:"null").",";
+		$sql.= " fk_salary_method=".(isset($this->salary_method)?$this->salary_method:"null").",";
 		$sql.= " step=".(isset($this->step)?$this->step:"null").",";
 		$sql.= " operand_1_type=".(isset($this->operand_1_type)?$this->operand_1_type:"null").",";
 		$sql.= " operand_1_value=".(isset($this->operand_1_value)?$this->operand_1_value:"null").",";
@@ -357,10 +323,6 @@ class Hrsalarysteps extends CommonObject
 		$sql.= " operand_3_type=".(isset($this->operand_3_type)?$this->operand_3_type:"null").",";
 		$sql.= " operand_3_value=".(isset($this->operand_3_value)?$this->operand_3_value:"null").",";
 		$sql.= " accounting_account=".(isset($this->accounting_account)?$this->accounting_account:"null").",";
-		$sql.= " ct_custom_fields_1_desc=".(isset($this->ct_custom_fields_1_desc)?"'".$this->db->escape($this->ct_custom_fields_1_desc)."'":"null").",";
-		$sql.= " ct_custom_fields_2_desc=".(isset($this->ct_custom_fields_2_desc)?"'".$this->db->escape($this->ct_custom_fields_2_desc)."'":"null").",";
-		$sql.= " c_custom_fields_1_desc=".(isset($this->c_custom_fields_1_desc)?"'".$this->db->escape($this->c_custom_fields_1_desc)."'":"null").",";
-		$sql.= " c_custom_fields_2_desc=".(isset($this->c_custom_fields_2_desc)?"'".$this->db->escape($this->c_custom_fields_2_desc)."'":"null").",";
 		$sql.= " toshow=".(isset($this->toshow)?$this->toshow:"null")."";
 
         
@@ -404,7 +366,46 @@ class Hrsalarysteps extends CommonObject
 		}
     }
 
+    /**
+     *	Return clicable name (with picto eventually)
+     *
+     *	@param		int			$withpicto		0=_No picto, 1=Includes the picto in the linkn, 2=Picto only
+     *	@return		string						String with URL
+     */
+    function getNomUrl($withpicto=0)
+    {
+    	global $langs;
 
+    	$result='';
+        $id=0;
+        $ref='';
+        if(isset($this->id))  
+            $id=$this->id;
+        else if (isset($this->rowid))
+            $id=$this->rowid;
+        if(isset($this->ref))
+            $ref=$this->ref;
+        if($id)
+            $lien = '<a href="'.DOL_URL_ROOT.'/emcontract/hrsalarysteps.php?id='.$id.'&action=view">';
+    	else if ($ref)
+            $lien = '<a href="'.DOL_URL_ROOT.'/emcontract/hrsalarysteps.php?ref='.$ref.'&action=view">';
+    	else
+            return "Error";
+        $lienfin='</a>';
+
+    	$picto='emcontract@emcontract';
+        
+        if($ref)
+            $label=$langs->trans("Show").': '.$ref;
+        else if($id)
+            $label=$langs->trans("Show").': '.$id;
+        
+    	if ($withpicto) $result.=($lien.img_object($label,$picto).$lienfin);
+    	if ($withpicto && $withpicto != 2) $result.=' ';
+    	if ($withpicto != 2) $result.=$lien.$ref.$lienfin;
+    	return $result;
+    }
+    
  	/**
 	 *  Delete object in database
 	 *
@@ -528,12 +529,12 @@ class Hrsalarysteps extends CommonObject
 		$this->id=0;
 		
 		$this->entity='';
-		$this->datec='';
-		$this->datem='';
-		$this->fk_user_author='';
-		$this->fk_user_modif='';
+		$this->date_creation='';
+		$this->date_modification='';
+		$this->user_creation='';
+		$this->user_modification='';
 		$this->description='';
-		$this->fk_salary_method='';
+		$this->salary_method='';
 		$this->step='';
 		$this->operand_1_type='';
 		$this->operand_1_value='';
@@ -543,13 +544,211 @@ class Hrsalarysteps extends CommonObject
 		$this->operand_3_type='';
 		$this->operand_3_value='';
 		$this->accounting_account='';
-		$this->ct_custom_fields_1_desc='';
-		$this->ct_custom_fields_2_desc='';
-		$this->c_custom_fields_1_desc='';
-		$this->c_custom_fields_2_desc='';
 		$this->toshow='';
 
 		
 	}
+/*
+ * function to genegate a select list from a table, the showed text will be a concatenation of some 
+ * column defined in column bit, the Least sinificative bit will represent the first colum 
+ * 
+ *  @param    string              	$table                 table which the fk refers to (without prefix)
+ *  @param    string              	$fieldValue         field of the table which the fk refers to, the one to put in the Valuepart
+ *  @param    string              	$htmlName        name to the form select
+ *  @param    string              	$fieldToShow1    first part of the concatenation
+ *  @param    string              	$fieldToShow1    second part of the concatenation
+ *  @param    string              	$selected            which value must be selected
+ *  @param    string              	$sqlTail              to limit per entity, to filter ...
+ *  @param    string              	$separator          separator between the tow contactened fileds
 
+ *  @return string                                                   html code
+ */
+function select_generic($table, $fieldValue,$htmlName,$fieldToShow1,$fieldToShow2="",$selected="",$sqlTail="",$separator=', '){
+     //
+    if($table=="" || $fieldValue=="" || $fieldToShow1=="" || $htmlName=="" )
+    {
+        return "error, one of the mandatory field of the function  select_generic is missing";
+    }
+    $select="<select class=\"flat\" id=\"".$htmlName." \" name=\"".$htmlName."\">";
+    
+    $sql="SELECT";
+    $sql.=" ".$fieldValue;
+    $sql.=" ,".$fieldToShow1;
+    if(!empty($fieldToShow2))
+        $sql.=" ,".$fieldToShow2;
+    $sql.= " FROM ".MAIN_DB_PREFIX.$table." as t";
+    if(!empty($sqlTail))
+            $sql.=" , ".$sqlTail;
+    //$sql.= " ORDER BY t.".$field;
+       
+    dol_syslog("form::select_generic sql=".$sql, LOG_DEBUG);
+    
+    $resql=$this->db->query($sql);
+   
+    if ($resql)
+    {
+        $select.= "<option value=\"-1\" ".(empty($selected)?"selected=\"selected\"":"").">&nbsp;</option>\n";
+        $i=0;
+         //return $table."this->db".$field;
+        $num = $this->db->num_rows($resql);
+        while ($i < $num)
+        {
+            
+            $obj = $this->db->fetch_object($resql);
+            
+            if ($obj)
+            {
+                    $select.= "<option value=\"".$obj->{$fieldValue}."\" ";
+                    $select.=(($obj->{$fieldValue}===$selected)?"selected=\"selected\" >":">");                    
+                    $select.=$obj->{$fieldToShow1};
+                    if(!empty($fieldToShow2))
+                         $select.=$separator.$obj->{$fieldToShow2};            
+                    $select.="</option>\n";
+            } 
+            $i++;
+        }
+    }
+    else
+    {
+        $error++;
+        dol_print_error($this->db);
+       $select.= "<option value=\"-1\" selected=\"selected\">ERROR</option>\n";
+    }
+      $select.="</select>\n";
+      return $select;
+    
+ }
+/*
+ * function to genegate a select list from a table, the showed text will be a concatenation of some 
+ * column defined in column bit, the Least sinificative bit will represent the first colum 
+ * 
+ *  @param    string              	$table              table which the enum refers to (without prefix)
+ *  @param    string              	$fieldValue         field of the table which the enum refers to
+ *  @param    string              	$htmlName           name to the form select
+ *  @param    string              	$selected           which value must be selected
+ *  @return string                                                   html code
+ */
+ 
+function select_enum($table, $fieldValue,$htmlName,$selected=""){
+     global $langs;
+    if($table=="" || $fieldValue=="" || $htmlName=="" )
+    {
+        return "error, one of the mandatory field of the function  select_enum is missing";
+    }    
+    $sql="SHOW COLUMNS FROM ";//llx_hr_event_time LIKE 'audience'";
+    $sql.=MAIN_DB_PREFIX.$table." WHERE Field='";
+    $sql.=$fieldValue."'";
+    //$sql.= " ORDER BY t.".$field;
+       
+    dol_syslog("form::select_enum sql=".$sql, LOG_DEBUG);
+    
+    $resql=$this->db->query($sql);
+    
+    if ($resql)
+    {
+        $i=0;
+         //return $table."this->db".$field;
+        $num = $this->db->num_rows($resql);
+        if($num)
+        {
+           
+            $obj = $this->db->fetch_object($resql);
+            if ($obj && strpos($obj->Type,'enum(')===0)
+            {
+                if(empty($selected) && !empty($obj->Default))$selected="'{$obj->Default}'";
+                $select="<select class=\"flat\" id=\"{$htmlName}\" name=\"{$htmlName}\">";
+                $select.= "<option value=\"-1\" ".(empty($selected)?"selected=\"selected\"":"").">&nbsp;</option>\n";
+
+                $enums= explode(',',substr($obj->Type, 5,-1));
+                foreach ($enums as $enum){
+                    $select.= "<option value=\"{$enum}\" ";
+                    $select.=((substr($enum,1,-1)===$selected)?"selected=\"selected\" >":">");                    
+                    $select.=$langs->trans(substr($enum,1,-1));          
+                    $select.="</option>\n";
+                }  
+                $select.="</select>\n";
+            }else{
+                $select="<input selected=\"{$selected}\" id=\"{$htmlName} \" name=\"{$htmlName}\">";
+            }
+ 
+        }else{
+                $select="<input selected=\"{$selected}\" id=\"{$htmlName} \" name=\"{$htmlName}\">";
+        }
+    }
+    else
+    {
+        $error++;
+        dol_print_error($this->db);
+       $select="<input selected=\"{$selected}\" id=\"{$htmlName} \" name=\"{$htmlName}\">";
+    }
+      
+      return $select;
+    
+ }
+
+/*
+ * function to genegate a select list from a table, the showed text will be a concatenation of some 
+ * column defined in column bit, the Least sinificative bit will represent the first colum 
+ * 
+ *  @param    string              	$table                 table which the fk refers to (without prefix)
+ *  @param    string              	$fieldValue         field of the table which the fk refers to, the one to put in the Valuepart
+ *  @param    string              	$selected           value selected of the field value column
+ *  @param    string              	$fieldToShow1    first part of the concatenation
+ *  @param    string              	$fieldToShow1    second part of the concatenation
+ *  @param    string              	$separator          separator between the tow contactened fileds
+
+ *  @return string                                                   html code
+ */
+function print_generic($table, $fieldValue,$selected,$fieldToShow1,$fieldToShow2="",$separator=', '){
+   //return $table.$this->db.$field;
+    if($table=="" || $fieldValue=="" || $fieldToShow1=='')
+    {
+        return "error, one of the mandatory field of the function  print_generic is missing";
+    }else if (empty($selected)){
+        return "NuLL";
+    }
+    
+    $sql="SELECT";
+    $sql.=" ".$fieldValue;
+    $sql.=" ,".$fieldToShow1;
+    if(!empty($fieldToShow2))
+        $sql.=" ,".$fieldToShow2;
+    $sql.= " FROM ".MAIN_DB_PREFIX.$table." as t";
+    $sql.= " WHERE t.".$fieldValue."=".$selected;
+       
+    dol_syslog("form::print_generic sql=".$sql, LOG_DEBUG);
+    
+    $resql=$this->db->query($sql);
+    
+    if ($resql)
+    {
+
+        $num = $this->db->num_rows($resql);
+        if ( $num)
+        {
+            $obj = $this->db->fetch_object($resql);
+            
+            if ($obj)
+            {
+                            $select=$obj->{$fieldToShow1};
+                            if(!empty($fieldToShow2))
+                                 $select.=$separator.$obj->{$fieldToShow2};        
+            }else{
+                $select= "NULL";
+            }
+        }else{
+            $select= "NULL";
+        }
+    }
+    else
+    {
+        $error++;
+        dol_print_error($this->db);
+       $select.= "ERROR";
+    }
+      $select.="\n";
+      return $select;
+ }
+ 
+ 
 }

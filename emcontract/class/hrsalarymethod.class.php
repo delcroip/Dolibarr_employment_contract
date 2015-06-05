@@ -18,10 +18,10 @@
  */
 
 /**
- *  \file       dev/skeletons/skeleton_class.class.php
- *  \ingroup    mymodule othermodule1 othermodule2
+ *  \file       dev/hrsalarymethods/hrsalarymethod.class.php
+ *  \ingroup    emcontract othermodule1 othermodule2
  *  \brief      This file is an example for a CRUD class file (Create/Read/Update/Delete)
- *				Put here some comments
+ *				Initialy built by build_class_from_table on 2015-06-05 20:12
  */
 
 // Put here all includes required by your class file
@@ -33,18 +33,30 @@ require_once(DOL_DOCUMENT_ROOT."/core/class/commonobject.class.php");
 /**
  *	Put here description of your class
  */
-class Skeleton_Class extends CommonObject
+class Hrsalarymethod extends CommonObject
 {
 	var $db;							//!< To store db handler
 	var $error;							//!< To return error code (or message)
 	var $errors=array();				//!< To return several error codes (or messages)
-	var $element='skeleton';			//!< Id that identify managed objects
-	var $table_element='mytable';		//!< Name of table without prefix where object is stored
+	var $element='hrsalarymethod';			//!< Id that identify managed objects
+	var $table_element='hr_salary_method';		//!< Name of table without prefix where object is stored
 
     var $id;
-    var $prop1;
-    var $prop2;
-	//...
+    
+	var $ref;
+	var $entity;
+	var $date_creation='';
+	var $date_modification='';
+	var $title;
+	var $description;
+	var $user_creation;
+	var $user_modification;
+	var $ct_custom_fields_1_desc;
+	var $ct_custom_fields_2_desc;
+	var $c_custom_fields_1_desc;
+	var $c_custom_fields_2_desc;
+
+    
 
 
     /**
@@ -72,22 +84,52 @@ class Skeleton_Class extends CommonObject
 		$error=0;
 
 		// Clean parameters
-        if (isset($this->prop1)) $this->prop1=trim($this->prop1);
-        if (isset($this->prop2)) $this->prop2=trim($this->prop2);
-		//...
+        
+		if (isset($this->ref)) $this->ref=trim($this->ref);
+		if (isset($this->entity)) $this->entity=trim($this->entity);
+		if (isset($this->title)) $this->title=trim($this->title);
+		if (isset($this->description)) $this->description=trim($this->description);
+		if (isset($this->user_creation)) $this->user_creation=trim($this->user_creation);
+		if (isset($this->user_modification)) $this->user_modification=trim($this->user_modification);
+		if (isset($this->ct_custom_fields_1_desc)) $this->ct_custom_fields_1_desc=trim($this->ct_custom_fields_1_desc);
+		if (isset($this->ct_custom_fields_2_desc)) $this->ct_custom_fields_2_desc=trim($this->ct_custom_fields_2_desc);
+		if (isset($this->c_custom_fields_1_desc)) $this->c_custom_fields_1_desc=trim($this->c_custom_fields_1_desc);
+		if (isset($this->c_custom_fields_2_desc)) $this->c_custom_fields_2_desc=trim($this->c_custom_fields_2_desc);
+
+        
 
 		// Check parameters
 		// Put here code to add control on parameters values
 
         // Insert request
 		$sql = "INSERT INTO ".MAIN_DB_PREFIX.$this->table_element."(";
-		$sql.= " field1,";
-		$sql.= " field2";
-		//...
+		
+		$sql.= "ref,";
+		$sql.= "entity,";
+		$sql.= "date_creation,";
+		$sql.= "title,";
+		$sql.= "description,";
+		$sql.= "fk_user_creation,";
+		$sql.= "ct_custom_fields_1_desc,";
+		$sql.= "ct_custom_fields_2_desc,";
+		$sql.= "c_custom_fields_1_desc,";
+		$sql.= "c_custom_fields_2_desc";
+
+		
         $sql.= ") VALUES (";
-        $sql.= " '".$this->prop1."',";
-        $sql.= " '".$this->prop2."'";
-		//...
+        
+		$sql.= " ".(! isset($this->ref)?'NULL':"'".$this->db->escape($this->ref)."'").",";
+		$sql.= " ".(! isset($this->entity)?'NULL':"'".$this->entity."'").",";
+		$sql.= " NOW() ,";
+		$sql.= " ".(! isset($this->title)?'NULL':"'".$this->db->escape($this->title)."'").",";
+		$sql.= " ".(! isset($this->description)?'NULL':"'".$this->db->escape($this->description)."'").",";
+		$sql.= " '".$user->id."',";
+		$sql.= " ".(! isset($this->ct_custom_fields_1_desc)?'NULL':"'".$this->db->escape($this->ct_custom_fields_1_desc)."'").",";
+		$sql.= " ".(! isset($this->ct_custom_fields_2_desc)?'NULL':"'".$this->db->escape($this->ct_custom_fields_2_desc)."'").",";
+		$sql.= " ".(! isset($this->c_custom_fields_1_desc)?'NULL':"'".$this->db->escape($this->c_custom_fields_1_desc)."'").",";
+		$sql.= " ".(! isset($this->c_custom_fields_2_desc)?'NULL':"'".$this->db->escape($this->c_custom_fields_2_desc)."'")."";
+
+        
 		$sql.= ")";
 
 		$this->db->begin();
@@ -143,9 +185,21 @@ class Skeleton_Class extends CommonObject
     	global $langs;
         $sql = "SELECT";
 		$sql.= " t.rowid,";
-		$sql.= " t.field1,";
-		$sql.= " t.field2";
-		//...
+		
+		$sql.= " t.ref,";
+		$sql.= " t.entity,";
+		$sql.= " t.date_creation,";
+		$sql.= " t.date_modification,";
+		$sql.= " t.title,";
+		$sql.= " t.description,";
+		$sql.= " t.fk_user_creation,";
+		$sql.= " t.fk_user_modification,";
+		$sql.= " t.ct_custom_fields_1_desc,";
+		$sql.= " t.ct_custom_fields_2_desc,";
+		$sql.= " t.c_custom_fields_1_desc,";
+		$sql.= " t.c_custom_fields_2_desc";
+
+		
         $sql.= " FROM ".MAIN_DB_PREFIX.$this->table_element." as t";
         if ($ref) $sql.= " WHERE t.ref = '".$ref."'";
         else $sql.= " WHERE t.rowid = ".$id;
@@ -159,9 +213,21 @@ class Skeleton_Class extends CommonObject
                 $obj = $this->db->fetch_object($resql);
 
                 $this->id    = $obj->rowid;
-                $this->prop1 = $obj->field1;
-                $this->prop2 = $obj->field2;
-				//...
+                
+				$this->ref = $obj->ref;
+				$this->entity = $obj->entity;
+				$this->date_creation = $this->db->jdate($obj->date_creation);
+				$this->date_modification = $this->db->jdate($obj->date_modification);
+				$this->title = $obj->title;
+				$this->description = $obj->description;
+				$this->user_creation = $obj->fk_user_creation;
+				$this->user_modification = $obj->fk_user_modification;
+				$this->ct_custom_fields_1_desc = $obj->ct_custom_fields_1_desc;
+				$this->ct_custom_fields_2_desc = $obj->ct_custom_fields_2_desc;
+				$this->c_custom_fields_1_desc = $obj->c_custom_fields_1_desc;
+				$this->c_custom_fields_2_desc = $obj->c_custom_fields_2_desc;
+
+                
             }
             $this->db->free($resql);
 
@@ -188,18 +254,38 @@ class Skeleton_Class extends CommonObject
 		$error=0;
 
 		// Clean parameters
-        if (isset($this->prop1)) $this->prop1=trim($this->prop1);
-        if (isset($this->prop2)) $this->prop2=trim($this->prop2);
-		//...
+        
+		if (isset($this->ref)) $this->ref=trim($this->ref);
+		if (isset($this->entity)) $this->entity=trim($this->entity);
+		if (isset($this->title)) $this->title=trim($this->title);
+		if (isset($this->description)) $this->description=trim($this->description);
+		if (isset($this->user_creation)) $this->user_creation=trim($this->user_creation);
+		if (isset($this->user_modification)) $this->user_modification=trim($this->user_modification);
+		if (isset($this->ct_custom_fields_1_desc)) $this->ct_custom_fields_1_desc=trim($this->ct_custom_fields_1_desc);
+		if (isset($this->ct_custom_fields_2_desc)) $this->ct_custom_fields_2_desc=trim($this->ct_custom_fields_2_desc);
+		if (isset($this->c_custom_fields_1_desc)) $this->c_custom_fields_1_desc=trim($this->c_custom_fields_1_desc);
+		if (isset($this->c_custom_fields_2_desc)) $this->c_custom_fields_2_desc=trim($this->c_custom_fields_2_desc);
+
+        
 
 		// Check parameters
 		// Put here code to add a control on parameters values
 
         // Update request
         $sql = "UPDATE ".MAIN_DB_PREFIX.$this->table_element." SET";
-        $sql.= " field1=".(isset($this->field1)?"'".$this->db->escape($this->field1)."'":"null").",";
-        $sql.= " field2=".(isset($this->field2)?"'".$this->db->escape($this->field2)."'":"null")."";
-		//...
+        
+		$sql.= " ref=".(isset($this->ref)?"'".$this->db->escape($this->ref)."'":"null").",";
+		$sql.= " entity=".(isset($this->entity)?$this->entity:"null").",";
+		$sql.= " date_modification=NOW() ,";
+		$sql.= " title=".(isset($this->title)?"'".$this->db->escape($this->title)."'":"null").",";
+		$sql.= " description=".(isset($this->description)?"'".$this->db->escape($this->description)."'":"null").",";
+		$sql.= " fk_user_modification='".$user->id."',";
+		$sql.= " ct_custom_fields_1_desc=".(isset($this->ct_custom_fields_1_desc)?"'".$this->db->escape($this->ct_custom_fields_1_desc)."'":"null").",";
+		$sql.= " ct_custom_fields_2_desc=".(isset($this->ct_custom_fields_2_desc)?"'".$this->db->escape($this->ct_custom_fields_2_desc)."'":"null").",";
+		$sql.= " c_custom_fields_1_desc=".(isset($this->c_custom_fields_1_desc)?"'".$this->db->escape($this->c_custom_fields_1_desc)."'":"null").",";
+		$sql.= " c_custom_fields_2_desc=".(isset($this->c_custom_fields_2_desc)?"'".$this->db->escape($this->c_custom_fields_2_desc)."'":"null")."";
+
+        
         $sql.= " WHERE rowid=".$this->id;
 
 		$this->db->begin();
@@ -260,14 +346,14 @@ class Skeleton_Class extends CommonObject
         if(isset($this->ref))
             $ref=$this->ref;
         if($id)
-            $lien = '<a href="'.DOL_URL_ROOT.'/mymodule/skeleton_page.php?id='.$id.'&action=view">';
+            $lien = '<a href="'.DOL_URL_ROOT.'/emcontract/hrsalarymethod.php?id='.$id.'&action=view">';
     	else if ($ref)
-            $lien = '<a href="'.DOL_URL_ROOT.'/mymodule/skeleton_page.php?ref='.$ref.'&action=view">';
+            $lien = '<a href="'.DOL_URL_ROOT.'/emcontract/hrsalarymethod.php?ref='.$ref.'&action=view">';
     	else
             return "Error";
         $lienfin='</a>';
 
-    	$picto='mymodule@mymodule';
+    	$picto='emcontract@emcontract';
         
         if($ref)
             $label=$langs->trans("Show").': '.$ref;
@@ -350,7 +436,7 @@ class Skeleton_Class extends CommonObject
 
 		$error=0;
 
-		$object=new Skeleton_Class($this->db);
+		$object=new Hrsalarymethod($this->db);
 
 		$this->db->begin();
 
@@ -401,8 +487,21 @@ class Skeleton_Class extends CommonObject
 	function initAsSpecimen()
 	{
 		$this->id=0;
-		$this->prop1='prop1';
-		$this->prop2='prop2';
+		
+		$this->ref='';
+		$this->entity='';
+		$this->date_creation='';
+		$this->date_modification='';
+		$this->title='';
+		$this->description='';
+		$this->user_creation='';
+		$this->user_modification='';
+		$this->ct_custom_fields_1_desc='';
+		$this->ct_custom_fields_2_desc='';
+		$this->c_custom_fields_1_desc='';
+		$this->c_custom_fields_2_desc='';
+
+		
 	}
 /*
  * function to genegate a select list from a table, the showed text will be a concatenation of some 

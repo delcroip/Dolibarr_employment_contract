@@ -32,11 +32,11 @@ class salaryMethod extends CommonObject {
    
    var $id;
    var $entity;
-   var $datec;
-   var $datem;
+   var $date_creation;
+   var $date_modification;
    var $description;
-   var $fk_user_author;
-   var $fk_user_modif;
+   var $fk_user_creation;
+   var $fk_user_modification;
   var $ct_custom_fields_1_desc ;
   var $ct_custom_fields_2_desc ;
   var $c_custom_fields_1_desc ;
@@ -75,11 +75,11 @@ class salaryMethod extends CommonObject {
 
                 $this->id               = $obj->id;
                 $this->entity   	= $obj->entity;
-                $this->datec    	= $obj->datem;
-                $this->datem    	= $obj->datem;
+                $this->date_creation    	= $obj->date_modification;
+                $this->date_modification    	= $obj->date_modification;
                 $this->description	= $obj->description;
-                $this->fk_user_author   = $obj->fk_user_author;
-                $this->fk_user_modif    = $obj->fk_user_modif;
+                $this->fk_user_creation   = $obj->fk_user_creation;
+                $this->fk_user_modification    = $obj->fk_user_modification;
                 $this->ct_custom_fields_1_desc = $obj->ct_custom_fields_1_desc;
                $this->ct_custom_fields_2_desc= $obj->ct_custom_fields_2_desc ;
                $this->c_custom_fields_1_desc = $obj->c_custom_fields_1_desc;
@@ -513,11 +513,11 @@ class salaryMethod extends CommonObject {
             // Clean parameters
 
             if (isset($this->entity)) $this->entity=trim($this->entity);
-            if (isset($this->datec)) $this->datec=trim($this->datec);
-           // if (isset($this->datem)) $this->datem=trim($this->datem);
+            if (isset($this->date_creation)) $this->date_creation=trim($this->date_creation);
+           // if (isset($this->date_modification)) $this->date_modification=trim($this->date_modification);
             if (isset($this->description)) $this->description=trim($this->description);
-           //if (isset($this->fk_user_author)) $this->fk_user_author=trim($this->fk_user_author);
-          //  if (isset($this->fk_user_modif)) $this->fk_user_modif=trim($this->fk_user_modif);
+           //if (isset($this->fk_user_creation)) $this->fk_user_creation=trim($this->fk_user_creation);
+          //  if (isset($this->fk_user_modification)) $this->fk_user_modification=trim($this->fk_user_modification);
             if (isset($this->ct_custom_fields_1_desc)) $this->ct_custom_fields_1_desc=trim($this->ct_custom_fields_1_desc);
             if (isset($this->ct_custom_fields_2_desc)) $this->ct_custom_fields_2_desc=trim($this->ct_custom_fields_2_desc);
             if (isset($this->c_custom_fields_1_desc)) $this->c_custom_fields_1_desc=trim($this->c_custom_fields_1_desc);
@@ -529,11 +529,11 @@ class salaryMethod extends CommonObject {
             $sql = "INSERT INTO ".MAIN_DB_PREFIX.$this->table_element."(";
 
             $sql.= "entity,";
-               $sql.= "datec,";
-              // $sql.= "datem,";
+               $sql.= "date_creation,";
+              // $sql.= "date_modification,";
                $sql.= "description,";
-               $sql.= "fk_user_author,";
-               $sql.= "fk_user_modif,";
+               $sql.= "fk_user_creation,";
+               $sql.= "fk_user_modification,";
                $sql.= "ct_custom_fields_1_desc ,";
                $sql.= "ct_custom_fields_2_desc,";
                $sql.= "c_custom_fields_1_desc ,";
@@ -544,12 +544,12 @@ class salaryMethod extends CommonObject {
         
             $sql.= " ".(! isset($this->entity)?'NULL':"'".$this->entity."'").",";//FIXME
            $sql.= " NOW(), ";
-           //$sql.= " ".(! isset($this->datec)?'NULL':"'".$this->entity."'").",";
-           //$sql.= " ".(! isset($this->datem)?'NULL':"'".$this->entity."'").",";
+           //$sql.= " ".(! isset($this->date_creation)?'NULL':"'".$this->entity."'").",";
+           //$sql.= " ".(! isset($this->date_modification)?'NULL':"'".$this->entity."'").",";
            $sql.= " ".(! isset($this->description)?'NULL':"'".$this->entity."'").",";
            $sql.= " ".$user->id.',';
-           //$sql.= " ".(! isset($this->fk_user_author)?'NULL':"'".$this->entity."'").",";
-           //$sql.= " ".(! isset($this->fk_user_modif)?'NULL':"'".$this->entity."'").",";
+           //$sql.= " ".(! isset($this->fk_user_creation)?'NULL':"'".$this->entity."'").",";
+           //$sql.= " ".(! isset($this->fk_user_modification)?'NULL':"'".$this->entity."'").",";
            $sql.= " ".(! isset($this->ct_custom_fields_1_desc )?'NULL':"'".$this->entity."'").",";
            $sql.= " ".(! isset($this->ct_custom_fields_2_desc )?'NULL':"'".$this->entity."'")."";
           $sql.= " ".(! isset($this->c_custom_fields_1_desc )?'NULL':"'".$this->entity."'").",";
@@ -619,11 +619,11 @@ class salaryMethod extends CommonObject {
             // Clean parameters
 
             if (isset($this->entity)) $this->entity=trim($this->entity);
-            //if (isset($this->datec)) $this->datec=trim($this->datec);
-            //if (isset($this->datem)) $this->datem=trim($this->datem);
+            //if (isset($this->date_creation)) $this->date_creation=trim($this->date_creation);
+            //if (isset($this->date_modification)) $this->date_modification=trim($this->date_modification);
             if (isset($this->description)) $this->description=trim($this->description);
-            //if (isset($this->fk_user_author)) $this->fk_user_author=trim($this->fk_user_author);
-            //if (isset($this->fk_user_modif)) $this->fk_user_modif=trim($this->fk_user_modif);
+            //if (isset($this->fk_user_creation)) $this->fk_user_creation=trim($this->fk_user_creation);
+            //if (isset($this->fk_user_modification)) $this->fk_user_modification=trim($this->fk_user_modification);
             if (isset($this->ct_custom_fields_1_desc)) $this->ct_custom_fields_1_desc=trim($this->ct_custom_fields_1_desc);
             if (isset($this->ct_custom_fields_2_desc)) $this->ct_custom_fields_2_desc=trim($this->ct_custom_fields_2_desc);
             if (isset($this->c_custom_fields_1_desc)) $this->c_custom_fields_1_desc=trim($this->c_custom_fields_1_desc);
@@ -635,17 +635,17 @@ class salaryMethod extends CommonObject {
             $sql = "UPDATE INTO ".MAIN_DB_PREFIX.$this->table_element."(";
             $sql.= "entity";//FIXME
             $sql.= "=".(! isset($this->entity)?'NULL':"'".$this->db->escape($this->entity)."'").",";
-            //$sql.= "datec";
-            //$sql.= "=".(! isset($this->datec)?'NULL':"'".$this->db->escape($this->datec)."'").",";
-            $sql.= "datem = NOW(),";
-            //$sql.= "=".(! isset($this->datem)?'NULL':"'".$this->db->escape($this->datem)."'").",";
+            //$sql.= "date_creation";
+            //$sql.= "=".(! isset($this->date_creation)?'NULL':"'".$this->db->escape($this->date_creation)."'").",";
+            $sql.= "date_modification = NOW(),";
+            //$sql.= "=".(! isset($this->date_modification)?'NULL':"'".$this->db->escape($this->date_modification)."'").",";
             $sql.= "description";
             $sql.= "=".(! isset($this->description)?'NULL':"'".$this->db->escape($this->description)."'").",";
-            //$sql.= "fk_user_author";
-            //$sql.= "=".(! isset($this->fk_user_author)?'NULL':"'".$this->db->escape($this->fk_user_author)."'").",";
-            $sql.= "fk_user_modif";
+            //$sql.= "fk_user_creation";
+            //$sql.= "=".(! isset($this->fk_user_creation)?'NULL':"'".$this->db->escape($this->fk_user_creation)."'").",";
+            $sql.= "fk_user_modification";
             $sql.= " ".$user->id.',';
-            //$sql.= "=".(! isset($this->fk_user_modif)?'NULL':"'".$this->db->escape($this->fk_user_modif)."'").",";
+            //$sql.= "=".(! isset($this->fk_user_modification)?'NULL':"'".$this->db->escape($this->fk_user_modification)."'").",";
             $sql.= "ct_custom_fields_1_desc ";
             $sql.= "=".(! isset($this->ct_custom_fields_1_desc )?'NULL':"'".$this->db->escape($this->ct_custom_fields_1_desc )."'").",";
             $sql.= "ct_custom_fields_2_desc ";
