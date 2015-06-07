@@ -192,7 +192,7 @@ class modemcontract extends DolibarrModules
 								'titre'=>'ContractTitle',
 								'mainmenu'=>'hrm',
 								'leftmenu'=>'emcontract',
-								'url'=>'/emcontract/index.php?mainmenu=hrm&leftmenu=emcontract',
+								'url'=>'/emcontract/hrcontract.php?mainmenu=hrm&leftmenu=emcontract',
 								'langs'=>'emcontract@emcontract',	// Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 								'position'=>100,
 								'enabled'=>'1',			// Define condition to show or hide menu entry. Use '$conf->mymodule->enabled' if entry must be visible if module is enabled.
@@ -205,7 +205,7 @@ class modemcontract extends DolibarrModules
 								'titre'=>'MenuListContract',
 								'mainmenu'=>'hrm',
 								'leftmenu'=>'emcontract_list',
-								'url'=>'/emcontract/index.php?mainmenu=hrm&action=request',
+								'url'=>'/emcontract/hrcontract.php?action=list&mainmenu=hrm&leftmenu=emcontract',
 								'langs'=>'emcontract@emcontract',	// Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 								'position'=>101,
 								'enabled'=>'$conf->emcontract->enabled',			// Define condition to show or hide menu entry. Use '$conf->mymodule->enabled' if entry must be visible if module is enabled.
@@ -218,7 +218,7 @@ class modemcontract extends DolibarrModules
 								'titre'=>'MenuAddContract',
 								'mainmenu'=>'hrm',
 								'leftmenu'=>'emcontract_add',
-								'url'=>'/emcontract/fiche.php?mainmenu=hrm&action=add',
+								'url'=>'/emcontract/hrcontract.php?action=create&mainmenu=hrm&leftmenu=emcontract',
 								'langs'=>'emcontract@emcontract',	// Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 								'position'=>102,
 								'enabled'=>'$conf->emcontract->enabled',			// Define condition to show or hide menu entry. Use '$conf->mymodule->enabled' if entry must be visible if module is enabled.
@@ -226,8 +226,99 @@ class modemcontract extends DolibarrModules
 								'target'=>'',
 								'user'=>2);				// 0=Menu for internal users, 1=external users, 2=both
 		$r++;
-
-		// Exports
+		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=hrm,fk_leftmenu=emcontract',		// Use r=value where r is index key used for the parent menu entry (higher parent must be a top menu entry)
+								'type'=>'left',			// This is a Left menu entry
+								'titre'=>'MenuListContractType',
+								'mainmenu'=>'hrm',
+								'leftmenu'=>'emcontracttype_list',
+								'url'=>'/emcontract/hrcontracttype.php?action=list&mainmenu=hrm&leftmenu=emcontract',
+								'langs'=>'emcontract@emcontract',	// Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+								'position'=>102,
+								'enabled'=>'$conf->emcontract->enabled',			// Define condition to show or hide menu entry. Use '$conf->mymodule->enabled' if entry must be visible if module is enabled.
+								'perms'=>'$user->rights->emcontract->add',		// Use 'perms'=>'$user->rights->mymodule->level1->level2' if you want your menu with a permission rules
+								'target'=>'',
+								'user'=>2);				// 0=Menu for internal users, 1=external users, 2=both
+		$r++;
+                $this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=hrm,fk_leftmenu=emcontract',		// Use r=value where r is index key used for the parent menu entry (higher parent must be a top menu entry)
+								'type'=>'left',			// This is a Left menu entry
+								'titre'=>'MenuAddContractType',
+								'mainmenu'=>'hrm',
+								'leftmenu'=>'emcontracttype_add',
+								'url'=>'/emcontract/hrcontracttype.php?action=create&mainmenu=hrm&leftmenu=emcontract',
+								'langs'=>'emcontract@emcontract',	// Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+								'position'=>102,
+								'enabled'=>'$conf->emcontract->enabled',			// Define condition to show or hide menu entry. Use '$conf->mymodule->enabled' if entry must be visible if module is enabled.
+								'perms'=>'$user->rights->emcontract->add',		// Use 'perms'=>'$user->rights->mymodule->level1->level2' if you want your menu with a permission rules
+								'target'=>'',
+								'user'=>2);				// 0=Menu for internal users, 1=external users, 2=both
+		$r++;
+		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=hrm,fk_leftmenu=emcontract',		// Use r=value where r is index key used for the parent menu entry (higher parent must be a top menu entry)
+								'type'=>'left',			// This is a Left menu entry
+								'titre'=>'MenuListSalaryMethod',
+								'mainmenu'=>'hrm',
+								'leftmenu'=>'salarymethod_list',
+								'url'=>'/emcontract/hrsalarymethod.php?action=list&mainmenu=hrm&leftmenu=emcontract',
+								'langs'=>'emcontract@emcontract',	// Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+								'position'=>102,
+								'enabled'=>'$conf->emcontract->enabled',			// Define condition to show or hide menu entry. Use '$conf->mymodule->enabled' if entry must be visible if module is enabled.
+								'perms'=>'$user->rights->emcontract->add',		// Use 'perms'=>'$user->rights->mymodule->level1->level2' if you want your menu with a permission rules
+								'target'=>'',
+								'user'=>2);				// 0=Menu for internal users, 1=external users, 2=both
+		$r++;
+                $this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=hrm,fk_leftmenu=emcontract',		// Use r=value where r is index key used for the parent menu entry (higher parent must be a top menu entry)
+								'type'=>'left',			// This is a Left menu entry
+								'titre'=>'MenuAddSalaryMethod',
+								'mainmenu'=>'hrm',
+								'leftmenu'=>'salarymethod_add',
+								'url'=>'/emcontract/hrsalarymethod.php?action=create&mainmenu=hrm&leftmenu=emcontract',
+								'langs'=>'emcontract@emcontract',	// Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+								'position'=>102,
+								'enabled'=>'$conf->emcontract->enabled',			// Define condition to show or hide menu entry. Use '$conf->mymodule->enabled' if entry must be visible if module is enabled.
+								'perms'=>'$user->rights->emcontract->add',		// Use 'perms'=>'$user->rights->mymodule->level1->level2' if you want your menu with a permission rules
+								'target'=>'',
+								'user'=>2);				// 0=Menu for internal users, 1=external users, 2=both
+		$r++;
+                $this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=hrm',			// Put 0 if this is a top menu
+								'type'=>'left',			// This is a Top menu entry
+								'titre'=>'SkillsTitle',
+								'mainmenu'=>'hrm',
+								'leftmenu'=>'skills',
+								'url'=>'/emcontract/hrskill.php?mainmenu=hrm&leftmenu=skills',
+								'langs'=>'emcontract@emcontract',	// Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+								'position'=>100,
+								'enabled'=>'1',			// Define condition to show or hide menu entry. Use '$conf->mymodule->enabled' if entry must be visible if module is enabled.
+								'perms'=>'$user->rights->emcontract->view',			// Use 'perms'=>'$user->rights->mymodule->level1->level2' if you want your menu with a permission rules
+								'target'=>'',
+								'user'=>2);
+                $r++;
+		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=hrm,fk_leftmenu=skills',		// Use r=value where r is index key used for the parent menu entry (higher parent must be a top menu entry)
+								'type'=>'left',			// This is a Left menu entry
+								'titre'=>'MenuListSkills',
+								'mainmenu'=>'hrm',
+								'leftmenu'=>'skill_list',
+								'url'=>'/emcontract/hrskill.php?action=list&mainmenu=hrm&leftmenu=skills',
+								'langs'=>'emcontract@emcontract',	// Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+								'position'=>102,
+								'enabled'=>'$conf->emcontract->enabled',			// Define condition to show or hide menu entry. Use '$conf->mymodule->enabled' if entry must be visible if module is enabled.
+								'perms'=>'$user->rights->emcontract->add',		// Use 'perms'=>'$user->rights->mymodule->level1->level2' if you want your menu with a permission rules
+								'target'=>'',
+								'user'=>2);				// 0=Menu for internal users, 1=external users, 2=both
+		$r++;
+                $this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=hrm,fk_leftmenu=skills',		// Use r=value where r is index key used for the parent menu entry (higher parent must be a top menu entry)
+								'type'=>'left',			// This is a Left menu entry
+								'titre'=>'MenuAddSills',
+								'mainmenu'=>'hrm',
+								'leftmenu'=>'skill_add',
+								'url'=>'/emcontract/hrskill.php?action=create&mainmenu=hrm&leftmenu=skills',
+								'langs'=>'emcontract@emcontract',	// Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+								'position'=>102,
+								'enabled'=>'$conf->emcontract->enabled',			// Define condition to show or hide menu entry. Use '$conf->mymodule->enabled' if entry must be visible if module is enabled.
+								'perms'=>'$user->rights->emcontract->add',		// Use 'perms'=>'$user->rights->mymodule->level1->level2' if you want your menu with a permission rules
+								'target'=>'',
+								'user'=>2);				// 0=Menu for internal users, 1=external users, 2=both
+		$r++;
+		
+// Exports
 		$r=1;
 
 		// Example:

@@ -276,6 +276,7 @@ jQuery(document).ready(function() {
 });
 </script>';
 $edit=0;
+$new=0;
 switch ($action) {
     case "create":
         $new=1;
