@@ -86,7 +86,8 @@ $upload_dir = $conf->emcontract->dir_output.'/Hrcontract/'.dol_sanitizeFileName(
  //   $cancel=TRUE;
  //  setEventMessages('Internal error, POST not exptected', null, 'errors');
 //}
- $tms= time();
+//FIXME
+ //$tms= time();
  $_SESSION['Hrcontract_class'][$tms]= array();
 
 
