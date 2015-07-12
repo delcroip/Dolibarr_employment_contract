@@ -18,10 +18,10 @@
  */
 
 /**
- *  \file       dev/skeletons/skeleton_class.class.php
- *  \ingroup    mymodule othermodule1 othermodule2
+ *  \file       dev/hrsalarycfdefss/hrsalarycfdefs.class.php
+ *  \ingroup    emcontract othermodule1 othermodule2
  *  \brief      This file is an example for a CRUD class file (Create/Read/Update/Delete)
- *				Put here some comments
+ *				Initialy built by build_class_from_table on 2015-06-28 19:16
  */
 
 // Put here all includes required by your class file
@@ -33,18 +33,28 @@ require_once(DOL_DOCUMENT_ROOT."/core/class/commonobject.class.php");
 /**
  *	Put here description of your class
  */
-class Skeleton_Class extends CommonObject
+class Hrsalarycfdefs extends CommonObject
 {
 	var $db;							//!< To store db handler
 	var $error;							//!< To return error code (or message)
 	var $errors=array();				//!< To return several error codes (or messages)
-	var $element='skeleton';			//!< Id that identify managed objects
-	var $table_element='mytable';		//!< Name of table without prefix where object is stored
+	var $element='hrsalarycfdefs';			//!< Id that identify managed objects
+	var $table_element='hr_salary_cf_defs';		//!< Name of table without prefix where object is stored
 
     var $id;
-    var $prop1;
-    var $prop2;
-	//...
+    
+	var $ref;
+	var $entity;
+	var $date_creation='';
+	var $date_modification='';
+	var $user_creation;
+	var $user_modification;
+	var $description;
+	var $salary_method;
+	var $linked_to;
+	var $default_value;
+
+    
 
 
     /**
@@ -72,22 +82,46 @@ class Skeleton_Class extends CommonObject
 		$error=0;
 
 		// Clean parameters
-        if (isset($this->prop1)) $this->prop1=trim($this->prop1);
-        if (isset($this->prop2)) $this->prop2=trim($this->prop2);
-		//...
+        
+		if (isset($this->ref)) $this->ref=trim($this->ref);
+		if (isset($this->entity)) $this->entity=trim($this->entity);
+		if (isset($this->user_creation)) $this->user_creation=trim($this->user_creation);
+		if (isset($this->user_modification)) $this->user_modification=trim($this->user_modification);
+		if (isset($this->description)) $this->description=trim($this->description);
+		if (isset($this->salary_method)) $this->salary_method=trim($this->salary_method);
+		if (isset($this->linked_to)) $this->linked_to=trim($this->linked_to);
+		if (isset($this->default_value)) $this->default_value=trim($this->default_value);
+
+        
 
 		// Check parameters
 		// Put here code to add control on parameters values
 
         // Insert request
 		$sql = "INSERT INTO ".MAIN_DB_PREFIX.$this->table_element."(";
-		$sql.= " field1,";
-		$sql.= " field2";
-		//...
+		
+		$sql.= "ref,";
+		$sql.= "entity,";
+		$sql.= "date_creation,";
+		$sql.= "fk_user_creation,";
+		$sql.= "description,";
+		$sql.= "fk_salary_method,";
+		$sql.= "linked_to,";
+		$sql.= "default_value";
+
+		
         $sql.= ") VALUES (";
-        $sql.= " '".$this->prop1."',";
-        $sql.= " '".$this->prop2."'";
-		//...
+        
+		$sql.= " ".(! isset($this->ref)?'NULL':"'".$this->db->escape($this->ref)."'").",";
+		$sql.= " ".(! isset($this->entity)?'NULL':"'".$this->entity."'").",";
+		$sql.= " NOW() ,";
+		$sql.= " '".$user->id."',";
+		$sql.= " ".(! isset($this->description)?'NULL':"'".$this->db->escape($this->description)."'").",";
+		$sql.= " ".(! isset($this->salary_method)?'NULL':"'".$this->db->escape($this->salary_method)."'").",";
+		$sql.= " ".(! isset($this->linked_to)?'NULL':"'".$this->linked_to."'").",";
+		$sql.= " ".(! isset($this->default_value)?'NULL':"'".$this->default_value."'")."";
+
+        
 		$sql.= ")";
 
 		$this->db->begin();
@@ -143,9 +177,19 @@ class Skeleton_Class extends CommonObject
     	global $langs;
         $sql = "SELECT";
 		$sql.= " t.rowid,";
-		$sql.= " t.field1,";
-		$sql.= " t.field2";
-		//...
+		
+		$sql.= " t.ref,";
+		$sql.= " t.entity,";
+		$sql.= " t.date_creation,";
+		$sql.= " t.date_modification,";
+		$sql.= " t.fk_user_creation,";
+		$sql.= " t.fk_user_modification,";
+		$sql.= " t.description,";
+		$sql.= " t.fk_salary_method,";
+		$sql.= " t.linked_to,";
+		$sql.= " t.default_value";
+
+		
         $sql.= " FROM ".MAIN_DB_PREFIX.$this->table_element." as t";
         if ($ref) $sql.= " WHERE t.ref = '".$ref."'";
         else $sql.= " WHERE t.rowid = ".$id;
@@ -159,9 +203,19 @@ class Skeleton_Class extends CommonObject
                 $obj = $this->db->fetch_object($resql);
 
                 $this->id    = $obj->rowid;
-                $this->prop1 = $obj->field1;
-                $this->prop2 = $obj->field2;
-				//...
+                
+				$this->ref = $obj->ref;
+				$this->entity = $obj->entity;
+				$this->date_creation = $this->db->jdate($obj->date_creation);
+				$this->date_modification = $this->db->jdate($obj->date_modification);
+				$this->user_creation = $obj->fk_user_creation;
+				$this->user_modification = $obj->fk_user_modification;
+				$this->description = $obj->description;
+				$this->salary_method = $obj->fk_salary_method;
+				$this->linked_to = $obj->linked_to;
+				$this->default_value = $obj->default_value;
+
+                
             }
             $this->db->free($resql);
 
@@ -188,18 +242,34 @@ class Skeleton_Class extends CommonObject
 		$error=0;
 
 		// Clean parameters
-        if (isset($this->prop1)) $this->prop1=trim($this->prop1);
-        if (isset($this->prop2)) $this->prop2=trim($this->prop2);
-		//...
+        
+		if (isset($this->ref)) $this->ref=trim($this->ref);
+		if (isset($this->entity)) $this->entity=trim($this->entity);
+		if (isset($this->user_creation)) $this->user_creation=trim($this->user_creation);
+		if (isset($this->user_modification)) $this->user_modification=trim($this->user_modification);
+		if (isset($this->description)) $this->description=trim($this->description);
+		if (isset($this->salary_method)) $this->salary_method=trim($this->salary_method);
+		if (isset($this->linked_to)) $this->linked_to=trim($this->linked_to);
+		if (isset($this->default_value)) $this->default_value=trim($this->default_value);
+
+        
 
 		// Check parameters
 		// Put here code to add a control on parameters values
 
         // Update request
         $sql = "UPDATE ".MAIN_DB_PREFIX.$this->table_element." SET";
-        $sql.= " field1=".(isset($this->field1)?"'".$this->db->escape($this->field1)."'":"null").",";
-        $sql.= " field2=".(isset($this->field2)?"'".$this->db->escape($this->field2)."'":"null")."";
-		//...
+        
+		$sql.= " ref=".(isset($this->ref)?"'".$this->db->escape($this->ref)."'":"null").",";
+		$sql.= " entity=".(isset($this->entity)?$this->entity:"null").",";
+		$sql.= " date_modification=NOW() ,";
+		$sql.= " fk_user_modification='".$user->id."',";
+		$sql.= " description=".(isset($this->description)?"'".$this->db->escape($this->description)."'":"null").",";
+		$sql.= " fk_salary_method=".(isset($this->salary_method)?"'".$this->db->escape($this->salary_method)."'":"null").",";
+		$sql.= " linked_to=".(isset($this->linked_to)?$this->linked_to:"null").",";
+		$sql.= " default_value=".(isset($this->default_value)?$this->default_value:"null")."";
+
+        
         $sql.= " WHERE rowid=".$this->id;
 
 		$this->db->begin();
@@ -240,55 +310,46 @@ class Skeleton_Class extends CommonObject
 		}
     }
 
-     /**
-     *	Return clickable name (with picto eventually)
+    /**
+     *	Return clicable name (with picto eventually)
      *
-     *	@param		string			$htmlcontent 		text to show
-     *	@param		int			$id                     Object ID
-     *	@param		string			$ref                    Object ref
      *	@param		int			$withpicto		0=_No picto, 1=Includes the picto in the linkn, 2=Picto only
      *	@return		string						String with URL
      */
-    function getNomUrl($htmlcontent,$id=0,$ref='',$withpicto=0)
+    function getNomUrl($withpicto=0)
     {
     	global $langs;
 
     	$result='';
-        if(empty($ref) && $id==0){
-            if(isset($this->id))  {
-                $id=$this->id;
-            }else if (isset($this->rowid)){
-                $id=$this->rowid;
-            }if(isset($this->ref)){
-                $ref=$this->ref;
-            }
-        }
-        
-        if($id){
-            $lien = '<a href="'.DOL_URL_ROOT.'/mymodule/skeleton_page.php?id='.$id.'&action=view">';
-        }else if (!empty($ref)){
-            $lien = '<a href="'.DOL_URL_ROOT.'/mymodule/skeleton_page.php?ref='.$ref.'&action=view">';
-        }else{
-            $lien =  "";
-        }
-        $lienfin=empty($lien)?'':'</a>';
+        $id=0;
+        $ref='';
+        if(isset($this->id))  
+            $id=$this->id;
+        else if (isset($this->rowid))
+            $id=$this->rowid;
+        if(isset($this->ref))
+            $ref=$this->ref;
+        if($id)
+            $lien = '<a href="'.DOL_URL_ROOT.'/emcontract/hrsalarycfdefs_page.php?id='.$id.'&action=view">';
+    	else if ($ref)
+            $lien = '<a href="'.DOL_URL_ROOT.'/emcontract/hrsalarycfdefs_page.php?ref='.$ref.'&action=view">';
+    	else
+            return "Error";
+        $lienfin='</a>';
 
-    	$picto='mymodule@mymodule';
+    	$picto='emcontract@emcontract';
         
-        if($ref){
+        if($ref)
             $label=$langs->trans("Show").': '.$ref;
-        }else if($id){
+        else if($id)
             $label=$langs->trans("Show").': '.$id;
-        }
-    	if ($withpicto==1){ 
-            $result.=($lien.img_object($label,$picto).$htmlcontent.$lienfin);
-        }else if ($withpicto==2) {
-            $result.=$lien.img_object($label,$picto).$lienfin;
-        }else{  
-            $result.=$lien.$htmlcontent.$lienfin;
-        }
+        
+    	if ($withpicto) $result.=($lien.img_object($label,$picto).$lienfin);
+    	if ($withpicto && $withpicto != 2) $result.=' ';
+    	if ($withpicto != 2) $result.=$lien.$ref.$lienfin;
     	return $result;
-    }    
+    }
+    
  	/**
 	 *  Delete object in database
 	 *
@@ -359,7 +420,7 @@ class Skeleton_Class extends CommonObject
 
 		$error=0;
 
-		$object=new Skeleton_Class($this->db);
+		$object=new Hrsalarycfdefs($this->db);
 
 		$this->db->begin();
 
@@ -410,8 +471,19 @@ class Skeleton_Class extends CommonObject
 	function initAsSpecimen()
 	{
 		$this->id=0;
-		$this->prop1='prop1';
-		$this->prop2='prop2';
+		
+		$this->ref='';
+		$this->entity='';
+		$this->date_creation='';
+		$this->date_modification='';
+		$this->user_creation='';
+		$this->user_modification='';
+		$this->description='';
+		$this->salary_method='';
+		$this->linked_to='';
+		$this->default_value='';
+
+		
 	}
 
 }

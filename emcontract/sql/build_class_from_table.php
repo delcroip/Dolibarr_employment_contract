@@ -336,10 +336,10 @@ foreach($property as $key => $prop)
                         $varprop.="\".";
                         // $sql.= " field1=".(isset($this->field1)?"'".$this->db->escape($this->field1)."'":"null").",";
                         if ($prop['ischar']){
-                            $varprop.='(isset($this->'.$prop['var'].')?"\'".$this->db->escape($this->'.$prop['var'].')."\'":"null")';
+                            $varprop.='(empty($this->'.$prop['var'].')?"null":"\'".$this->db->escape($this->'.$prop['var'].')."\'")';
                             // $sql.= " field1=".(isset($this->field1)?$this->field1:"null").",";                           
                         }else{
-                            $varprop.='(isset($this->'.$prop['var'].')?$this->'.$prop['var'].':"null")';
+                            $varprop.='(empty($this->'.$prop['var'].')?"null":"\'".$this->'.$prop['var'].'."\'")';
                         }
                         $varprop.=".\"";
                 }
@@ -503,9 +503,9 @@ foreach($property as $key => $prop)
         case 'date':
         case 'timestamp':
             $varpropget.="\t\t\$object->".$prop['var']."=dol_mktime(0, 0, 0,'";
-            $varpropget.=preg_replace('/_/','',ucfirst($prop['var']))."month','";
-            $varpropget.=preg_replace('/_/','',ucfirst($prop['var']))."day','";
-            $varpropget.=preg_replace('/_/','',ucfirst($prop['var']))."year');\n";
+            $varpropget.='GETPOST('.preg_replace('/_/','',ucfirst($prop['var']))."month'),'";
+            $varpropget.='GETPOST('.preg_replace('/_/','',ucfirst($prop['var']))."day',')";
+            $varpropget.='GETPOST('.preg_replace('/_/','',ucfirst($prop['var']))."year'));\n";
             break;
         default:
             $varpropget.="\t\t\$object->".$prop['var']."=GETPOST(\"";
@@ -565,17 +565,17 @@ foreach($property as $key => $prop)
                                 $varprop.="\t\tprint \$form->select_dolusers(\$object->".$prop['var'].", '";
                                 $varprop.=preg_replace('/_/','',ucfirst($prop['var']))."', 1, '', 0 );\n";
                                 $varprop.="\t\t}else{\n";
-                                $varprop.="\t\tprint \$object->print_generic('user', 'rowid',\$object->".$prop['var'].",'lastname','firstname',' ');\n";
+                                $varprop.="\t\tprint print_generic(\$db,'user', 'rowid',\$object->".$prop['var'].",'lastname','firstname',' ');\n";
                          }else if(strpos($prop['field'],'fk_') ===0) 
                         {                           
-                                $varprop.="\t\tprint \$object->select_generic('".$prop['var']."','rowid','";
+                                $varprop.="\t\tprint select_generic(\$db,'".$prop['var']."','rowid','";
                                 $varprop.= preg_replace('/_/','',ucfirst($prop['var']))."','rowid','description',";
                                 $varprop.= "\$object->".$prop['var'].");\n";
                                 $varprop.="\t\t}else{\n";
-                                $varprop.="\t\tprint \$object->print_generic('".$prop['var']."','rowid',";
+                                $varprop.="\t\tprint print_generic(\$db,'".$prop['var']."','rowid',";
                                 $varprop.="\$object->".$prop['var'].",'rowid','description');\n";
                         }else if(strpos($property[$i]['type'],'enum')===0){
-                                $varprop.="\t\tprint \$object->select_enum('{$table}','{$prop['field']}','";
+                                $varprop.="\t\tprint select_enum(\$db,'{$table}','{$prop['field']}','";
                                 $varprop.= preg_replace('/_/','',ucfirst($prop['var']))."',";
                                 $varprop.= "\$object->".$prop['var'].");\n";
                                 $varprop.="\t\t}else{\n";
@@ -628,9 +628,9 @@ foreach($property as $key => $prop)
 {
     if($i<4) // just to have some example
     {
-    $varprop.="print_liste_field_titre(\$langs->trans('";
+    $varprop.="\tprint_liste_field_titre(\$langs->trans('";
     $varprop.=$prop['var']."'),\$_SERVER['PHP_SELF'],'t.";
-    $varprop.=$prop['var']."','',\$param,'',\$sortfield,\$sortorder);\n";
+    $varprop.=$prop['var']."','',\$param,'',\$sortfield,\$sortorder);\nprint \"\\n\";\n";
     }
     $i++;  
 }
@@ -642,7 +642,7 @@ $targetcontent=preg_replace('/print_liste_field_titre\(\$langs->trans\(\'field2\
  */
 $varprop='';
 $i=0;
-$varprop.="\t\tprint \"<tr class='\".((\$i%2==0)?'pair':'impair').\" >\";\n";
+$varprop.="\t\tprint \"<tr class=\\\"\".((\$i%2==0)?'pair':'impair').\"\\\" >\";\n";
 foreach($property as $key => $prop)
 {
 if($i<4) // just to have some example
@@ -652,10 +652,12 @@ if($i<4) // just to have some example
         $varprop.="\t\tprint \"<td>\".dol_print_date(\$obj->";
         $varprop.=$prop['field'].",'day').\"</td>\";\n";      
     }else if(strpos($prop['field'],'fk_') ===0) {
-        $varprop.="\t\tprint \"<td>\".\$object->print_generic('".$prop['var']."','rowid',";
+        $varprop.="\t\tprint \"<td>\".print_generic(\$db,'".$prop['var']."','rowid',";
         $varprop.="\$obj->".$prop['field'].",'rowid','description').\"</td>\";\n";
-    }else if($prop['field']=='id' || $prop['field']=='rowin'){
-        $varprop.="\t\tprint \"<td>\".\$object->getNomUrl().\"<td>\";\n";
+    }else if($prop['field']=='id' || $prop['field']=='rowid'){
+        $varprop.="\t\tprint \"<td>\".\$object->getNomUrl(\$obj->rowid,\$obj->rowid,'',1).\"</td>\";\n";
+    }else if($prop['field']=='ref'){
+        $varprop.="\t\tprint \"<td>\".\$object->getNomUrl(\$obj->ref,\$obj->ref,'',0).\"<td>\";\n";
     }else
     {                     
         $varprop.="\t\tprint \"<td>\".\$obj->".$prop['field'].".\"</td>\";\n";

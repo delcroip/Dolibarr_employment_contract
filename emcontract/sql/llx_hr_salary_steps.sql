@@ -27,7 +27,7 @@ date_modification		        TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT
 fk_user_creation          integer NOT NULL,
 fk_user_modification           integer ,
 description             VARCHAR( 255 ) NOT NULL,
-fk_salary_method        integer NOT NULL,
+fk_salary_method        VARCHAR(63),
 step		        integer NOT NULL,
 operand_1_type	        ENUM ('value','step','operand','salary_method') default 'value' NOT NULL, -- 0- value from emcontract operand, 1- output of another step, 2- value
 operand_1_value	        DECIMAL(16,4), -- depending of the type, could be the number of the emcontract operand or a step or a pure value

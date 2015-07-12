@@ -18,10 +18,10 @@
  */
 
 /**
- *   	\file       dev/skeletons/skeleton.php
+ *   	\file       dev/skeletons/skeleton_page.php
  *		\ingroup    emcontract othermodule1 othermodule2
  *		\brief      This file is an example of a php page
- *					Initialy built by build_class_from_table on 2015-06-05 20:13
+ *					Initialy built by build_class_from_table on 2015-07-06 20:38
  */
 
 //if (! defined('NOREQUIREUSER'))  define('NOREQUIREUSER','1');
@@ -51,8 +51,11 @@ dol_include_once('/core/lib/functions2.lib.php');
 dol_include_once('/core/lib/files.lib.php');
 //dol_include_once('/core/lib/images.lib.php');
 dol_include_once('/core/class/html.formfile.class.php');
-
-
+dol_include_once('/core/class/html.formother.class.php');
+// include conditionnally of the dolibarr version
+//if((version_compare(DOL_VERSION, "3.8", "<"))){
+        dol_include_once("/emcontract/lib/emcontract.lib.php");
+//}
 
 // Load traductions files requiredby by page
 //$langs->load("companies");
@@ -67,6 +70,22 @@ $cancel=GETPOST('cancel');
 $confirm=GETPOST('confirm');
 $tms= GETPOST('tms','alpha');
 //// Get parameters
+$removefilter=isset($_POST["removefilter_x"]);//|| isset($_POST["removefilter"]);
+$applyfilter=isset($_POST["search_x"]) ;//|| isset($_POST["search"]);
+
+
+
+if (!$removefilter && $applyfilter)		// Both test must be present to be compatible with all browsers
+{
+    $listsearch=isset($_POST['listsearch'])?$_POST['listsearch']:'';
+
+    $ls_rowid=GETPOST('ls_rowid','int');
+    $ls_description=GETPOST('ls_description','apha');
+    $ls_date_creation_month=GETPOST('ls_date_creation_month','int');
+    $ls_date_creation_year=GETPOST('ls_date_creation_year','int');
+    $ls_type_contract=GETPOST('ls_type_contract','int');
+    
+}
 $sortfield = GETPOST('sortfield','alpha'); //FIXME, need to use for all the list
 $sortorder = GETPOST('sortorder','alpha');//FIXME, need to use for all the list
 $page = GETPOST('page','int'); //FIXME, need to use for all the list
@@ -86,8 +105,7 @@ $upload_dir = $conf->emcontract->dir_output.'/Hrcontracttype/'.dol_sanitizeFileN
  //   $cancel=TRUE;
  //  setEventMessages('Internal error, POST not exptected', null, 'errors');
 //}
- $tms= time();
- $_SESSION['Hrcontracttype_class'][$tms]= array();
+
 
 
 // Right Management
@@ -124,8 +142,18 @@ if(!empty($ref))
 $error=0;
 if ($cancel){
         reloadpage($backtopage,$id,$ref);
+}else if(($action == 'create') || ($action == 'edit' && ($id>0 || !empty($ref)))){
+    $tms=time();
+    $_SESSION['Hrcontracttype_'.$tms]=array();
+    $_SESSION['Hrcontracttype_'.$tms]['action']=$action;
+            
 }else if (($action == 'add') || ($action == 'update' && ($id>0 || !empty($ref))))
 {
+        //block resubmit
+        if(empty($tms) || (!isset($_SESSION['Hrcontracttype_'.$tms]))){
+                setEventMessages(null,'WrongTimeStamp_requestNotExpected', 'errors');
+                $action=($action=='add')?'create':'edit';
+        }
         //retrive the data
         		$object->rowid=GETPOST("Rowid");
 		$object->entity=GETPOST("Entity");
@@ -176,8 +204,9 @@ if ($cancel){
                             if ($result > 0)
                             {
                                 // Creation OK
+                                unset($_SESSION['Hrcontracttype_'.$tms]);
                                     setEventMessages('hrcontractfullyUpdated',null, 'mesgs');
-                                    reloadpage($backtopage,$id,$ref); 
+                                    reloadpage($backtopage,$result,$ref); 
                             }
                             else
                             {
@@ -196,7 +225,13 @@ if ($cancel){
                             if ($id > 0 || !empty($ref) )
                             {
                                     $result=$object->fetch($id,$ref);
-                                    if ($result < 0) dol_print_error($db);
+                                    if ($result < 0){ 
+                                        dol_print_error($db);
+                                    }else { // fill the id & ref
+                                        if(isset($object->id))$id = $object->id;
+                                        if(isset($object->rowid))$id = $object->rowid;
+                                        if(isset($object->ref))$ref = $object->ref;
+                                    }
                                
                             }else
                             {
@@ -209,8 +244,10 @@ if ($cancel){
                             if ($result > 0)
                             {
                                     // Creation OK
+                                // remove the tms
+                                   unset($_SESSION['Hrcontracttype_'.$tms]);
                                    setEventMessages('hrcontractSucessfullyCreated',null, 'mesgs');
-                                   reloadpage($backtopage,$id,$ref);
+                                   reloadpage($backtopage,$result,$ref);
                                     
                             }else
                             {
@@ -260,8 +297,9 @@ if(isset( $_SESSION['Hrcontracttype_class'][$tms]))
 ****************************************************/
 
 llxHeader('','Hrcontracttype','');
-
+print "<div> <!-- module body-->";
 $form=new Form($db);
+$formother=new FormOther($db);
 
 
 // Put here content of your page
@@ -281,6 +319,8 @@ jQuery(document).ready(function() {
 });
 </script>';
 $edit=0;
+print_fiche_titre($langs->trans('Hrcontracttype'));
+
 switch ($action) {
     case "create":
         $new=1;
@@ -294,13 +334,13 @@ switch ($action) {
         }
     case "view":
     {
-        //print_fiche_titre($langs->trans('Hrcontracttype'));
         	// tabs
         if($edit==0 && $new==0){ //show tabs
             $head=Hrcontracttype_prepare_head($object);
             dol_fiche_head($head,'card',$langs->trans("Hrcontracttype"),0,'emcontract@emcontract');            
         }
 	print '<br>';
+
         if($edit==1){
             if($new==1){
                 print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'?action=add">';
@@ -310,6 +350,15 @@ switch ($action) {
                         
             print '<input type="hidden" name="tms" value="'.$tms.'">';
             print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
+
+        }else {// shoz the nqv bar
+            $basedurltab=explode("?", $PHP_SELF);
+            $basedurl=$basedurltab[0].'?action=list';
+            $linkback = '<a href="'.$basedurl.(! empty($socid)?'?socid='.$socid:'').'">'.$langs->trans("BackToList").'</a>';
+            if(!isset($object->ref))//save ref if any
+                $object->ref=$object->id;
+            print $form->showrefnav($object, 'action=view&id', $linkback, 1, 'rowid', 'ref', '');
+            //reloqd the ref
 
         }
 
@@ -569,9 +618,9 @@ switch ($action) {
 
 		print "<td>".$langs->trans('Salarymethod')." </td><td>";
 		if($edit==1){
-		print $object->select_generic('salary_method','rowid','Salarymethod','rowid','description',$object->salary_method);
+		print select_generic($db,'hr_salary_method','rowid','Salarymethod','rowid','description',$object->salary_method);
 		}else{
-		print $object->print_generic('salary_method','rowid',$object->salary_method,'rowid','description');
+		print print_generic($db,'hr_salary_method','rowid',$object->salary_method,'rowid','description');
 		}
 		print "</td>";
 		print "\n</tr>\n";
@@ -623,12 +672,12 @@ switch ($action) {
                 // Boutons d'actions
                 //if($user->rights->Hrcontracttype->edit)
                 //{
-                    print '<a href="'.$_SERVER["PHP_SELF"].'?id='.$_GET['id'].'&action=edit" class="butAction">'.$langs->trans("Update").'</a>';
+                    print '<a href="'.$_SERVER["PHP_SELF"].'?id='.$id.'&action=edit" class="butAction">'.$langs->trans("Update").'</a>';
                 //}
                 
                 //if ($user->rights->Hrcontracttype->delete)
                 //{
-                    print '<a class="butActionDelete" href="'.$_SERVER["PHP_SELF"].'?id='.$_GET['id'].'&action=delete">'.$langs->trans('Delete').'</a>';
+                    print '<a class="butActionDelete" href="'.$_SERVER["PHP_SELF"].'?id='.$id.'&action=delete">'.$langs->trans('Delete').'</a>';
                 //}
                 //else
                 //{
@@ -638,22 +687,15 @@ switch ($action) {
                 print '</div>';
             }
         }
-      
-
-
-//FIXME DELETE
-        dol_fiche_end();
-    }
         break;
+    }
         case 'viewinfo':
-        //print_fiche_titre($langs->trans('Hrcontracttype'));
         $head=Hrcontracttype_prepare_head($object);
         dol_fiche_head($head,'info',$langs->trans("Hrcontracttype"),0,'emcontract@emcontract');            
         print '<table width="100%"><tr><td>';
         dol_print_object_info($object);
         print '</td></tr></table>';
         print '</div>';
-        dol_fiche_end();
         break;
     case 'deletefile':
         $action='delete';
@@ -662,7 +704,6 @@ switch ($action) {
         if (! $sortfield) $sortfield="name";
 	$object->fetch_thirdparty();
 
-        //print_fiche_titre($langs->trans('Hrcontracttype'));
         $head=Hrcontracttype_prepare_head($object);
         dol_fiche_head($head,'documents',$langs->trans("Hrcontracttype"),0,'emcontract@emcontract');            
         
@@ -691,7 +732,7 @@ switch ($action) {
         $param = '&id='.$object->id;
         include_once DOL_DOCUMENT_ROOT . '/core/tpl/document_actions_post_headers.tpl.php';
 
-        dol_fiche_end();
+        
         break;
     case "delete";
         if( ($id>0 || $ref!="")){
@@ -734,23 +775,120 @@ switch ($action) {
 
     
     $sql.= " FROM ".MAIN_DB_PREFIX."hr_contract_type as t";
+    $sql.= " WHERE t.entity = ".$conf->entity;
+    if ($filter && $filter != -1)		// GETPOST('filtre') may be a string
+    {
+            $filtrearr = explode(",", $filter);
+            foreach ($filtrearr as $fil)
+            {
+                    $filt = explode(":", $fil);
+                    $sql .= " AND " . $filt[0] . " = " . $filt[1];
+            }
+    }
+    if ($ls_rowid)
+    {
+             $sql .= natural_search(array('t.rowid'), $ls_rowid);
+    }
+    if ($ls_description)
+    {
+             $sql .= natural_search('t.description', $ls_description);
+    }
+    if ($ls_date_creation_month)
+    {
+
+             $sql .= ' AND MONTH(t.date_creation)="'.$ls_date_creation_month.'"';
+    }
+    if ($ls_date_creation_year)
+    {
+
+             $sql .= ' AND YEAR(t.date_creation)="'.$ls_date_creation_year.'"';
+    }
+    if ($ls_type_contract)
+    {
+             $sql .= natural_search('t.type_contract', $ls_type_contract);
+    }
+
+    $nbtotalofrecords = 0;
+  
+    if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST))
+    {
+            $result = $db->query($sql);
+            $nbtotalofrecords = $db->num_rows($result);
+    }
+
+    if(!empty($sortfield)){
+        $sql.= $db->order($sortfield,$sortorder);
+    }else{
+          $sortorder = 'ASC';
+    }
+    
+    
+    if(!empty($limit)){
+        $sql.= $db->plimit($limit+1, $offset);      
+    }
+
 //    $sql.= " WHERE field3 = 'xxx'";
 //    $sql.= " ORDER BY field1 ASC";
-
-    print '<table class="noborder">'."\n";
-    print '<tr class="liste_titre">';
-    print_liste_field_titre($langs->trans('rowid'),$_SERVER['PHP_SELF'],'t.rowid','',$param,'',$sortfield,$sortorder);
-print_liste_field_titre($langs->trans('entity'),$_SERVER['PHP_SELF'],'t.entity','',$param,'',$sortfield,$sortorder);
-print_liste_field_titre($langs->trans('date_creation'),$_SERVER['PHP_SELF'],'t.date_creation','',$param,'',$sortfield,$sortorder);
-print_liste_field_titre($langs->trans('date_modification'),$_SERVER['PHP_SELF'],'t.date_modification','',$param,'',$sortfield,$sortorder);
-
-    
-    print '</tr>';
 
     dol_syslog($script_file, LOG_DEBUG);
     $resql=$db->query($sql);
     if ($resql)
     {
+   
+    if (!empty($ls_rowid) )	$param.='&ls_rowid'.urlencode($ls_rowid);
+    if (!empty($ls_description))      	$param.='&ls_description='.urlencode($ls_description);
+    if (!empty($ls_date_creation_month))      	$param.='&ls_date_creation_month='.urlencode($ls_date_creation_month);
+    if (!empty($ls_date_creation_year))	$param.='&ls_date_creation_year='.urlencode($ls_date_creation_year);
+    if (!empty($ls_type_contract))	$param.='&ls_type_contract='.urlencode($ls_type_contract);
+    if ($filter && $filter != -1) $param.='&filtre='.urlencode($filter);
+
+    //print_barre_liste($langs->trans("Hrcontracttype"),$page,$_SERVER["PHP_SELF"],$param,$sortfield,$sortorder,'',$num,$nbtotalofrecords);
+    print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+    print '<table class="liste" width="100%">'."\n";
+    print '<tr class="liste_titre">';
+    print_liste_field_titre($langs->trans("rowid"),$_SERVER["PHP_SELF"],"t.rowid","",$param,"align='left'",$sortfield,$sortorder);
+    print "\n";
+    print_liste_field_titre($langs->trans('description'),$_SERVER["PHP_SELF"],'t.description','',$param,'',$sortfield,$sortorder);
+    print "\n";
+    print_liste_field_titre($langs->trans('date_creation'),$_SERVER["PHP_SELF"],'t.date_creation','',$param,'',$sortfield,$sortorder);
+    print "\n";
+    print_liste_field_titre($langs->trans('type_contract'),$_SERVER["PHP_SELF"],'t.type_contract','',$param,'',$sortfield,$sortorder);
+    print "\n";
+    //print '<td class="liste_titre">&nbsp;</td>';
+    print '</tr>';  
+      // Filters FIXME
+    print '<tr class="liste_titre">'; 
+    //rowid
+        print '<td class="liste_titre" align="left">';
+    print '<input class="flat" size="5" type="text" name="ls_rowid" value="'.$ls_rowid.'">';
+    print '</td>';
+    //description
+        print '<td class="liste_titre" >';
+    print '<input class="flat" size="20" type="text" name="ls_description" value="'.$ls_description.'">';
+    print '</td>';
+    //date_creation
+    print '<td class="liste_titre" colspan="1" >';
+    print '<input class="flat" type="text" size="1" maxlength="2" name="ls_date_creation_month" value="'.$ls_date_creation_month.'">';
+    $syear = $ls_date_creation_year;
+    $formother->select_year($syear?$syear:-1,'ls_date_creation_year',1, 20, 5);
+    print '</td>';
+    //type_contract
+        print '<td class="liste_titre" >';
+    print '<input class="flat" size="16" type="text" name="ls_type_contract" value="'.$ls_type_contract.'">';
+    //print '</td>';
+    //print '<td class="liste_titre">';
+    print '<input type="image" class="liste_titre" name="search" src="'.img_picto($langs->trans("Search"),'search.png','','',1).'" value="'.dol_escape_htmltag($langs->trans("Search")).'" title="'.dol_escape_htmltag($langs->trans("Search")).'">';
+    print '<input type="image" class="liste_titre" name="removefilter" src="'.img_picto($langs->trans("Search"),'searchclear.png','','',1).'" value="'.dol_escape_htmltag($langs->trans("RemoveFilter")).'" title="'.dol_escape_htmltag($langs->trans("RemoveFilter")).'">';
+    
+    print '</td>';
+    print '</tr>'."\n"; 
+        
+        
+        
+        
+        
+        
+        
        $i=0;
         $num = $db->num_rows($resql);
         while ($i < $num)
@@ -759,12 +897,13 @@ print_liste_field_titre($langs->trans('date_modification'),$_SERVER['PHP_SELF'],
             if ($obj)
             {
                 // You can use here results
-                		print "<tr class='".(($i%2==0)?'pair':'impair')." >";
-		print "<td>".$obj->rowid."</td>";
-		print "<td>".$obj->entity."</td>";
-		print "<td>".dol_print_date($obj->date_creation,'day')."</td>";
-		print "<td>".dol_print_date($obj->date_modification,'day')."</td>";
-		print "</tr>";
+                print "<tr class=\"".(($i%2==0)?'pair':'impair')."\" >";
+		
+		print "<td align='left'>".$object->getNomUrl($obj->rowid,$obj->rowid,'',1)."</td>";
+		print "<td>".$obj->description."</td>";
+		print "<td>".dol_print_date($db->jdate($obj->date_creation,'day'))."</td>";
+		print "<td>".$obj->type_contract."</td>";
+		print "</tr>\n";
 
                 
 
@@ -778,10 +917,11 @@ print_liste_field_titre($langs->trans('date_modification'),$_SERVER['PHP_SELF'],
         dol_print_error($db);
     }
 
-    print '</table>'."\n";
+    print '</table>'."\n</form>\n";
 }
         break;
 }
+dol_fiche_end();
 
 function reloadpage($backtopage,$id,$ref){
         if (!empty($backtopage)){

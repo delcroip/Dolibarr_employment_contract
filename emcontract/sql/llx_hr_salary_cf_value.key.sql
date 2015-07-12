@@ -18,7 +18,8 @@
 -- HR Revision 0.1.0
 
 
-ALTER TABLE llx_hr_salary_steps 
-ADD FOREIGN KEY (fk_salary_method) REFERENCES llx_hr_salary_method(`ref`),
+
+ALTER TABLE llx_hr_salary_cf_value
+ADD FOREIGN KEY (fk_salary_cf_defs) REFERENCES llx_hr_salary_cf_defs(`ref`),
 ADD FOREIGN KEY (fk_user_creation) REFERENCES llx_user(rowid),
 ADD FOREIGN KEY (fk_user_modification) REFERENCES llx_user(rowid)

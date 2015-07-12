@@ -704,6 +704,7 @@ function print_generic($table, $fieldValue,$selected,$fieldToShow1,$fieldToShow2
       $select.="\n";
       return $select;
  }
+ // Function
  
  
 }

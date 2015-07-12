@@ -21,7 +21,7 @@
  *  \file       dev/hrcontracts/hrcontract.class.php
  *  \ingroup    emcontract othermodule1 othermodule2
  *  \brief      This file is an example for a CRUD class file (Create/Read/Update/Delete)
- *				Initialy built by build_class_from_table on 2015-06-05 20:13
+ *				Initialy built by build_class_from_table on 2015-07-05 11:43
  */
 
 // Put here all includes required by your class file
@@ -325,25 +325,25 @@ class Hrcontract extends CommonObject
         // Update request
         $sql = "UPDATE ".MAIN_DB_PREFIX.$this->table_element." SET";
         
-		$sql.= " ref=".(isset($this->ref)?"'".$this->db->escape($this->ref)."'":"null").",";
-		$sql.= " fk_user=".(isset($this->user)?$this->user:"null").",";
-		$sql.= " entity=".(isset($this->entity)?$this->entity:"null").",";
+		$sql.= " ref=".(empty($this->ref)?"null":"'".$this->db->escape($this->ref)."'").",";
+		$sql.= " fk_user=".(empty($this->user)?'null':$this->user).",";
+		$sql.= " entity=".(empty($this->entity)?'null':$this->entity).",";
 		$sql.= " date_modification=NOW() ,";
-		$sql.= " fk_contract_type=".(isset($this->contract_type)?$this->contract_type:"null").",";
-		$sql.= " fk_job_type=".(isset($this->job_type)?$this->job_type:"null").",";
-		$sql.= " fk_job_Location=".(isset($this->job_Location)?$this->job_Location:"null").",";
+		$sql.= " fk_contract_type=".(empty($this->contract_type)?'null':$this->contract_type).",";
+		$sql.= " fk_job_type=".(empty($this->job_type)?'null':$this->job_type).",";
+		$sql.= " fk_job_Location=".(empty($this->job_Location)?'null':$this->job_Location).",";
 		$sql.= " date_dpae=".(dol_strlen($this->date_dpae)!=0 ? "'".$this->db->idate($this->date_dpae)."'" : 'null').",";
 		$sql.= " date_medicalexam=".(dol_strlen($this->date_medicalexam)!=0 ? "'".$this->db->idate($this->date_medicalexam)."'" : 'null').",";
 		$sql.= " date_sign_employee=".(dol_strlen($this->date_sign_employee)!=0 ? "'".$this->db->idate($this->date_sign_employee)."'" : 'null').",";
 		$sql.= " date_sign_management=".(dol_strlen($this->date_sign_management)!=0 ? "'".$this->db->idate($this->date_sign_management)."'" : 'null').",";
-		$sql.= " description=".(isset($this->description)?"'".$this->db->escape($this->description)."'":"null").",";
+		$sql.= " description=".(empty($this->description)?"'".$this->db->escape($this->description)."'":"null").",";
 		$sql.= " date_start_contract=".(dol_strlen($this->date_start_contract)!=0 ? "'".$this->db->idate($this->date_start_contract)."'" : 'null').",";
 		$sql.= " date_end_contract=".(dol_strlen($this->date_end_contract)!=0 ? "'".$this->db->idate($this->date_end_contract)."'" : 'null').",";
 		$sql.= " fk_user_modification='".$user->id."',";
-		$sql.= " base_rate=".(isset($this->base_rate)?$this->base_rate:"null").",";
-		$sql.= " reason=".(isset($this->reason)?"'".$this->db->escape($this->reason)."'":"null").",";
-		$sql.= " sm_custom_field_1_value=".(isset($this->sm_custom_field_1_value)?$this->sm_custom_field_1_value:"null").",";
-		$sql.= " sm_custom_field_2_value=".(isset($this->sm_custom_field_2_value)?$this->sm_custom_field_2_value:"null")."";
+		$sql.= " base_rate=".(empty($this->base_rate)?'null':$this->base_rate).",";
+		$sql.= " reason=".(empty($this->reason)?"'".$this->db->escape($this->reason)."'":"null").",";
+		$sql.= " sm_custom_field_1_value=".(empty($this->sm_custom_field_1_value)?"null":"'".$this->sm_custom_field_1_value."'").",";
+		$sql.= " sm_custom_field_2_value=".(empty($this->sm_custom_field_2_value)?"null":"'".$this->sm_custom_field_2_value."'")."";
 
         
         $sql.= " WHERE rowid=".$this->id;
@@ -387,42 +387,53 @@ class Hrcontract extends CommonObject
     }
 
     /**
-     *	Return clicable name (with picto eventually)
+     *	Return clickable name (with picto eventually)
      *
+     *	@param		string			$htmlcontent 		text to show
+     *	@param		int			$id                     Object ID
+     *	@param		string			$ref                    Object ref
      *	@param		int			$withpicto		0=_No picto, 1=Includes the picto in the linkn, 2=Picto only
      *	@return		string						String with URL
      */
-    function getNomUrl($withpicto=0)
+    function getNomUrl($htmlcontent,$id=0,$ref='',$withpicto=0)
     {
     	global $langs;
 
     	$result='';
-        $id=0;
-        $ref='';
-        if(isset($this->id))  
-            $id=$this->id;
-        else if (isset($this->rowid))
-            $id=$this->rowid;
-        if(isset($this->ref))
-            $ref=$this->ref;
-        if($id)
+        if(empty($ref) && $id==0){
+            if(isset($this->id))  {
+                $id=$this->id;
+            }else if (isset($this->rowid)){
+                $id=$this->rowid;
+            }if(isset($this->ref)){
+                $ref=$this->ref;
+            }
+        }
+ 
+        
+        if($id){
             $lien = '<a href="'.DOL_URL_ROOT.'/emcontract/hrcontract.php?id='.$id.'&action=view">';
-    	else if ($ref)
+        }else if (!empty($ref)){
             $lien = '<a href="'.DOL_URL_ROOT.'/emcontract/hrcontract.php?ref='.$ref.'&action=view">';
-    	else
-            return "Error";
-        $lienfin='</a>';
+        }else{
+            $lien =  "";
+        }
+        $lienfin=empty($lien)?'':'</a>';
 
     	$picto='emcontract@emcontract';
         
-        if($ref)
+        if($ref){
             $label=$langs->trans("Show").': '.$ref;
-        else if($id)
+        }else if($id){
             $label=$langs->trans("Show").': '.$id;
-        
-    	if ($withpicto) $result.=($lien.img_object($label,$picto).$lienfin);
-    	if ($withpicto && $withpicto != 2) $result.=' ';
-    	if ($withpicto != 2) $result.=$lien.$ref.$lienfin;
+        }
+    	if ($withpicto==1){ 
+            $result.=($lien.$htmlcontent.img_object($label,$picto).$lienfin);
+        } if ($withpicto==2) {
+            $result.=$lien.img_object($label,$picto).$lienfin;
+        }else{  
+            $result.=$lien.$htmlcontent.$lienfin;
+        }
     	return $result;
     }
     
@@ -572,207 +583,5 @@ class Hrcontract extends CommonObject
 
 		
 	}
-/*
- * function to genegate a select list from a table, the showed text will be a concatenation of some 
- * column defined in column bit, the Least sinificative bit will represent the first colum 
- * 
- *  @param    string              	$table                 table which the fk refers to (without prefix)
- *  @param    string              	$fieldValue         field of the table which the fk refers to, the one to put in the Valuepart
- *  @param    string              	$htmlName        name to the form select
- *  @param    string              	$fieldToShow1    first part of the concatenation
- *  @param    string              	$fieldToShow1    second part of the concatenation
- *  @param    string              	$selected            which value must be selected
- *  @param    string              	$sqlTail              to limit per entity, to filter ...
- *  @param    string              	$separator          separator between the tow contactened fileds
 
- *  @return string                                                   html code
- */
-function select_generic($table, $fieldValue,$htmlName,$fieldToShow1,$fieldToShow2="",$selected="",$sqlTail="",$separator=', '){
-     //
-    if($table=="" || $fieldValue=="" || $fieldToShow1=="" || $htmlName=="" )
-    {
-        return "error, one of the mandatory field of the function  select_generic is missing";
-    }
-    $select="<select class=\"flat\" id=\"".$htmlName." \" name=\"".$htmlName."\">";
-    
-    $sql="SELECT";
-    $sql.=" ".$fieldValue;
-    $sql.=" ,".$fieldToShow1;
-    if(!empty($fieldToShow2))
-        $sql.=" ,".$fieldToShow2;
-    $sql.= " FROM ".MAIN_DB_PREFIX.$table." as t";
-    if(!empty($sqlTail))
-            $sql.=" , ".$sqlTail;
-    //$sql.= " ORDER BY t.".$field;
-       
-    dol_syslog("form::select_generic sql=".$sql, LOG_DEBUG);
-    
-    $resql=$this->db->query($sql);
-   
-    if ($resql)
-    {
-        $select.= "<option value=\"-1\" ".(empty($selected)?"selected=\"selected\"":"").">&nbsp;</option>\n";
-        $i=0;
-         //return $table."this->db".$field;
-        $num = $this->db->num_rows($resql);
-        while ($i < $num)
-        {
-            
-            $obj = $this->db->fetch_object($resql);
-            
-            if ($obj)
-            {
-                    $select.= "<option value=\"".$obj->{$fieldValue}."\" ";
-                    $select.=(($obj->{$fieldValue}===$selected)?"selected=\"selected\" >":">");                    
-                    $select.=$obj->{$fieldToShow1};
-                    if(!empty($fieldToShow2))
-                         $select.=$separator.$obj->{$fieldToShow2};            
-                    $select.="</option>\n";
-            } 
-            $i++;
-        }
-    }
-    else
-    {
-        $error++;
-        dol_print_error($this->db);
-       $select.= "<option value=\"-1\" selected=\"selected\">ERROR</option>\n";
-    }
-      $select.="</select>\n";
-      return $select;
-    
- }
-/*
- * function to genegate a select list from a table, the showed text will be a concatenation of some 
- * column defined in column bit, the Least sinificative bit will represent the first colum 
- * 
- *  @param    string              	$table              table which the enum refers to (without prefix)
- *  @param    string              	$fieldValue         field of the table which the enum refers to
- *  @param    string              	$htmlName           name to the form select
- *  @param    string              	$selected           which value must be selected
- *  @return string                                                   html code
- */
- 
-function select_enum($table, $fieldValue,$htmlName,$selected=""){
-     global $langs;
-    if($table=="" || $fieldValue=="" || $htmlName=="" )
-    {
-        return "error, one of the mandatory field of the function  select_enum is missing";
-    }    
-    $sql="SHOW COLUMNS FROM ";//llx_hr_event_time LIKE 'audience'";
-    $sql.=MAIN_DB_PREFIX.$table." WHERE Field='";
-    $sql.=$fieldValue."'";
-    //$sql.= " ORDER BY t.".$field;
-       
-    dol_syslog("form::select_enum sql=".$sql, LOG_DEBUG);
-    
-    $resql=$this->db->query($sql);
-    
-    if ($resql)
-    {
-        $i=0;
-         //return $table."this->db".$field;
-        $num = $this->db->num_rows($resql);
-        if($num)
-        {
-           
-            $obj = $this->db->fetch_object($resql);
-            if ($obj && strpos($obj->Type,'enum(')===0)
-            {
-                if(empty($selected) && !empty($obj->Default))$selected="'{$obj->Default}'";
-                $select="<select class=\"flat\" id=\"{$htmlName}\" name=\"{$htmlName}\">";
-                $select.= "<option value=\"-1\" ".(empty($selected)?"selected=\"selected\"":"").">&nbsp;</option>\n";
-
-                $enums= explode(',',substr($obj->Type, 5,-1));
-                foreach ($enums as $enum){
-                    $select.= "<option value=\"{$enum}\" ";
-                    $select.=((substr($enum,1,-1)===$selected)?"selected=\"selected\" >":">");                    
-                    $select.=$langs->trans(substr($enum,1,-1));          
-                    $select.="</option>\n";
-                }  
-                $select.="</select>\n";
-            }else{
-                $select="<input selected=\"{$selected}\" id=\"{$htmlName} \" name=\"{$htmlName}\">";
-            }
- 
-        }else{
-                $select="<input selected=\"{$selected}\" id=\"{$htmlName} \" name=\"{$htmlName}\">";
-        }
-    }
-    else
-    {
-        $error++;
-        dol_print_error($this->db);
-       $select="<input selected=\"{$selected}\" id=\"{$htmlName} \" name=\"{$htmlName}\">";
-    }
-      
-      return $select;
-    
- }
-
-/*
- * function to genegate a select list from a table, the showed text will be a concatenation of some 
- * column defined in column bit, the Least sinificative bit will represent the first colum 
- * 
- *  @param    string              	$table                 table which the fk refers to (without prefix)
- *  @param    string              	$fieldValue         field of the table which the fk refers to, the one to put in the Valuepart
- *  @param    string              	$selected           value selected of the field value column
- *  @param    string              	$fieldToShow1    first part of the concatenation
- *  @param    string              	$fieldToShow1    second part of the concatenation
- *  @param    string              	$separator          separator between the tow contactened fileds
-
- *  @return string                                                   html code
- */
-function print_generic($table, $fieldValue,$selected,$fieldToShow1,$fieldToShow2="",$separator=', '){
-   //return $table.$this->db.$field;
-    if($table=="" || $fieldValue=="" || $fieldToShow1=='')
-    {
-        return "error, one of the mandatory field of the function  print_generic is missing";
-    }else if (empty($selected)){
-        return "NuLL";
-    }
-    
-    $sql="SELECT";
-    $sql.=" ".$fieldValue;
-    $sql.=" ,".$fieldToShow1;
-    if(!empty($fieldToShow2))
-        $sql.=" ,".$fieldToShow2;
-    $sql.= " FROM ".MAIN_DB_PREFIX.$table." as t";
-    $sql.= " WHERE t.".$fieldValue."=".$selected;
-       
-    dol_syslog("form::print_generic sql=".$sql, LOG_DEBUG);
-    
-    $resql=$this->db->query($sql);
-    
-    if ($resql)
-    {
-
-        $num = $this->db->num_rows($resql);
-        if ( $num)
-        {
-            $obj = $this->db->fetch_object($resql);
-            
-            if ($obj)
-            {
-                            $select=$obj->{$fieldToShow1};
-                            if(!empty($fieldToShow2))
-                                 $select.=$separator.$obj->{$fieldToShow2};        
-            }else{
-                $select= "NULL";
-            }
-        }else{
-            $select= "NULL";
-        }
-    }
-    else
-    {
-        $error++;
-        dol_print_error($this->db);
-       $select.= "ERROR";
-    }
-      $select.="\n";
-      return $select;
- }
- 
- 
 }

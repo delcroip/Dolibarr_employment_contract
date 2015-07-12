@@ -27,6 +27,8 @@ if (! $res) die("Include of main fails");
 /*----------------------- Includes Class -------------------------------------*/
 //dol_include_once('/emcontract/class/hrcontract.class.php');
 //$langs->load("Hrcontract_class");
+dol_include_once('/emcontract/class/hrsalarymethod.class.php');
+$salarymethod = new Hrsalarymethod($db);
 dol_include_once('/core/class/html.formother.class.php');
 $htmlother = new FormOther($db);
 dol_include_once('/core/class/html.form.class.php');
@@ -90,7 +92,21 @@ dol_fiche_head($head,'step'.$step,$langs->trans("salaryGenerator"),0,'emcontract
 
 Switch ($step){
 case 2:
-    //validation for the inputs from step 1
+    print '<form method="POST" action="?step=2">';
+    print '<input type="hidden" name="tms" value="'.$tms.'">';
+    print '<table class="border centpercent">'."\n";
+    // show each lines of the salary variable
+    print '<tr>'."\n";
+    print "\t<td>".$langs->trans('User')."</td>\n\t<td>\n\t\t";
+    print $form->select_dolusers($object->user, 'User', 1, '', 0 )."\n\t</td>\n";
+    print "</tr>\n";
+    
+    
+    print '</table>';
+    print '<input type="submit" class="button" value="'.$langs->trans('step').' 2">';
+		
+    print '</form>';
+    
 
     break;
 case 1:

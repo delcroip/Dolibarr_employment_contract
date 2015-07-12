@@ -17,8 +17,22 @@
 -- ===================================================================
 -- HR Revision 0.1.0
 
+-- custom fields defs 
+CREATE TABLE llx_hr_salary_cf_defs
+(
+rowid                   integer NOT NULL AUTO_INCREMENT,
+`ref`                   VARCHAR(63),
+entity	                integer DEFAULT 1 NOT NULL,		-- multi company id
+date_creation           DATETIME NOT NULL,
+date_modification	TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,                
+fk_user_creation        integer NOT NULL,
+fk_user_modification    integer ,
+description             VARCHAR( 255 ) NOT NULL, -- desc to show on the pages
+fk_salary_method        VARCHAR(63), -- ref to the salary method ref (id not used to be able to expor sm)
+linked_to	        ENUM ('salary_method','contract','salary_calc') default 'salary_calc' NOT NULL, -- 0- value from emcontract operand, 1- output of another step, 2- value
+default_value	        DECIMAL(16,4), -- 
+PRIMARY KEY (rowid)
+) 
+ENGINE=innodb;
 
-ALTER TABLE llx_hr_salary_steps 
-ADD FOREIGN KEY (fk_salary_method) REFERENCES llx_hr_salary_method(`ref`),
-ADD FOREIGN KEY (fk_user_creation) REFERENCES llx_user(rowid),
-ADD FOREIGN KEY (fk_user_modification) REFERENCES llx_user(rowid)
+

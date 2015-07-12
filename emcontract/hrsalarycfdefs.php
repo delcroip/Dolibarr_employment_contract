@@ -21,7 +21,7 @@
  *   	\file       dev/skeletons/skeleton_page.php
  *		\ingroup    emcontract othermodule1 othermodule2
  *		\brief      This file is an example of a php page
- *					Initialy built by build_class_from_table on 2015-07-05 11:43
+ *					Initialy built by build_class_from_table on 2015-06-28 19:16
  */
 
 //if (! defined('NOREQUIREUSER'))  define('NOREQUIREUSER','1');
@@ -45,20 +45,20 @@ if (! $res && file_exists("/var/www/dolibarr/htdocs/main.inc.php")) $res=@includ
 if (! $res) die("Include of main fails");
 // Change this following line to use the correct relative path from htdocs
 //include_once(DOL_DOCUMENT_ROOT.'/core/class/formcompany.class.php');
-dol_include_once('/emcontract/class/hrcontract.class.php');
+dol_include_once('/emcontract/class/hrsalarycfdefs.class.php');
 dol_include_once('/core/lib/functions2.lib.php');
 //document handling
 dol_include_once('/core/lib/files.lib.php');
 //dol_include_once('/core/lib/images.lib.php');
 dol_include_once('/core/class/html.formfile.class.php');
 // include conditionnally of the dolibarr version
-//if((version_compare(DOL_VERSION, "3.8", "<"))){
+//if((version_compare(DOL_VERSION, "4.0", "<"))){
         dol_include_once("/emcontract/lib/emcontract.lib.php");
 //}
 
 // Load traductions files requiredby by page
 //$langs->load("companies");
-$langs->load("Hrcontract_class");
+$langs->load("Hrsalarycfdefs_class");
 
 // Get parameters
 $id			= GETPOST('id','int');
@@ -78,11 +78,11 @@ $pageprev = $page - 1;
 $pagenext = $page + 1;
 
 
-$upload_dir = $conf->emcontract->dir_output.'/Hrcontract/'.dol_sanitizeFileName($object->ref);
+$upload_dir = $conf->emcontract->dir_output.'/Hrsalarycfdefs/'.dol_sanitizeFileName($object->ref);
 
 
  // uncomment to avoid resubmision
-//if(isset( $_SESSION['Hrcontract_class'][$tms]))
+//if(isset( $_SESSION['Hrsalarycfdefs_class'][$tms]))
 //{
 
  //   $cancel=TRUE;
@@ -102,9 +102,9 @@ if ($user->societe_id > 0 ||
 	accessforbidden();
 }
 */
-
+//var_dump($_SESSION);
 // create object and set id or ref if provided as parameter
-$object=new Hrcontract($db);
+$object=new Hrsalarycfdefs($db);
 if($id>0)
 {
     $object->id=$id; 
@@ -127,35 +127,24 @@ if ($cancel){
         reloadpage($backtopage,$id,$ref);
 }else if(($action == 'create') || ($action == 'edit' && ($id>0 || !empty($ref)))){
     $tms=time();
-    $_SESSION['Hrcontract_'.$tms]=array();
-    $_SESSION['Hrcontract_'.$tms]['action']=$action;
+    $_SESSION['skeleton_'.$tms]=array();
+    $_SESSION['skeleton_'.$tms]['action']=$action;
             
 }else if (($action == 'add') || ($action == 'update' && ($id>0 || !empty($ref))))
 {
         //block resubmit
-        if(empty($tms) || (!isset($_SESSION['Hrcontract_'.$tms]))){
+       if( empty($tms) || (!isset($_SESSION['skeleton_'.$tms]))){
                 setEventMessages(null,'WrongTimeStamp_requestNotExpected', 'errors');
                 $action=($action=='add')?'create':'edit';
         }
         //retrive the data
         		$object->rowid=GETPOST("Rowid");
 		$object->ref=GETPOST("Ref");
-		$object->user=GETPOST("User");
 		$object->entity=GETPOST("Entity");
-		$object->contract_type=GETPOST("Contracttype");
-		$object->job_type=GETPOST("Jobtype");
-		$object->job_Location=GETPOST("JobLocation");
-		$object->date_dpae=dol_mktime(0, 0, 0,GETPOST('Datedpaemonth'),GETPOST('Datedpaeday'),GETPOST('Datedpaeyear'));
-		$object->date_medicalexam=dol_mktime(0, 0, 0,GETPOST('Datemedicalexammonth'),GETPOST('Datemedicalexamday'),GETPOST('Datemedicalexamyear'));
-		$object->date_sign_employee=dol_mktime(0, 0, 0,GETPOST('Datesignemployeemonth'),GETPOST('Datesignemployeeday'),GETPOST('Datesignemployeeyear'));
-		$object->date_sign_management=dol_mktime(0, 0, 0,GETPOST('Datesignmanagementmonth'),GETPOST('Datesignmanagementday'),GETPOST('Datesignmanagementyear'));
 		$object->description=GETPOST("Description");
-		$object->date_start_contract=dol_mktime(0, 0, 0,GETPOST('Datestartcontractmonth'),GETPOST('Datestartcontractday'),GETPOST('Datestartcontractyear'));
-		$object->date_end_contract=dol_mktime(0, 0, 0,GETPOST('Dateendcontractmonth'),GETPOST('Dateendcontractday'),GETPOST('Dateendcontractyear'));
-		$object->base_rate=GETPOST("Baserate");
-		$object->reason=GETPOST("Reason");
-		$object->sm_custom_field_1_value=GETPOST("Smcustomfield1value");
-		$object->sm_custom_field_2_value=GETPOST("Smcustomfield2value");
+		$object->salary_method=GETPOST("Salarymethod");
+		$object->linked_to=GETPOST("Linkedto");
+		$object->default_value=GETPOST("Defaultvalue");
 
         
         
@@ -182,9 +171,9 @@ if ($cancel){
                             if ($result > 0)
                             {
                                 // Creation OK
-                                unset($_SESSION['Hrcontract_'.$tms]);
+                                unset($_SESSION['skeleton_'.$tms]);
                                     setEventMessages('hrcontractfullyUpdated',null, 'mesgs');
-                                    reloadpage($backtopage,$result,$ref); 
+                                    reloadpage($backtopage,$id,$ref); 
                             }
                             else
                             {
@@ -203,12 +192,7 @@ if ($cancel){
                             if ($id > 0 || !empty($ref) )
                             {
                                     $result=$object->fetch($id,$ref);
-                                    if ($result < 0){ dol_print_error($db);
-                                    }else { // fill the id & ref
-                                        if(isset($object->id))$id = $object->id;
-                                        if(isset($object->rowid))$id = $object->rowid;
-                                        if(isset($object->ref))$ref = $object->ref;
-                                    }
+                                    if ($result < 0) dol_print_error($db);
                                
                             }else
                             {
@@ -222,7 +206,7 @@ if ($cancel){
                             {
                                     // Creation OK
                                 // remove the tms
-                                   unset($_SESSION['Hrcontract_'.$tms]);
+                                   unset($_SESSION['skeleton_'.$tms]);
                                    setEventMessages('hrcontractSucessfullyCreated',null, 'mesgs');
                                    reloadpage($backtopage,$result,$ref);
                                     
@@ -262,9 +246,9 @@ if ($cancel){
                             break;
             }             
 //Removing the tms array so the order can't be submitted two times
-if(isset( $_SESSION['Hrcontract_class'][$tms]))
+if(isset( $_SESSION['Hrsalarycfdefs_class'][$tms]))
 {
-    unset($_SESSION['Hrcontract_class'][$tms]);
+    unset($_SESSION['Hrsalarycfdefs_class'][$tms]);
 }
 
 /***************************************************
@@ -272,9 +256,10 @@ if(isset( $_SESSION['Hrcontract_class'][$tms]))
 *
 * Put here all code to build page
 ****************************************************/
+llxHeader('','Hrsalarycfdefs','');
+print_fiche_titre($langs->trans('Hrsalarycfdefs'));
 
-llxHeader('','Hrcontract','');
-print "<div> <!-- module body-->";
+print "<div> <!-- fiche-->";
 $form=new Form($db);
 
 
@@ -295,30 +280,24 @@ jQuery(document).ready(function() {
 });
 </script>';
 $edit=0;
-print_fiche_titre($langs->trans('Hrcontract'));
-
 switch ($action) {
     case "create":
         $new=1;
     case "edit":
         $edit=1;
-   case "delete";
+    case "delete";
         if( $action=='delete' && ($id>0 || $ref!="")){
-         $ret=$form->form_confirm($_SERVER["PHP_SELF"].'?action=confirm_delete&id='.$id,$langs->trans("DeleteHrcontract"),$langs->trans("ConfirmDelete"),"confirm_delete", '', 0, 1);
+         $ret=$form->form_confirm($_SERVER["PHP_SELF"].'?action=confirm_delete&id='.$id,$langs->trans("DeleteHrsalarycfdefs"),$langs->trans("ConfirmDelete"),"confirm_delete", '', 0, 1);
          if ($ret == 'html') print '<br />';
          //to have the object to be deleted in the background\
         }
     case "view":
     {
-        	// tabs
+        //        	// tabs
         if($edit==0 && $new==0){ //show tabs
-            $head=Hrcontract_prepare_head($object);
-            dol_fiche_head($head,'card',$langs->trans("Hrcontract"),0,'emcontract@emcontract');            
+            $head=Hrsalarycfdefs_prepare_head($object);
+            dol_fiche_head($head,'card',$langs->trans("Hrsalarycfdefs"),0,'emcontract@emcontract');            
         }
-        $linkback = '<a href="'.$PHP_SELF.(! empty($socid)?'?socid='.$socid:'').'">'.$langs->trans("BackToList").'</a>';
-  	// Ref
-   	print $form->showrefnav($object, 'id', $linkback, 1, 'rowid', 'ref', '');
-
 	print '<br>';
         if($edit==1){
             if($new==1){
@@ -347,18 +326,6 @@ switch ($action) {
 		}
 		print "</td>";
 
-// show the field user
-
-		print "<td class='fieldrequired'>".$langs->trans('User')." </td><td>";
-		if($edit==1){
-		print $form->select_dolusers($object->user, 'User', 1, '', 0 );
-		}else{
-		print print_generic($db,'user', 'rowid',$object->user,'lastname','firstname',' ');
-		}
-		print "</td>";
-		print "\n</tr>\n";
-		print "<tr>\n";
-
 // show the field entity
 
 		print "<td class='fieldrequired'>".$langs->trans('Entity')." </td><td>";
@@ -371,104 +338,12 @@ switch ($action) {
 			print $object->entity;
 		}
 		print "</td>";
-
-// show the field contract_type
-
-		print "<td class='fieldrequired'>".$langs->trans('Contracttype')." </td><td>";
-		if($edit==1){
-		print select_generic($db,'hr_contract_type','rowid','Contracttype','rowid','description',$object->contract_type);
-		}else{
-		print print_generic($db,'hr_contract_type','rowid',$object->contract_type,'rowid','description');
-		}
-		print "</td>";
-		print "\n</tr>\n";
-		print "<tr>\n";
-
-// show the field job_type
-
-		print "<td class='fieldrequired'>".$langs->trans('Jobtype')." </td><td>";
-		if($edit==1){
-		print select_generic($db,'hr_job_type','rowid','Jobtype','rowid','description',$object->job_type);
-		}else{
-		print print_generic($db,'hr_job_type','rowid',$object->job_type,'rowid','description');
-		}
-		print "</td>";
-
-// show the field job_Location
-
-		print "<td>".$langs->trans('JobLocation')." </td><td>";
-		if($edit==1){
-		print select_generic($db,'societe_address','label','name','rowid','description',$object->job_Location);
-		}else{
-		print print_generic($db,'societe_address','rowid',$object->job_Location,'label','name');
-		}
-		print "</td>";
-		print "\n</tr>\n";
-		print "<tr>\n";
-
-// show the field date_dpae
-
-		print "<td>".$langs->trans('Datedpae')." </td><td>";
-		if($edit==1){
-		if($new==1){
-			print $form->select_date(-1,'Datedpae');
-		}else{
-			print $form->select_date($object->date_dpae,'Datedpae');
-		}
-		}else{
-			print dol_print_date($object->date_dpae,'day');
-		}
-		print "</td>";
-
-// show the field date_medicalexam
-
-		print "<td>".$langs->trans('Datemedicalexam')." </td><td>";
-		if($edit==1){
-		if($new==1){
-			print $form->select_date(-1,'Datemedicalexam');
-		}else{
-			print $form->select_date($object->date_medicalexam,'Datemedicalexam');
-		}
-		}else{
-			print dol_print_date($object->date_medicalexam,'day');
-		}
-		print "</td>";
-		print "\n</tr>\n";
-		print "<tr>\n";
-
-// show the field date_sign_employee
-
-		print "<td>".$langs->trans('Datesignemployee')." </td><td>";
-		if($edit==1){
-		if($new==1){
-			print $form->select_date(-1,'Datesignemployee');
-		}else{
-			print $form->select_date($object->date_sign_employee,'Datesignemployee');
-		}
-		}else{
-			print dol_print_date($object->date_sign_employee,'day');
-		}
-		print "</td>";
-
-// show the field date_sign_management
-
-		print "<td>".$langs->trans('Datesignmanagement')." </td><td>";
-		if($edit==1){
-		if($new==1){
-			print $form->select_date(-1,'Datesignmanagement');
-		}else{
-			print $form->select_date($object->date_sign_management,'Datesignmanagement');
-		}
-		}else{
-			print dol_print_date($object->date_sign_management,'day');
-		}
-		print "</td>";
 		print "\n</tr>\n";
 		print "<tr>\n";
 
 // show the field description
 
-		print "<td>".$langs->trans('Description')." </td><td>";
+		print "<td class='fieldrequired'>".$langs->trans('Description')." </td><td>";
 		if($edit==1){
 			print '<input type="text" value="'.$object->description.'" name="Description">';
 		}else{
@@ -476,94 +351,56 @@ switch ($action) {
 		}
 		print "</td>";
 
-// show the field date_start_contract
+// show the field salary_method
 
-		print "<td>".$langs->trans('Datestartcontract')." </td><td>";
+		print "<td class='fieldrequired'>".$langs->trans('Salarymethod')." </td><td>";
 		if($edit==1){
-		if($new==1){
-			print $form->select_date(-1,'Datestartcontract');
+		print select_generic($db,'hr_salary_method','rowid','Salarymethod','rowid','description',$object->salary_method);
 		}else{
-			print $form->select_date($object->date_start_contract,'Datestartcontract');
-		}
-		}else{
-			print dol_print_date($object->date_start_contract,'day');
+		print print_generic($db,'hr_salary_method','rowid',$object->salary_method,'rowid','description');
 		}
 		print "</td>";
 		print "\n</tr>\n";
 		print "<tr>\n";
 
-// show the field date_end_contract
+// show the field linked_to
 
-		print "<td>".$langs->trans('Dateendcontract')." </td><td>";
+		print "<td class='fieldrequired'>".$langs->trans('Linkedto')." </td><td>";
 		if($edit==1){
-		if($new==1){
-			print $form->select_date(-1,'Dateendcontract');
+		if ($new==1)
+			print '<input type="text" value="salary_calc" name="Linkedto">';
+		else
+				print '<input type="text" value="'.$object->linked_to.'" name="Linkedto">';
 		}else{
-			print $form->select_date($object->date_end_contract,'Dateendcontract');
-		}
-		}else{
-			print dol_print_date($object->date_end_contract,'day');
-		}
-		print "</td>";
-
-// show the field base_rate
-
-		print "<td>".$langs->trans('Baserate')." </td><td>";
-		if($edit==1){
-			print '<input type="text" value="'.$object->base_rate.'" name="Baserate">';
-		}else{
-			print $object->base_rate;
-		}
-		print "</td>";
-		print "\n</tr>\n";
-		print "<tr>\n";
-
-// show the field reason
-
-		print "<td>".$langs->trans('Reason')." </td><td>";
-		if($edit==1){
-			print '<input type="text" value="'.$object->reason.'" name="Reason">';
-		}else{
-			print $object->reason;
+			print $object->linked_to;
 		}
 		print "</td>";
 
-// show the field sm_custom_field_1_value
+// show the field default_value
 
-		print "<td>".$langs->trans('Smcustomfield1value')." </td><td>";
+		print "<td>".$langs->trans('Defaultvalue')." </td><td>";
 		if($edit==1){
-			print '<input type="text" value="'.$object->sm_custom_field_1_value.'" name="Smcustomfield1value">';
+			print '<input type="text" value="'.$object->default_value.'" name="Defaultvalue">';
 		}else{
-			print $object->sm_custom_field_1_value;
+			print $object->default_value;
 		}
 		print "</td>";
 		print "\n</tr>\n";
-		print "<tr>\n";
-
-// show the field sm_custom_field_2_value
-
-		print "<td>".$langs->trans('Smcustomfield2value')." </td><td>";
-		if($edit==1){
-			print '<input type="text" value="'.$object->sm_custom_field_2_value.'" name="Smcustomfield2value">';
-		}else{
-			print $object->sm_custom_field_2_value;
-		}
-		print "</td>";
-		print "<td></td></tr>\n";
 
             
 
 	print '</table>'."\n";
 	print '<br>';
-	print '<div class="center">';
         if($edit==1){
-        if($new==1){
+            print '<div class="center">';
+            if($new==1){
                 print '<input type="submit" class="button" name="add" value="'.$langs->trans("Create").'">';
             }else{
                 print '<input type="submit" name="update" value="'.$langs->trans("Update").'" class="button">';
             }
-            print ' &nbsp; <input type="submit" class="button" name="cancel" value="'.$langs->trans("Cancel").'"></div>';
-            print '</form>';
+            print ' &nbsp; <input type="submit" class="button" name="cancel" value="'.$langs->trans("Cancel").'">';
+            print '</div> ,<!--center--> ';
+            print "</form>\n";
         }else{
             $parameters=array();
             $reshook=$hookmanager->executeHooks('addMoreActionsButtons',$parameters,$object,$action);    // Note that $action and $object may have been modified by hook
@@ -574,32 +411,35 @@ switch ($action) {
                 print '<div class="tabsAction">';
 
                 // Boutons d'actions
-                //if($user->rights->Hrcontract->edit)
+                //if($user->rights->Hrsalarycfdefs->edit)
                 //{
-                    print '<a href="'.$_SERVER["PHP_SELF"].'?id='.$id.'&action=edit" class="butAction">'.$langs->trans("Update").'</a>';
+                    print '<a href="'.$_SERVER["PHP_SELF"].'?id='.$_GET['id'].'&action=edit" class="butAction">'.$langs->trans("Update").'</a>';
                 //}
                 
-                //if ($user->rights->Hrcontract->delete)
+                //if ($user->rights->Hrsalarycfdefs->delete)
                 //{
-                    print '<a class="butActionDelete" href="'.$_SERVER["PHP_SELF"].'?id='.$id.'&action=delete">'.$langs->trans('Delete').'</a>';
+                    print '<a class="butActionDelete" href="'.$_SERVER["PHP_SELF"].'?id='.$_GET['id'].'&action=delete">'.$langs->trans('Delete').'</a>';
                 //}
                 //else
                 //{
                 //    print '<a class="butActionRefused" href="#" title="'.dol_escape_htmltag($langs->trans("NotAllowed")).'">'.$langs->trans('Delete').'</a>';
                 //}
                     
-                print '</div>';
+                print '</div> <!--tabaction-->';
             }
         }
         break;
+
     }
-        case 'viewinfo':
-        $head=Hrcontract_prepare_head($object);
-        dol_fiche_head($head,'info',$langs->trans("Hrcontract"),0,'emcontract@emcontract');            
+    case 'viewinfo':
+        //print_fiche_titre($langs->trans('Hrsalarycfdefs'));
+        $head=Hrsalarycfdefs_prepare_head($object);
+        dol_fiche_head($head,'info',$langs->trans("Hrsalarycfdefs"),0,'emcontract@emcontract');            
         print '<table width="100%"><tr><td>';
         dol_print_object_info($object);
         print '</td></tr></table>';
-        print '</div>';
+        //print '</div>';
+  
         break;
     case 'deletefile':
         $action='delete';
@@ -608,8 +448,11 @@ switch ($action) {
         if (! $sortfield) $sortfield="name";
 	$object->fetch_thirdparty();
 
-        $head=Hrcontract_prepare_head($object);
-        dol_fiche_head($head,'documents',$langs->trans("Hrcontract"),0,'emcontract@emcontract');            
+        //print_fiche_titre($langs->trans('Hrsalarycfdefs'));
+        print "\n<!--pre fiche-->/n";
+        $head=Hrsalarycfdefs_prepare_head($object);
+        
+        dol_fiche_head($head,'documents',$langs->trans("Hrsalarycfdefs"),0,'emcontract@emcontract');            
         
         $filearray=dol_dir_list($upload_dir,"files",0,'','\.meta$',$sortfield,(strtolower($sortorder)=='desc'?SORT_DESC:SORT_ASC),1);
 	$totalsize=0;
@@ -629,18 +472,18 @@ switch ($action) {
         print '<tr><td>'.$langs->trans("TotalSizeOfAttachedFiles").'</td><td colspan="3">'.$totalsize.' '.$langs->trans("bytes").'</td></tr>';
         print '</table>';
 
-        print '</div>';
+        //print '</div>';
 
         $modulepart = 'emcontract';
         $permission = $user->rights->emcontract->add;
         $param = '&id='.$object->id;
         include_once DOL_DOCUMENT_ROOT . '/core/tpl/document_actions_post_headers.tpl.php';
 
-        
+    
         break;
     case "delete";
         if( ($id>0 || $ref!="")){
-         $ret=$form->form_confirm($_SERVER["PHP_SELF"].'?action=confirm_delete&id='.$id,$langs->trans("DeleteHrcontract"),$langs->trans("ConfirmDelete"),"confirm_delete", '', 0, 1);
+         $ret=$form->form_confirm($_SERVER["PHP_SELF"].'?action=confirm_delete&id='.$id,$langs->trans("DeleteHrsalarycfdefs"),$langs->trans("ConfirmDelete"),"confirm_delete", '', 0, 1);
          if ($ret == 'html') print '<br />';
          //to have the object to be deleted in the background        
         }
@@ -650,46 +493,32 @@ switch ($action) {
     $sql = "SELECT";
     $sql.= " t.rowid,";
     
-		$sql.= " t.`ref`,";
-		$sql.= " t.fk_user,";
+		$sql.= " t.ref,";
 		$sql.= " t.entity,";
 		$sql.= " t.date_creation,";
 		$sql.= " t.date_modification,";
-		$sql.= " t.fk_contract_type,";
-		$sql.= " t.fk_job_type,";
-		$sql.= " t.fk_job_Location,";
-		$sql.= " t.date_dpae,";
-		$sql.= " t.date_medicalexam,";
-		$sql.= " t.date_sign_employee,";
-		$sql.= " t.date_sign_management,";
-		$sql.= " t.description,";
-		$sql.= " t.date_start_contract,";
-		$sql.= " t.date_end_contract,";
 		$sql.= " t.fk_user_creation,";
 		$sql.= " t.fk_user_modification,";
-		$sql.= " t.base_rate,";
-		$sql.= " t.reason,";
-		$sql.= " t.sm_custom_field_1_value,";
-		$sql.= " t.sm_custom_field_2_value";
+		$sql.= " t.description,";
+		$sql.= " t.fk_salary_method,";
+		$sql.= " t.linked_to,";
+		$sql.= " t.default_value";
 
     
-    $sql.= " FROM ".MAIN_DB_PREFIX."hr_contract as t";
+    $sql.= " FROM ".MAIN_DB_PREFIX."hr_salary_cf_defs as t";
 //    $sql.= " WHERE field3 = 'xxx'";
 //    $sql.= " ORDER BY field1 ASC";
     print '<table class="noborder">'."\n";
-    print "<tr class=\"liste_titre\">\n";
+    print '<tr class="liste_titre">';
     print_liste_field_titre($langs->trans('rowid'),$_SERVER['PHP_SELF'],'t.rowid','',$param,'',$sortfield,$sortorder);
-    print "\n";
-    print_liste_field_titre($langs->trans('ref'),$_SERVER['PHP_SELF'],'t.ref','',$param,'',$sortfield,$sortorder);
-    print "\n";
-    print_liste_field_titre($langs->trans('user'),$_SERVER['PHP_SELF'],'t.user','',$param,'',$sortfield,$sortorder);
-    print "\n";
-    print_liste_field_titre($langs->trans('entity'),$_SERVER['PHP_SELF'],'t.entity','',$param,'',$sortfield,$sortorder);
+print_liste_field_titre($langs->trans('ref'),$_SERVER['PHP_SELF'],'t.ref','',$param,'',$sortfield,$sortorder);
+print_liste_field_titre($langs->trans('entity'),$_SERVER['PHP_SELF'],'t.entity','',$param,'',$sortfield,$sortorder);
+print_liste_field_titre($langs->trans('date_creation'),$_SERVER['PHP_SELF'],'t.date_creation','',$param,'',$sortfield,$sortorder);
 
     
-    print "\n".'</tr>';
+    print '</tr>';
 
-    dol_syslog("Hrcontract:viewList", LOG_DEBUG);
+    dol_syslog($script_file, LOG_DEBUG);
     $resql=$db->query($sql);
     if ($resql)
     {
@@ -701,12 +530,11 @@ switch ($action) {
             if ($obj)
             {
                 // You can use here results
-                		print "<tr class=\"".(($i%2==0)?'pair':'impair')."\" >";
-		
-		print "<td>".$object->getNomUrl('',$obj->rowid,'',2)."</td>";
-		print "<td>".$object->getNomUrl($obj->ref,0,$obj->ref,0)."</td>";
-		print "<td>".print_generic($db,'user','rowid',$obj->fk_user,'firstname','lastname')."</td>";
+                print "<tr class=\"".(($i%2==0)?'pair':'impair')."\" >";
+		print "<td>".$obj->rowid."</td>";
+		print "<td>".$obj->ref."</td>";
 		print "<td>".$obj->entity."</td>";
+		print "<td>".dol_print_date($obj->date_creation,'day')."</td>";
 		print "</tr>";
 
                 
@@ -725,7 +553,8 @@ switch ($action) {
 }
         break;
 }
-dol_fiche_end();
+    print "<!-- ficheend-->";
+    dol_fiche_end();
 
 function reloadpage($backtopage,$id,$ref){
         if (!empty($backtopage)){
@@ -741,7 +570,7 @@ function reloadpage($backtopage,$id,$ref){
         }
 
 }
-function Hrcontract_prepare_head($object)
+function Hrsalarycfdefs_prepare_head($object)
 {
     global $langs, $conf, $user;
     $h = 0;

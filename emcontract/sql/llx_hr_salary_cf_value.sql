@@ -17,8 +17,17 @@
 -- ===================================================================
 -- HR Revision 0.1.0
 
-
-ALTER TABLE llx_hr_salary_steps 
-ADD FOREIGN KEY (fk_salary_method) REFERENCES llx_hr_salary_method(`ref`),
-ADD FOREIGN KEY (fk_user_creation) REFERENCES llx_user(rowid),
-ADD FOREIGN KEY (fk_user_modification) REFERENCES llx_user(rowid)
+-- custom fields value
+CREATE TABLE llx_hr_salary_cf_value
+(
+rowid                   integer NOT NULL AUTO_INCREMENT,
+entity	                integer DEFAULT 1 NOT NULL,		-- multi company id
+date_creation           DATETIME NOT NULL,
+date_modification	TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,                
+fk_user_creation        integer NOT NULL,
+fk_salary_cf_defs       VARCHAR(63), -- ref to the salary custom fields ref (id not used to be able to expor sm)
+apply_to	        VARCHAR(63), -- ref, depend of linked to: 'salary_method','contract'
+cf_value	        DECIMAL(16,4), -- 
+PRIMARY KEY (rowid)
+) 
+ENGINE=innodb;
